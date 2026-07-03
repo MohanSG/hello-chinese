@@ -5,38 +5,23 @@ import {
 } from "react-router-dom";
 
 import Home from "./pages/Home";
-import About from "./pages/About";
 import Book from "./pages/Book";
-import Contact from "./pages/Contact"
-import Chat from "./pages/Chat";
+import About from "./pages/About"
+import Classes from "./pages/Classes"
 
 function App() {
-
   return (
     <BrowserRouter>
       <Routes>
-        <Route
-          path="/"
-          element={<Home />}
-        />
-        <Route
-          path="/About"
-          element={<About />}
-        />
-        <Route
-          path="/Book"
-          element={<Book />}
-        />
-        <Route
-          path="/Contact"
-          element={<Contact />}
-        />
-      <Route
-        path="/Chat"
-        element={<Chat />}
-      />
-    </Routes>
-    </BrowserRouter >
+        <Route path="/" element={<Home />} />
+        <Route path="/About" element={<About />} />
+        <Route path="/Book" element={<Book />} />
+        <Route path="/Contact" element={<Home />} />
+        <Route path="/Chat" element={<Home />} />
+        <Route path="/Calendar" element={<Home />} />
+        <Route path="/Classes" element={<Classes />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
