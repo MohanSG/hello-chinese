@@ -2,7 +2,9 @@ version: "3.9"
 
 services:
   backend:
-    build: ./hello-chinese/api
+    build:
+      context: ./hello-chinese/api
+      dockerfile: Dockerfile.dev
     develop:
       watch:
         - action: "sync"
@@ -22,7 +24,9 @@ services:
       - ./hello-chinese/api/.env
 
   frontend:
-    build: ./hello-chinese/react-with-flask
+    build:
+      context: ./hello-chinese/react-with-flask
+      dockerfile: Dockerfile.dev
     develop:
       watch:
         - action: "sync"
