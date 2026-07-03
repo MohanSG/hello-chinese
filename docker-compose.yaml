@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./hello-chinese/api
+    develop:
+      watch:
+        - action: "sync"
+          path: "./hello-chinese/api"
+          target: /app
+          ignore:
+            - .venv/
+            - __pycache__/
+            - .pytest_cache
+            - .git/
+          initial_sync: true
+        - action: "rebuild"
+          path: ./hello-chinese/api/requirements.txt
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./hello-chinese/api/.env
+
+  frontend:
+    build: ./hello-chinese/react-with-flask
+    develop:
+      watch:
+        - action: "sync"
+          path: "./hello-chinese/react-with-flask"
+          target: /app
+          ignore:
+            - node_modules/
+            - dist/
+            - .git/
+          initial_sync: true
+        - action: "rebuild"
+          path: "./hello-chinese/react-with-flask/package.json"
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
