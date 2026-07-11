@@ -1,0 +1,41 @@
+.booking-form { background: var(--color-bg-alt); border: 1px solid var(--color-border-strong); border-radius: 18px; padding: clamp(22px, 3vw, 32px); box-shadow: 0 2px 10px rgba(42, 35, 27, .05); }
+
+.booking-form__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 24px; }
+.booking-form__head-left { display: flex; align-items: center; gap: 12px; }
+.booking-form__num { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 10px; background: var(--color-brand-tint); color: var(--color-brand); font-family: var(--font-serif); font-size: 17px; font-weight: 600; }
+.booking-form__title { font-family: var(--font-serif); font-weight: 600; font-size: 20px; margin: 0; color: var(--color-text); }
+
+.booking-form__remove {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-bg);
+  color: var(--color-text-mute);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all .2s;
+}
+.booking-form__remove:hover { background: var(--color-brand-tint); color: var(--color-brand); border-color: rgba(194, 58, 43, .3); }
+
+.booking-form__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 0; }
+.booking-form__field { display: flex; flex-direction: column; gap: 7px; }
+.booking-form__field--wide { grid-column: 1 / -1; }
+.booking-form__label { font-size: 13px; font-weight: 600; color: var(--color-text); }
+.booking-form__input {
+  padding: 13px 15px;
+  border-radius: 10px;
+  border: 1.5px solid var(--color-border-strong);
+  background: #f9f5ee;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--color-text);
+  outline: none;
+  width: 100%;
+  transition: border-color .2s;
+}
+.booking-form__input:focus { border-color: var(--color-brand); }
+
+.booking-form__price { display: flex; justify-content: flex-end; font-size: 14.5px; color: var(--color-text-soft); }
+.booking-form__price span { font-weight: 700; color: var(--color-text); margin-left: 6px; }

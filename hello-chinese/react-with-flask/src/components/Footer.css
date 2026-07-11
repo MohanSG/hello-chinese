@@ -1,0 +1,17 @@
+.footer { background: var(--color-dark-alt); color: var(--color-cream-text-soft); }
+.footer__grid { max-width: 1180px; margin: 0 auto; padding: 60px clamp(20px, 5vw, 56px) 30px; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
+
+.footer__brand { display: flex; align-items: center; gap: 11px; margin-bottom: 16px; }
+.footer__logo { width: 44px; height: 44px; border-radius: 999px; object-fit: cover; }
+.footer__brand-name { font-family: var(--font-serif); font-size: 20px; font-weight: 600; color: #fff; }
+.footer__blurb { font-size: 14.5px; line-height: 1.6; color: var(--color-cream-text-faint); margin: 0; max-width: 320px; }
+
+.footer__col { display: flex; flex-direction: column; gap: 11px; }
+.footer__col-head { font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--color-footer-head); margin-bottom: 4px; }
+.footer__link { font-size: 14.5px; color: var(--color-cream-text-soft); text-decoration: none; transition: color .2s; }
+.footer__link:hover { color: #fff; }
+.footer__text { font-size: 14.5px; color: var(--color-cream-text-faint); }
+
+.footer__bottom { border-top: 1px solid rgba(255, 255, 255, .1); }
+.footer__bottom-inner { max-width: 1180px; margin: 0 auto; padding: 20px clamp(20px, 5vw, 56px); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--color-footer-head); }
+.footer__zh { font-family: var(--font-zh); }

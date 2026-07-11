@@ -1,4 +1,7 @@
 import { useState } from "react";
+import "../styles/variables.css";
+import "../styles/shared.css";
+import "./Faq.css";
 
 const FAQS = [
   { q: "What ages do you teach?", a: "We teach children and teens aged 5 to 17, from complete beginners to advanced heritage speakers. Classes are grouped by both age and level." },
@@ -13,28 +16,23 @@ function Faq() {
   const [open, setOpen] = useState(0);
 
   return (
-    <section style={{ background: "#f6f1e8", fontFamily: "'Hanken Grotesk', system-ui, sans-serif" }}>
-      <div style={{ maxWidth: "840px", margin: "0 auto", padding: "clamp(64px,9vw,110px) clamp(20px,5vw,56px)" }}>
-        <div style={{ textAlign: "center", marginBottom: "48px" }}>
-          <div style={{ fontSize: "12.5px", fontWeight: 700, letterSpacing: "2.4px", color: "#c23a2b", textTransform: "uppercase", marginBottom: "16px" }}>FAQ</div>
-          <h2 style={{ fontFamily: "'Newsreader', serif", fontWeight: 600, fontSize: "clamp(30px,4vw,44px)", lineHeight: 1.12, letterSpacing: "-.6px", margin: 0, color: "#2a231b" }}>
-            Questions parents ask
-          </h2>
+    <section className="faq">
+      <div className="faq__container">
+        <div className="faq__head">
+          <div className="eyebrow">FAQ</div>
+          <h2 className="section-title">Questions parents ask</h2>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        <div className="faq__list">
           {FAQS.map((f, i) => {
             const isOpen = open === i;
             return (
-              <div key={i} style={{ background: "#fffdf8", border: "1px solid rgba(42,35,27,.08)", borderRadius: "14px", overflow: "hidden" }}>
-                <button
-                  onClick={() => setOpen(isOpen ? null : i)}
-                  style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", padding: "22px 24px", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}
-                >
-                  <span style={{ fontFamily: "'Hanken Grotesk', sans-serif", fontSize: "16.5px", fontWeight: 600, color: "#2a231b" }}>{f.q}</span>
-                  <span style={{ flex: "none", fontFamily: "'Newsreader', serif", fontSize: "26px", lineHeight: 1, color: "#c23a2b", transition: "transform .3s ease", transform: `rotate(${isOpen ? "45deg" : "0deg"})` }}>+</span>
+              <div key={i} className="faq__item">
+                <button className="faq__question" onClick={() => setOpen(isOpen ? null : i)}>
+                  <span className="faq__q-text">{f.q}</span>
+                  <span className={"faq__sign" + (isOpen ? " open" : "")}>+</span>
                 </button>
-                <div style={{ overflow: "hidden", transition: "max-height .4s ease, opacity .35s ease", maxHeight: isOpen ? "260px" : "0", opacity: isOpen ? 1 : 0 }}>
-                  <p style={{ margin: 0, padding: "0 24px 22px", fontSize: "15px", lineHeight: 1.65, color: "#6b6154" }}>{f.a}</p>
+                <div className={"faq__answer" + (isOpen ? " open" : "")}>
+                  <p className="faq__answer-text">{f.a}</p>
                 </div>
               </div>
             );
