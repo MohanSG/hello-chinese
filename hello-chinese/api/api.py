@@ -10,8 +10,15 @@ import os
 
 load_dotenv()
 
+allowed_origins = ["http://localhost:5173"]
+
+FRONTEND_URL = os.getenv("FRONTEND_URL")
+
+if FRONTEND_URL:
+    allowed_origins.append(FRONTEND_URL)
+
 app = Flask(__name__)
-CORS(app, origins=[os.getenv("VITE_API_URL")], supports_credentials=True)
+CORS(app, origins=allowed_origins, supports_credentials=True)
 
 app.config['MAIL_SERVER']= 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
