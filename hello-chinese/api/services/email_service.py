@@ -18,6 +18,7 @@ def send_email(payload):
                 <tr>
                     <th>Name</th>
                     <th>Age</th>
+                    <th>Phone</th>
                     <th>Class Type</th>
                     <th>Sessions</th>
                     <th>Preferred Dates</th>
@@ -30,6 +31,7 @@ def send_email(payload):
                 <tr>
                     <td>{student.get('name')}</td>
                     <td>{student.get('age')}</td>
+                    <td>{student.get('phone')}</td>
                     <td>{student.get('type')} Class</td>
                     <td>{student.get('sessions')} Sessions per week</td>
                     <td>{student.get('daysLabel')}</td>
@@ -67,7 +69,7 @@ def send_email(payload):
     subject = f"{payload.get('confirmationNumber')} - Hello Chinese Enrollment"
     recipients = payload.get('recipientEmail')
     recipients.append("hello.nihao.chinese@gmail.com")
-    
+
     msg = Message(
         subject,
         sender=current_app.config["MAIL_USERNAME"],
