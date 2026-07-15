@@ -39,3 +39,32 @@
 
 .booking-form__price { display: flex; justify-content: flex-end; font-size: 14.5px; color: var(--color-text-soft); }
 .booking-form__price span { font-weight: 700; color: var(--color-text); margin-left: 6px; }
+
+.booking-form__days-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.booking-form__label-note { font-weight: 500; color: var(--color-text-faint); }
+.booking-form__days-head-right { display: flex; align-items: center; gap: 10px; }
+.booking-form__days-count { font-size: 12.5px; color: var(--color-text-faint); }
+.booking-form__clear-dates { border: none; background: none; color: var(--color-brand); font-size: 12.5px; font-weight: 600; text-decoration: underline; cursor: pointer; padding: 0; }
+
+.booking-form__calendars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.booking-form__calendar { background: #f9f5ee; border: 1px solid var(--color-border-strong); border-radius: 12px; padding: 14px; }
+.booking-form__calendar-label { text-align: center; font-size: 12.5px; font-weight: 700; color: var(--color-text); margin-bottom: 10px; }
+.booking-form__calendar-dow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 6px; }
+.booking-form__calendar-dow-cell { text-align: center; font-size: 9.5px; font-weight: 700; color: var(--color-text-faint); }
+.booking-form__calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.booking-form__calendar-cell {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  padding: 0;
+  border: 1.5px solid var(--color-border-strong);
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+}
+.booking-form__calendar-cell:hover:not(:disabled) { border-color: var(--color-brand); }
+.booking-form__calendar-cell--empty { background: transparent; border-color: transparent; color: transparent; cursor: default; }
+.booking-form__calendar-cell--selected { background: var(--color-brand); border-color: var(--color-brand); color: #fff; }

@@ -8,10 +8,57 @@ export const TYPE_LABELS = {
   Math: "Math Lessons",
   "Chinese and Math": "Chinese + Math Combo",
 };
+export const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+export const MONTH_NAMES_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+export const DOW_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
+
+function formatDateKey(d) {
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+export function formatDateShort(dateStr) {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return `${MONTH_NAMES_SHORT[m - 1]} ${d}`;
+}
+function buildMonths(selectedDates) {
+  const selectedSet = new Set(selectedDates || []);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const months = [];
+  for (let m = 0; m < 3; m++) {
+    const first = new Date(today.getFullYear(), today.getMonth() + m, 1);
+    const year = first.getFullYear(), monthIdx = first.getMonth();
+    const label = `${MONTH_NAMES[monthIdx]} ${year}`;
+    const firstDow = first.getDay();
+    const daysInMonth = new Date(year, monthIdx + 1, 0).getDate();
+    const cells = [];
+    for (let i = 0; i < firstDow; i++) cells.push({ key: `b${i}`, day: null });
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateObj = new Date(year, monthIdx, day);
+      const dateStr = formatDateKey(dateObj);
+      cells.push({ key: dateStr, day, dateStr, isPast: dateObj < today, selected: selectedSet.has(dateStr) });
+    }
+    while (cells.length % 7 !== 0) cells.push({ key: `e${cells.length}`, day: null });
+    months.push({ label, cells });
+  }
+  return months;
+}
 
 function BookingForm({ id, num, onRemove, updateForm }) {
   const [selectedClass, setSelectedClass] = useState("");
+  const [selectedDates, setSelectedDates] = useState([]);
   const price = PRICES[selectedClass];
+  const months = buildMonths(selectedDates);
+
+  const toggleDate = (dateStr) => {
+    const next = selectedDates.includes(dateStr) ? selectedDates.filter((d) => d !== dateStr) : [...selectedDates, dateStr];
+    setSelectedDates(next);
+    updateForm(id, "selectedDates", next);
+  };
+  const clearDates = () => {
+    setSelectedDates([]);
+    updateForm(id, "selectedDates", []);
+  };
 
   return (
     <div className="booking-form">
@@ -70,6 +117,42 @@ function BookingForm({ id, num, onRemove, updateForm }) {
             </select>
           </label>
         )}
+        <div className="booking-form__field booking-form__field--wide">
+          <div className="booking-form__days-head">
+            <span className="booking-form__label">Preferred dates to attend <span className="booking-form__label-note">(select any dates in the next 3 months)</span></span>
+            <div className="booking-form__days-head-right">
+              <span className="booking-form__days-count">{selectedDates.length} date{selectedDates.length === 1 ? "" : "s"} selected</span>
+              {selectedDates.length > 0 && (
+                <button type="button" className="booking-form__clear-dates" onClick={clearDates}>clear</button>
+              )}
+            </div>
+          </div>
+          <div className="booking-form__calendars">
+            {months.map((month, mi) => (
+              <div className="booking-form__calendar" key={mi}>
+                <div className="booking-form__calendar-label">{month.label}</div>
+                <div className="booking-form__calendar-dow">
+                  {DOW_LABELS.map((d, di) => (
+                    <div className="booking-form__calendar-dow-cell" key={di}>{d}</div>
+                  ))}
+                </div>
+                <div className="booking-form__calendar-grid">
+                  {month.cells.map((cell) => (
+                    <button
+                      type="button"
+                      key={cell.key}
+                      disabled={cell.day == null || cell.isPast}
+                      className={`booking-form__calendar-cell${cell.day == null || cell.isPast ? " booking-form__calendar-cell--empty" : ""}${cell.selected ? " booking-form__calendar-cell--selected" : ""}`}
+                      onClick={cell.day != null && !cell.isPast ? () => toggleDate(cell.dateStr) : undefined}
+                    >
+                      {cell.day || ""}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
         {price != null && (
           <div className="booking-form__price booking-form__field--wide">
             Monthly price: <span>${price}/mo</span>

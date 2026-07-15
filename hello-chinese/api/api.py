@@ -4,6 +4,7 @@ from flask_cors import CORS
 from openai import OpenAI
 from dotenv import load_dotenv
 from extensions import mail
+import json
 from services.email_service import send_email
 import os
 
@@ -25,28 +26,17 @@ client = OpenAI(
     api_key=os.getenv("OPENAI_API")
 )
 
-@app.route("/about", methods=["POST"])
-def about():
-    data = request.get_json()
-
 @app.route("/send-test-email", methods=['POST'])
 def send_test_email():
     data = request.get_json();
+    payload = data.get('msg')
 
-    subject = data.get('subject')
-    recipient = data.get('recipient')
-    msg = data.get('msg')
-
-    if not recipient:
-        return jsonify({'error' : 'recipient is requred'}), 400
+    print(payload)
     
-    if not subject:
-        return jsonify({'error' : 'subject is requred'}), 400
+    if not payload:
+        return jsonify({'error' : 'payload is requred'}), 400
     
-    if not msg:
-        return jsonify({'error' : 'message is requred'}), 400
-    
-    send_email(subject, recipient, msg)
+    send_email(payload)
 
     return jsonify({'message' : 'Email Sent'})
 

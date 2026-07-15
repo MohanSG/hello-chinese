@@ -2,7 +2,7 @@ import { useState } from "react";
 import { apiRequest } from "../api/client";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
-import BookingForm, { PRICES, TYPE_LABELS } from "../components/BookingForm";
+import BookingForm, { PRICES, TYPE_LABELS, formatDateShort } from "../components/BookingForm";
 import "../styles/variables.css";
 import "../styles/shared.css";
 import "./Book.css";
@@ -16,19 +16,22 @@ function Book() {
   const Form = BookingForm;
   const [emailStatus, setEmailStatus] = useState("");
   const [formList, setFormList] = useState([
-    { email: "", id: Date.now(), firstName: "", lastName: "", age: "", phone: "", type: "", sessions: "" },
+    { email: "", id: Date.now(), firstName: "", lastName: "", age: "", phone: "", type: "", sessions: "", selectedDates: [] },
   ]);
   const [couponInput, setCouponInput] = useState("");
   const [couponApplied, setCouponApplied] = useState(null); // { code, type, value, label }
   const [couponError, setCouponError] = useState("");
+  const [paymentPlan, setPaymentPlan] = useState("monthly"); // "monthly" | "full"
+  const FULL_PLAN_DISCOUNT = 0.05;
   const [confirmation, setConfirmation] = useState(null); // { name, number, students, subtotal, discount, total, couponCode }
+  const [emailPayload, setEmailPayload] = useState(null); // data to send in the confirmation email
 
   const updateForm = (id, field, value) => {
     setFormList(formList.map((form) => (form.id === id ? { ...form, [field]: value } : form)));
   };
 
   function AddStudent() {
-    const newForm = { email: "", id: Date.now(), firstName: "", lastName: "", age: "", phone: "", type: "", sessions: "" };
+    const newForm = { email: "", id: Date.now(), firstName: "", lastName: "", age: "", phone: "", type: "", sessions: "", selectedDates: [] };
     setFormList([...formList, newForm]);
   }
 
@@ -43,7 +46,10 @@ function Book() {
     discount = couponApplied.type === "percent" ? Math.round((subtotal * couponApplied.value) / 100) : couponApplied.value;
     discount = Math.min(discount, subtotal);
   }
-  const total = subtotal - discount;
+  const monthlyTotal = subtotal - discount;
+  const isFullPlan = paymentPlan === "full";
+  const fullSavings = isFullPlan ? Math.round(monthlyTotal * 12 * FULL_PLAN_DISCOUNT) : 0;
+  const total = isFullPlan ? monthlyTotal * 12 - fullSavings : monthlyTotal;
 
   const applyCoupon = () => {
     const code = couponInput.trim().toUpperCase();
@@ -65,25 +71,55 @@ function Book() {
     setCouponError("");
   };
 
+  const getRecipientEmails = () => {
+    return [...new Set(pricedStudents.map((s) => s.email).filter(Boolean))];
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (pricedStudents.length === 0) return;
+    const number = "HC-" + Math.floor(100000 + Math.random() * 900000);
+    const students = pricedStudents.map((s, i) => ({
+      firstName: s.firstName,
+      lastName: s.lastName,
+      age: s.age,
+      phone: s.phone,
+      type: s.type,
+      sessions: s.sessions,
+      selectedDates: s.selectedDates || [],
+      name: s.firstName || s.lastName ? `${s.firstName} ${s.lastName}`.trim() : `Student ${i + 1}`,
+      typeLabel: TYPE_LABELS[s.type],
+      priceLabel: `$${PRICES[s.type]}/mo`,
+      daysLabel: s.selectedDates && s.selectedDates.length ? [...s.selectedDates].sort().map((d) => formatDateShort(d)).join(", ") : "No dates selected",
+    }));
+    const payload = {
+      parentName: pricedStudents[0].firstName || "there",
+      confirmationNumber: number,
+      recipientEmail: getRecipientEmails(),
+      students,
+      paymentPlan: isFullPlan ? "full" : "monthly",
+      subtotal,
+      couponCode: couponApplied ? couponApplied.code : null,
+      discount,
+      fullSavings,
+      total,
+      totalDueLabel: isFullPlan ? `$${total} due today` : `$${total}/mo`,
+    };
+    setEmailPayload(payload);
     try {
       await apiRequest("/send-test-email", {
         method: "POST",
-        body: JSON.stringify({ subject: "Test subject", recipient: "mohansg12@gmail.com", msg: formList }),
+        body: JSON.stringify({ subject: "Test subject", recipient: "mohansg12@gmail.com", msg: payload }),
       });
       setEmailStatus("Sent!");
       setConfirmation({
         name: pricedStudents[0].firstName || "there",
-        number: "HC-" + Math.floor(100000 + Math.random() * 900000),
-        students: pricedStudents.map((s, i) => ({
-          name: s.firstName || s.lastName ? `${s.firstName} ${s.lastName}`.trim() : `Student ${i + 1}`,
-          typeLabel: TYPE_LABELS[s.type],
-          priceLabel: `$${PRICES[s.type]}/mo`,
-        })),
+        number,
+        students,
         subtotal,
         discount,
+        isFullPlan,
+        fullSavings,
         total,
         couponCode: couponApplied ? couponApplied.code : null,
       });
@@ -93,10 +129,11 @@ function Book() {
   };
 
   const startOver = () => {
-    setFormList([{ email: "", id: Date.now(), firstName: "", lastName: "", age: "", phone: "", type: "", sessions: "" }]);
+    setFormList([{ email: "", id: Date.now(), firstName: "", lastName: "", age: "", phone: "", type: "", sessions: "", selectedDates: [] }]);
     setCouponInput("");
     setCouponApplied(null);
     setCouponError("");
+    setPaymentPlan("monthly");
     setEmailStatus("");
     setConfirmation(null);
   };
@@ -131,6 +168,7 @@ function Book() {
                   <div>
                     <div className="book-summary__student-name">{s.name}</div>
                     <div className="book-summary__student-type">{s.typeLabel}</div>
+                    <div className="book-summary__student-days">Days: {s.daysLabel}</div>
                   </div>
                   <div className="book-summary__student-price">{s.priceLabel}</div>
                 </div>
@@ -138,15 +176,20 @@ function Book() {
             </div>
             <div className="book-summary__totals">
               <div className="book-summary__row">
-                <span>Subtotal</span><span>${confirmation.subtotal}/mo</span>
+                <span>Subtotal</span><span>{confirmation.isFullPlan ? `$${confirmation.subtotal * 12}/yr` : `$${confirmation.subtotal}/mo`}</span>
               </div>
               {confirmation.couponCode && (
                 <div className="book-summary__row book-summary__row--discount">
-                  <span>Coupon ({confirmation.couponCode})</span><span>−${confirmation.discount}/mo</span>
+                  <span>Coupon ({confirmation.couponCode})</span><span>−{confirmation.isFullPlan ? `$${confirmation.discount * 12}/yr` : `$${confirmation.discount}/mo`}</span>
+                </div>
+              )}
+              {confirmation.isFullPlan && (
+                <div className="book-summary__row book-summary__row--discount">
+                  <span>Pay-in-full savings (5%)</span><span>−${confirmation.fullSavings}</span>
                 </div>
               )}
               <div className="book-summary__row book-summary__row--total">
-                <span>Total due monthly</span><span>${confirmation.total}/mo</span>
+                <span>{confirmation.isFullPlan ? "Total due today" : "Total due monthly"}</span><span>{confirmation.isFullPlan ? `$${confirmation.total}` : `$${confirmation.total}/mo`}</span>
               </div>
             </div>
           </div>
@@ -240,10 +283,18 @@ function Book() {
               <div className="book-summary__lines">
                 {pricedStudents.map((s, i) => (
                   <div className="book-summary__row" key={s.id}>
-                    <span>{(s.firstName || s.lastName) ? `${s.firstName} ${s.lastName}`.trim() : `Student ${i + 1}`} — {TYPE_LABELS[s.type]}</span>
+                    <span>{(s.firstName || s.lastName) ? `${s.firstName} ${s.lastName}`.trim() : `Student ${i + 1}`} — {TYPE_LABELS[s.type]}{s.selectedDates && s.selectedDates.length ? ` (${s.selectedDates.length} date${s.selectedDates.length === 1 ? "" : "s"})` : ""}</span>
                     <span className="book-summary__row-price">${PRICES[s.type]}/mo</span>
                   </div>
                 ))}
+              </div>
+
+              <div className="book-plan">
+                <span className="book-plan__label">Payment plan</span>
+                <div className="book-plan__options">
+                  <button type="button" className={`book-plan__btn${!isFullPlan ? " book-plan__btn--active" : ""}`} onClick={() => setPaymentPlan("monthly")}>Pay monthly</button>
+                  <button type="button" className={`book-plan__btn${isFullPlan ? " book-plan__btn--active" : ""}`} onClick={() => setPaymentPlan("full")}>Pay in full <span className="book-plan__note">(save 5%)</span></button>
+                </div>
               </div>
 
               <div className="book-coupon">
@@ -265,12 +316,15 @@ function Book() {
               </div>
 
               <div className="book-summary__totals">
-                <div className="book-summary__row"><span>Subtotal</span><span>${subtotal}/mo</span></div>
+                <div className="book-summary__row"><span>Subtotal</span><span>{isFullPlan ? `$${subtotal * 12}/yr` : `$${subtotal}/mo`}</span></div>
                 {couponApplied && (
-                  <div className="book-summary__row book-summary__row--discount"><span>Discount</span><span>−${discount}/mo</span></div>
+                  <div className="book-summary__row book-summary__row--discount"><span>Discount</span><span>−{isFullPlan ? `$${discount * 12}/yr` : `$${discount}/mo`}</span></div>
+                )}
+                {isFullPlan && (
+                  <div className="book-summary__row book-summary__row--discount"><span>Pay-in-full savings (5%)</span><span>−${fullSavings}</span></div>
                 )}
                 <div className="book-summary__row book-summary__row--total">
-                  <span>Total due monthly</span><span>${total}/mo</span>
+                  <span>{isFullPlan ? "Total due today" : "Total due monthly"}</span><span>{isFullPlan ? `$${total}` : `$${total}/mo`}</span>
                 </div>
               </div>
             </div>
