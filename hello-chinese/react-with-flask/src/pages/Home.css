@@ -1,16 +1,24 @@
 .home { background: var(--color-bg); overflow-x: hidden; }
 
+/* at a glance */
+.glance-strip { background: var(--color-bg-alt); border-bottom: 1px solid var(--color-border); }
+.glance-strip__inner { max-width: 1180px; margin: 0 auto; padding: clamp(36px, 5vw, 52px) clamp(20px, 5vw, 56px); display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.glance { display: flex; flex-direction: column; gap: 6px; }
+.glance__label { font-size: 12px; font-weight: 700; letter-spacing: 1.6px; color: var(--color-brand); text-transform: uppercase; }
+.glance__value { font-family: var(--font-serif); font-size: 21px; font-weight: 600; color: var(--color-text); }
+
 /* who we are */
 .home-about { background: var(--color-bg-alt); }
 .home-about__grid { max-width: 1180px; margin: 0 auto; padding: clamp(64px, 9vw, 110px) clamp(20px, 5vw, 56px); display: grid; grid-template-columns: 1fr 1fr; gap: clamp(40px, 6vw, 80px); align-items: center; }
 .home-about__photo-wrap { position: relative; }
 .home-about__photo { aspect-ratio: 4 / 5; background-image: repeating-linear-gradient(135deg, var(--tan-1) 0 22px, var(--tan-2) 22px 44px); }
-.home-about__badge { position: absolute; bottom: -26px; left: -26px; background: var(--color-brand); color: #fff; border-radius: 16px; padding: 18px 22px; box-shadow: 0 14px 34px rgba(194, 58, 43, .32); }
+.home-about__badge { position: absolute; bottom: -26px; left: -26px; background: var(--color-brand); color: #fff; border-radius: 16px; padding: 18px 22px; box-shadow: 0 14px 34px rgba(167, 38, 32, .32); }
 .home-about__badge-zh { font-family: var(--font-zh); font-size: 24px; font-weight: 600; line-height: 1; }
 .home-about__badge-text { font-size: 12px; margin-top: 4px; color: rgba(255, 255, 255, .9); }
 .home-about__title { font-family: var(--font-serif); font-weight: 600; font-size: clamp(30px, 4vw, 44px); line-height: 1.12; letter-spacing: -.6px; margin: 0 0 22px; color: var(--color-text); }
 .home-about__p { font-size: 17px; line-height: 1.7; color: var(--color-text-soft); margin: 0 0 18px; }
 .home-about__zh-inline { font-family: var(--font-zh); color: var(--color-brand); font-weight: 600; }
+.home-about__teacher-standard { font-size: 15.5px; line-height: 1.65; color: var(--color-text-mute); margin: 0 0 26px; padding: 18px 20px; background: var(--color-bg); border-radius: 12px; border-left: 3px solid var(--color-gold); }
 .home-about__facts { display: flex; flex-wrap: wrap; gap: 22px; }
 .home-about__fact { display: flex; align-items: center; gap: 11px; }
 .home-about__fact-dot { width: 9px; height: 9px; border-radius: 999px; background: var(--color-brand); }
@@ -23,7 +31,7 @@
 .home-philosophy__lede { font-size: 17px; line-height: 1.7; color: var(--color-text-soft); margin: 0; }
 .home-philosophy__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .home-pillar { background: var(--color-bg-alt); border: 1px solid var(--color-border); border-radius: 18px; padding: 30px 26px; transition: all .25s; }
-.home-pillar:hover { transform: translateY(-5px); box-shadow: 0 20px 44px rgba(42, 35, 27, .1); }
+.home-pillar:hover { transform: translateY(-5px); box-shadow: 0 20px 44px rgba(32, 32, 31, .1); }
 .home-pillar__icon-wrap { width: 56px; height: 56px; border-radius: 14px; background: var(--color-brand-tint); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
 .home-pillar__icon { width: 30px; height: 30px; object-fit: contain; }
 .home-pillar__title { font-family: var(--font-serif); font-weight: 600; font-size: 20px; line-height: 1.2; margin: 0 0 10px; color: var(--color-text); }
@@ -36,30 +44,22 @@
 .home-offers__lede { font-size: 17px; line-height: 1.7; color: var(--color-text-soft); margin: 0; }
 .home-offers__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: stretch; }
 
-.offer-card { position: relative; display: flex; flex-direction: column; border-radius: 22px; padding: 34px 30px; background: var(--color-bg-alt); border: 1px solid rgba(42, 35, 27, .1); }
-.offer-card.popular { background: var(--color-dark); border: 1px solid var(--color-dark); box-shadow: 0 30px 60px rgba(36, 29, 22, .28); }
+.offer-card { position: relative; display: flex; flex-direction: column; border-radius: 22px; padding: 34px 30px; background: var(--color-bg-alt); border: 1px solid rgba(32, 32, 31, .1); }
+.offer-card.popular { border: 1.5px solid var(--color-brand); box-shadow: 0 20px 44px rgba(167, 38, 32, .12); }
 .offer-card__badge { position: absolute; top: 18px; right: 18px; background: var(--color-brand); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 6px 12px; border-radius: 999px; }
 .offer-card__zh { font-family: var(--font-zh); font-size: 26px; font-weight: 600; color: var(--color-brand); margin-bottom: 14px; }
-.offer-card.popular .offer-card__zh { color: var(--color-brand-light); }
 .offer-card__name { font-family: var(--font-serif); font-weight: 600; font-size: 24px; margin: 0 0 6px; color: var(--color-text); }
-.offer-card.popular .offer-card__name { color: #fff; }
 .offer-card__blurb { font-size: 14px; line-height: 1.55; margin: 0 0 22px; color: var(--color-text-mute); }
-.offer-card.popular .offer-card__blurb { color: var(--color-cream-text-soft); }
 .offer-card__price-row { display: flex; align-items: baseline; gap: 6px; margin-bottom: 4px; }
 .offer-card__price { font-family: var(--font-serif); font-size: 44px; font-weight: 600; color: var(--color-text); }
-.offer-card.popular .offer-card__price { color: #fff; }
 .offer-card__per { font-size: 15px; font-weight: 500; color: var(--color-text-faint); }
-.offer-card.popular .offer-card__per { color: var(--color-cream-text-faint); }
 .offer-card__save { font-size: 13px; font-weight: 600; color: var(--color-green); margin-bottom: 24px; min-height: 18px; }
-.offer-card.popular .offer-card__save { color: var(--color-brand-light); }
 .offer-card__features { display: flex; flex-direction: column; gap: 13px; margin-bottom: 28px; }
 .offer-card__feature { display: flex; align-items: flex-start; gap: 11px; }
 .offer-card__check { flex: none; margin-top: 2px; width: 18px; height: 18px; border-radius: 999px; background: var(--color-brand-tint); color: var(--color-brand); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; }
-.offer-card.popular .offer-card__check { background: var(--color-brand); color: #fff; }
 .offer-card__feature-text { font-size: 14.5px; line-height: 1.45; color: #4a4238; }
-.offer-card.popular .offer-card__feature-text { color: var(--color-cream-text); }
 .offer-card__btn { display: block; text-align: center; margin-top: auto; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 700; text-decoration: none; background: var(--color-text); color: #fff; transition: all .2s; }
-.offer-card.popular .offer-card__btn { background: var(--color-brand); box-shadow: 0 8px 20px rgba(194, 58, 43, .35); }
+.offer-card.popular .offer-card__btn { background: var(--color-brand); box-shadow: 0 8px 20px rgba(167, 38, 32, .35); }
 .offer-card__btn:hover { color: #fff; opacity: .92; }
 
 .home-offers__foot { text-align: center; font-size: 14px; color: var(--color-text-faint); margin: 30px 0 0; }
@@ -67,7 +67,7 @@
 
 /* trial band */
 .home-trial { background: var(--color-dark); position: relative; overflow: hidden; }
-.home-trial__watermark { position: absolute; top: -80px; right: -40px; font-family: var(--font-zh); font-size: 340px; line-height: 1; color: rgba(194, 58, 43, .14); font-weight: 700; pointer-events: none; user-select: none; }
+.home-trial__watermark { position: absolute; top: -80px; right: -40px; font-family: var(--font-zh); font-size: 340px; line-height: 1; color: rgba(167, 38, 32, .14); font-weight: 700; pointer-events: none; user-select: none; }
 .home-trial__grid { position: relative; max-width: 1180px; margin: 0 auto; padding: clamp(60px, 8vw, 96px) clamp(20px, 5vw, 56px); display: grid; grid-template-columns: 1.4fr 1fr; gap: 56px; align-items: center; }
 .home-trial__title { font-family: var(--font-serif); font-weight: 600; font-size: clamp(32px, 4.5vw, 50px); line-height: 1.08; letter-spacing: -.8px; margin: 0 0 20px; color: #fff; }
 .home-trial__desc { font-size: 17.5px; line-height: 1.65; color: var(--color-cream-text-soft); margin: 0 0 30px; max-width: 520px; }

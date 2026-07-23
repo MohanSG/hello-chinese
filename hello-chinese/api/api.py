@@ -4,7 +4,6 @@ from flask_cors import CORS
 from openai import OpenAI
 from dotenv import load_dotenv
 from extensions import mail
-import json
 from services.email_service import send_email
 import os
 
@@ -28,6 +27,14 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 
 mail = Mail(app)
+
+app.logger.info(
+    "Mail config: server=%s port=%s username_set=%s password_set=%s",
+    app.config["MAIL_SERVER"],
+    app.config["MAIL_PORT"],
+    bool(app.config["MAIL_USERNAME"]),
+    bool(app.config["MAIL_PASSWORD"]),
+)
 
 client = OpenAI(
     api_key=os.getenv("OPENAI_API")

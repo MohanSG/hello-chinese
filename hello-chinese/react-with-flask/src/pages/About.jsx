@@ -30,7 +30,7 @@ function About() {
         <div className="about-header__watermark">我们</div>
         <div className="about-header__inner">
           <div className="eyebrow eyebrow--light">Our story</div>
-          <h1 className="about-header__title">About Hello Chinese</h1>
+          <h1 className="about-header__title">About HelloChinese</h1>
           <p className="about-header__desc">
             We're a small team of teachers on a simple mission: help American kids grow up genuinely bilingual — with warmth, patience, and a lot of conversation.
           </p>
@@ -53,7 +53,7 @@ function About() {
             <div className="eyebrow">How we started</div>
             <h2 className="about-story__title">It began at a kitchen table.</h2>
             <p className="about-story__p">
-              Hello Chinese started when a handful of parents asked one teacher to help their kids learn Mandarin the way children actually learn a language — by speaking it, playing with it, and hearing it every week.
+              HelloChinese started when a handful of parents asked one teacher to help their kids learn Mandarin the way children actually learn a language — by speaking it, playing with it, and hearing it every week.
             </p>
             <p className="about-story__p">
               Those first lessons around a kitchen table grew into a school. Today we teach over a thousand students across the country, online and in person, but the philosophy hasn't changed: keep classes small, keep them warm, and let confidence lead.

@@ -1,26 +1,26 @@
 /* HelloChinese — design tokens + global reset.
    Import once, at the app root (App.jsx already does this). */
 
-@import url("https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@500;600;700&display=swap");
 
 :root {
-  --font-serif: 'Newsreader', serif;
-  --font-sans: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
   --font-zh: 'Noto Serif SC', serif;
   --font-mono: ui-monospace, Menlo, monospace;
 
-  --color-bg: #f6f1e8;
+  --color-bg: #f7f1e7;
   --color-bg-alt: #fffdf8;
   --color-dark: #241d16;
   --color-dark-alt: #1c1710;
 
-  --color-text: #2a231b;
+  --color-text: #20201f;
   --color-text-soft: #5b5348;
   --color-text-mute: #6b6154;
   --color-text-faint: #948977;
 
-  --color-brand: #c23a2b;
-  --color-brand-dark: #a02f22;
+  --color-brand: #a72620;
+  --color-brand-dark: #8a1f1a;
   --color-brand-light: #e08a7c;
   --color-brand-tint: #f6e7e1;
 
@@ -30,9 +30,10 @@
   --color-cream-text-faint: #a89c8a;
 
   --color-footer-head: #7d7263;
-  --color-border: rgba(42, 35, 27, .09);
-  --color-border-strong: rgba(42, 35, 27, .14);
+  --color-border: rgba(32, 32, 31, .09);
+  --color-border-strong: rgba(32, 32, 31, .14);
   --color-green: #3f7d6e;
+  --color-gold: #c6a15b;
 
   --tan-1: #efe3d0;
   --tan-2: #e7d9c2;

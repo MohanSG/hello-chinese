@@ -2,11 +2,16 @@ import { useState } from "react";
 import "../styles/variables.css";
 import "./BookingForm.css";
 
-export const PRICES = { Chinese: 180, Math: 160, "Chinese and Math": 300 };
+export const PRICES = { "Step-In": 40, "Step-Up": 40, "Step-Beyond": 40, Tutoring: 20, "Math Enrichment": 40, "Private Chinese": 40 };
+export const PRICE_UNITS = { Tutoring: "hour" };
+export function unitFor(type) { return PRICE_UNITS[type] || "session"; }
 export const TYPE_LABELS = {
-  Chinese: "Chinese Lessons",
-  Math: "Math Lessons",
-  "Chinese and Math": "Chinese + Math Combo",
+  "Step-In": "Step-In",
+  "Step-Up": "Step-Up",
+  "Step-Beyond": "Step-Beyond",
+  Tutoring: "Tutoring",
+  "Math Enrichment": "Math Enrichment",
+  "Private Chinese": "Private Chinese Lessons",
 };
 export const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 export const MONTH_NAMES_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -101,10 +106,13 @@ function BookingForm({ id, num, onRemove, updateForm }) {
               setSelectedClass(e.target.value);
             }}
           >
-            <option disabled value="">Select Lesson Type</option>
-            <option value="Chinese">Chinese Lessons — $180/mo</option>
-            <option value="Math">Math Lessons — $160/mo</option>
-            <option value="Chinese and Math">Chinese and Math Lessons — $300/mo</option>
+            <option disabled value="">Select a program</option>
+            <option value="Step-In">Step-In (ages 3–6) — $40/session</option>
+            <option value="Step-Up">Step-Up (ages 6–10) — $40/session</option>
+            <option value="Step-Beyond">Step-Beyond (ages 10+) — $40/session</option>
+            <option value="Tutoring">Tutoring — $20/hour</option>
+            <option value="Math Enrichment">Math Enrichment — $40/session</option>
+            <option value="Private Chinese">Private Chinese Lessons — from $40/session</option>
           </select>
         </label>
         {selectedClass && (
@@ -155,7 +163,7 @@ function BookingForm({ id, num, onRemove, updateForm }) {
         </div>
         {price != null && (
           <div className="booking-form__price booking-form__field--wide">
-            Monthly price: <span>${price}/mo</span>
+            Price: <span>${price}/{unitFor(selectedClass)}</span>
           </div>
         )}
       </form>

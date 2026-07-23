@@ -26,6 +26,7 @@ function Contact() {
               ["✉", "Email", "hello@hellochinese.com"],
               ["☏", "Phone", "(800) 555-1234"],
               ["◷", "Hours", "Mon–Sat · 9am–7pm"],
+              ["📍", "Location", "The Yard (Eastern Market), 700 Pennsylvania Ave. SE, Washington, DC 20003"],
             ].map(([icon, label, value]) => (
               <div key={label} className="contact__info-row">
                 <span className="contact__info-icon">{icon}</span>
@@ -53,10 +54,12 @@ function Contact() {
                 <span className="contact__label">Program of interest</span>
                 <select required name="program" className="contact__input" defaultValue="">
                   <option value="" disabled>Select a program…</option>
-                  <option>Mandarin Chinese</option>
-                  <option>Math</option>
-                  <option>Math + Chinese Combo</option>
-                  <option>1-on-1 tutoring</option>
+                  <option>Step-In</option>
+                  <option>Step-Up</option>
+                  <option>Step-Beyond</option>
+                  <option>Tutoring</option>
+                  <option>Math Enrichment</option>
+                  <option>Private Chinese Lessons</option>
                   <option>Not sure yet</option>
                 </select>
               </label>
@@ -71,9 +74,20 @@ function Contact() {
               <div className="contact__success-check">✓</div>
               <div className="contact__success-zh">谢谢!</div>
               <h3 className="contact__success-title">Thank you — message received.</h3>
-              <p className="contact__success-body">
-                We'll be in touch within one business day with class options and trial times for your child.
-              </p>
+              <p className="contact__success-lede">Here's what happens next:</p>
+              <div className="contact__success-steps">
+                {[
+                  "We review your child's age, experience, and goals to recommend a level.",
+                  "We reply within one business day with a placement recommendation and trial times.",
+                  "You pick a free trial date — no payment, no commitment.",
+                  "After the trial, you decide whether to enroll — no pressure either way.",
+                ].map((step, i) => (
+                  <div key={i} className="contact__success-step">
+                    <span className="contact__success-step-num">{i + 1}</span>
+                    <span className="contact__success-step-text">{step}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

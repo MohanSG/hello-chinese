@@ -1,0 +1,29 @@
+.culture { background: var(--color-bg); }
+
+.culture-header { background: var(--color-dark); position: relative; overflow: hidden; }
+.culture-header__watermark { position: absolute; top: -90px; right: -30px; font-family: var(--font-zh); font-size: 330px; line-height: 1; color: rgba(167, 38, 32, .14); font-weight: 700; pointer-events: none; user-select: none; }
+.culture-header__inner { position: relative; max-width: 1100px; margin: 0 auto; padding: clamp(48px, 7vw, 80px) clamp(20px, 5vw, 56px); }
+.culture-header__title { font-family: var(--font-serif); font-weight: 600; font-size: clamp(38px, 5.5vw, 60px); line-height: 1.04; letter-spacing: -1px; margin: 0 0 18px; color: #fff; }
+.culture-header__desc { font-size: 17.5px; line-height: 1.6; color: var(--color-cream-text-soft); margin: 0; max-width: 600px; }
+
+.culture-grid-section { background: var(--color-bg-alt); }
+.culture-grid-section__container { max-width: 1180px; margin: 0 auto; padding: clamp(56px, 8vw, 96px) clamp(20px, 5vw, 56px); }
+.culture-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+.culture-card { display: flex; flex-direction: column; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 22px; overflow: hidden; }
+.culture-card__photo { aspect-ratio: 16 / 10; display: flex; align-items: flex-end; justify-content: center; padding: 18px; }
+.culture-card__body { padding: clamp(22px, 3vw, 28px); }
+.culture-card__zh { font-family: var(--font-zh); font-size: 24px; color: var(--color-brand); font-weight: 600; margin-bottom: 10px; }
+.culture-card__name { font-family: var(--font-serif); font-weight: 600; font-size: 22px; margin: 0 0 10px; color: var(--color-text); }
+.culture-card__desc { font-size: 15px; line-height: 1.6; color: var(--color-text-soft); margin: 0 0 18px; }
+.culture-card__tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.culture-card__tag { background: var(--color-bg-alt); border: 1px solid var(--color-border-strong); padding: 6px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 600; color: var(--color-text-soft); }
+
+.culture-note { margin-top: 32px; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 16px; padding: 24px 28px; }
+.culture-note__title { font-family: var(--font-serif); font-weight: 600; font-size: 17px; margin: 0 0 10px; color: var(--color-text); }
+.culture-note__body { font-size: 14.5px; line-height: 1.65; color: var(--color-text-soft); margin: 0; }
+
+.culture-cta { background: var(--color-dark); position: relative; overflow: hidden; }
+.culture-cta__watermark { position: absolute; top: -70px; right: -30px; font-family: var(--font-zh); font-size: 280px; line-height: 1; color: rgba(167, 38, 32, .14); font-weight: 700; pointer-events: none; user-select: none; }
+.culture-cta__inner { position: relative; max-width: 1100px; margin: 0 auto; padding: clamp(56px, 8vw, 96px) clamp(20px, 5vw, 56px); text-align: center; }
+.culture-cta__title { font-family: var(--font-serif); font-weight: 600; font-size: clamp(28px, 3.8vw, 42px); line-height: 1.12; letter-spacing: -.5px; margin: 0 0 16px; color: #fff; }
+.culture-cta__desc { font-size: 17px; line-height: 1.65; color: var(--color-cream-text-soft); margin: 0 auto 30px; max-width: 520px; }

@@ -4,12 +4,12 @@ import "../styles/shared.css";
 import "./Faq.css";
 
 const FAQS = [
-  { q: "What ages do you teach?", a: "We teach children and teens aged 5 to 17, from complete beginners to advanced heritage speakers. Classes are grouped by both age and level." },
-  { q: "Are classes online or in person?", a: "Both. Most families choose live online classes, and in-person options are available in select cities. You can mix and match as your schedule changes." },
+  { q: "What ages do you teach?", a: "We teach children ages 3 to 12 — from Step-In (3–6) through Step-Beyond (10+) — plus Tutoring, Math Enrichment, and Private Chinese Lessons for a range of ages. Classes are grouped by age and level." },
+  { q: "Are classes online or in person?", a: "Step-In, Step-Up, Step-Beyond, Tutoring, and Math Enrichment meet in person at The Yard (Eastern Market). Private Chinese Lessons are available online or in person." },
   { q: "Does my child need prior Mandarin experience?", a: "Not at all. We welcome complete beginners as well as kids who already speak some Mandarin at home. A quick placement chat helps us find the right class." },
-  { q: "How big are the classes?", a: "Every group class caps at 6 students, so teachers know each child by name and can give real, personal attention." },
+  { q: "How big are the classes?", a: "Every group caps at 10 students with 2 teachers, so kids get real, personal attention." },
   { q: "How does the free trial work?", a: "Book a free 30-minute trial lesson with no commitment. Your child meets a teacher, tries a real class, and you decide from there — no pressure." },
-  { q: "Can I pause or switch programs?", a: "Yes. Billing is monthly with no long-term contract. You can pause, switch between Chinese and Math, or upgrade to the combo anytime." },
+  { q: "Can I pause or switch programs?", a: "Yes. Sessions are billed per term with no long-term contract — you can switch between Step-In, Step-Up, Step-Beyond, Tutoring, Math Enrichment, or Private Chinese Lessons anytime." },
 ];
 
 function Faq() {

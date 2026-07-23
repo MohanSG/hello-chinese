@@ -1,8 +1,10 @@
 from flask_mail import Message
 from flask import current_app
 from extensions import mail
+import resend
+import os
 
-
+resend.api_key= os.environ["RESEND_API_KEY"]
 def send_email(payload):
 
     html_content = f"""
@@ -79,3 +81,13 @@ def send_email(payload):
 
     print(msg.html)
     mail.send(msg)
+
+    # params: resend.Emails.SendParams = {
+    # "from": "Acme <onboarding@resend.dev>",
+    # "to": recipients,
+    # "subject": subject,
+    # "html": html_content,
+    # }
+
+    # email = resend.Emails.send(params)
+    # print(email)

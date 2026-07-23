@@ -24,7 +24,7 @@
 
 .photo-placeholder {
   border-radius: 20px;
-  box-shadow: 0 24px 60px rgba(42, 35, 27, .14);
+  box-shadow: 0 24px 60px rgba(32, 32, 31, .14);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -33,7 +33,7 @@
 .photo-placeholder__tag {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: rgba(42, 35, 27, .42);
+  color: rgba(32, 32, 31, .42);
   background: rgba(255, 253, 248, .8);
   padding: 6px 12px;
   border-radius: 20px;
@@ -63,7 +63,7 @@
   font-size: 16px;
   font-weight: 700;
   text-decoration: none;
-  box-shadow: 0 8px 22px rgba(194, 58, 43, .3);
+  box-shadow: 0 8px 22px rgba(167, 38, 32, .3);
   transition: all .2s;
 }
 .btn-red:hover { background: var(--color-brand-dark); color: #fff; transform: translateY(-2px); }

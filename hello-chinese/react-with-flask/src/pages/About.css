@@ -1,7 +1,7 @@
 .about { background: var(--color-bg); }
 
 .about-header { background: var(--color-dark); position: relative; overflow: hidden; }
-.about-header__watermark { position: absolute; top: -90px; right: -30px; font-family: var(--font-zh); font-size: 330px; line-height: 1; color: rgba(194, 58, 43, .14); font-weight: 700; pointer-events: none; user-select: none; }
+.about-header__watermark { position: absolute; top: -90px; right: -30px; font-family: var(--font-zh); font-size: 330px; line-height: 1; color: rgba(167, 38, 32, .14); font-weight: 700; pointer-events: none; user-select: none; }
 .about-header__inner { position: relative; max-width: 1100px; margin: 0 auto; padding: clamp(48px, 7vw, 80px) clamp(20px, 5vw, 56px); }
 .about-header__title { font-family: var(--font-serif); font-weight: 600; font-size: clamp(38px, 5.5vw, 60px); line-height: 1.04; letter-spacing: -1px; margin: 0 0 18px; color: #fff; }
 .about-header__desc { font-size: 17.5px; line-height: 1.6; color: var(--color-cream-text-soft); margin: 0; max-width: 600px; }
@@ -10,7 +10,7 @@
 .about-story__grid { max-width: 1100px; margin: 0 auto; padding: clamp(56px, 8vw, 100px) clamp(20px, 5vw, 56px); display: grid; grid-template-columns: 1fr 1fr; gap: clamp(40px, 6vw, 80px); align-items: center; }
 .about-story__photo-wrap { position: relative; }
 .about-story__photo { aspect-ratio: 4 / 5; background-image: repeating-linear-gradient(135deg, var(--tan-1) 0 22px, var(--tan-2) 22px 44px); }
-.about-story__badge { position: absolute; bottom: -26px; left: -26px; background: var(--color-brand); color: #fff; border-radius: 16px; padding: 18px 22px; box-shadow: 0 14px 34px rgba(194, 58, 43, .32); }
+.about-story__badge { position: absolute; bottom: -26px; left: -26px; background: var(--color-brand); color: #fff; border-radius: 16px; padding: 18px 22px; box-shadow: 0 14px 34px rgba(167, 38, 32, .32); }
 .about-story__badge-year { font-family: var(--font-zh); font-size: 24px; font-weight: 600; line-height: 1; }
 .about-story__badge-text { font-size: 12px; margin-top: 4px; color: rgba(255, 255, 255, .9); }
 .about-story__title { font-family: var(--font-serif); font-weight: 600; font-size: clamp(28px, 3.6vw, 40px); line-height: 1.14; letter-spacing: -.5px; margin: 0 0 22px; color: var(--color-text); }
@@ -33,14 +33,14 @@
 .about-teachers__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
 .teacher-card { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 18px; overflow: hidden; }
 .teacher-card__photo { aspect-ratio: 1 / 1; background-image: repeating-linear-gradient(135deg, var(--tan-1) 0 18px, var(--tan-2) 18px 36px); display: flex; align-items: flex-end; justify-content: center; padding: 14px; }
-.teacher-card__photo-tag { font-family: var(--font-mono); font-size: 10px; color: rgba(42, 35, 27, .4); background: rgba(255, 253, 248, .8); padding: 4px 9px; border-radius: 20px; }
+.teacher-card__photo-tag { font-family: var(--font-mono); font-size: 10px; color: rgba(32, 32, 31, .4); background: rgba(255, 253, 248, .8); padding: 4px 9px; border-radius: 20px; }
 .teacher-card__body { padding: 20px; }
 .teacher-card__name { font-family: var(--font-serif); font-weight: 600; font-size: 19px; margin: 0 0 3px; color: var(--color-text); }
 .teacher-card__role { font-size: 13px; font-weight: 600; color: var(--color-brand); margin-bottom: 10px; }
 .teacher-card__bio { font-size: 13.5px; line-height: 1.55; color: var(--color-text-mute); margin: 0; }
 
 .about-cta { background: var(--color-dark); position: relative; overflow: hidden; }
-.about-cta__watermark { position: absolute; top: -80px; right: -40px; font-family: var(--font-zh); font-size: 320px; line-height: 1; color: rgba(194, 58, 43, .14); font-weight: 700; pointer-events: none; user-select: none; }
+.about-cta__watermark { position: absolute; top: -80px; right: -40px; font-family: var(--font-zh); font-size: 320px; line-height: 1; color: rgba(167, 38, 32, .14); font-weight: 700; pointer-events: none; user-select: none; }
 .about-cta__inner { position: relative; max-width: 1100px; margin: 0 auto; padding: clamp(56px, 7vw, 90px) clamp(20px, 5vw, 56px); text-align: center; }
 .about-cta__title { font-family: var(--font-serif); font-weight: 600; font-size: clamp(30px, 4vw, 46px); line-height: 1.1; letter-spacing: -.6px; margin: 0 0 18px; color: #fff; }
 .about-cta__desc { font-size: 17.5px; line-height: 1.6; color: var(--color-cream-text-soft); margin: 0 auto 30px; max-width: 520px; }

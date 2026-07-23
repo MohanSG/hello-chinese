@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
+import { useLanguage } from "../i18n/LanguageContext";
 import "../styles/variables.css";
 import "./Hero.css";
 
@@ -11,6 +12,7 @@ const SLIDES = [
 
 function Hero() {
   const [slide, setSlide] = useState(0);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const t = setInterval(() => setSlide((s) => (s + 1) % SLIDES.length), 5500);
@@ -36,21 +38,21 @@ function Hero() {
         <div className="hero__copy">
           <div className="hero__badge">
             <span className="hero__badge-zh">你好</span>
-            <span className="hero__badge-text">Bilingual classes for ages 5–17</span>
+            <span className="hero__badge-text">{t("home.badge")}</span>
           </div>
           <h1 className="hero__title">
-            Speak Chinese.
+            {t("home.heroTitle1")}
             <br />
-            <span className="hero__title-accent">Understand more.</span>
+            <span className="hero__title-accent">{t("home.heroTitleAccent")}</span>
             <br />
-            Connect deeply.
+            {t("home.heroTitle2")}
           </h1>
           <p className="hero__desc">
-            Warm, small-group Mandarin — and math — for American kids and teens. Taught by educators who make every lesson feel like a real conversation.
+            {t("home.heroDesc")}
           </p>
           <div className="hero__actions">
-            <NavLink to="/Book" className="hero__btn-primary">Book a free trial →</NavLink>
-            <NavLink to="/Classes" className="hero__btn-outline">See our classes</NavLink>
+            <NavLink to="/Classes" className="hero__btn-primary">{t("home.ctaFindClass")}</NavLink>
+            <NavLink to="/Book" className="hero__btn-outline">{t("home.ctaTrial")}</NavLink>
           </div>
         </div>
       </div>

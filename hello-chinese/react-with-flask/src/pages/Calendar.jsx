@@ -11,11 +11,11 @@ import "./Calendar.css";
 const FEED_URL = "https://script.google.com/macros/s/AKfycbzfGjYYN44wM21Sbk1UKYUsF3f9ICtg5d7o36u9YDeVQ42K5pD1D9P2GWFDQIyBhQvteQ/exec";
 
 const FALLBACK_SCHEDULE = [
-  { day: "Sunday", startTime: "9:00 AM", endTime: "10:00 AM", className: "Mandarin Chinese", level: "Beginner · Ages 5–8", format: "In-person" },
-  { day: "Sunday", startTime: "10:00 AM", endTime: "11:00 AM", className: "Mandarin Chinese", level: "Intermediate · Ages 9–12", format: "In-person" },
-  { day: "Sunday", startTime: "11:00 AM", endTime: "12:00 PM", className: "Math", level: "K–8 · Mixed levels", format: "In-person" },
-  { day: "Tuesday", startTime: "5:00 PM", endTime: "6:00 PM", className: "Mandarin Chinese", level: "Advanced · Teens", format: "Online" },
-  { day: "Thursday", startTime: "5:00 PM", endTime: "6:00 PM", className: "Math", level: "Pre-algebra · Ages 11–14", format: "Online" },
+  { day: "Sunday", startTime: "9:00 AM", endTime: "10:00 AM", className: "Step-In", level: "Ages 3–6", format: "In-person" },
+  { day: "Sunday", startTime: "10:00 AM", endTime: "11:00 AM", className: "Step-Up", level: "Ages 6–10", format: "In-person" },
+  { day: "Sunday", startTime: "11:00 AM", endTime: "12:00 PM", className: "Step-Beyond", level: "Ages 10+", format: "In-person" },
+  { day: "Sunday", startTime: "11:00 AM", endTime: "12:00 PM", className: "Math Enrichment", level: "All ages", format: "In-person" },
+  { day: "Sunday", startTime: "9:00 AM", endTime: "12:00 PM", className: "Tutoring", level: "Optional support", format: "In-person" },
 ];
 
 const FALLBACK_EXCEPTIONS = [
@@ -28,7 +28,11 @@ const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function pad(n) { return n < 10 ? "0" + n : "" + n; }
 function toISODate(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
-function isMandarin(className) { return !/math/i.test(className); }
+function classKind(className) {
+  if (/math/i.test(className)) return "math";
+  if (/tutoring/i.test(className)) return "tutoring";
+  return "mandarin";
+}
 
 function buildMonthCells(year, month) {
   const startWeekday = new Date(year, month, 1).getDay();
@@ -118,8 +122,9 @@ function Calendar() {
             <button className="calendar-nav__btn" aria-label="Next month" onClick={() => setMonthOffset((m) => m + 1)}>›</button>
           </div>
           <div className="calendar-legend">
-            <div className="calendar-legend__item"><span className="calendar-legend__swatch mandarin" /><span className="calendar-legend__text">Mandarin Chinese</span></div>
-            <div className="calendar-legend__item"><span className="calendar-legend__swatch math" /><span className="calendar-legend__text">Math</span></div>
+            <div className="calendar-legend__item"><span className="calendar-legend__swatch mandarin" /><span className="calendar-legend__text">Step-In / Step-Up / Step-Beyond</span></div>
+            <div className="calendar-legend__item"><span className="calendar-legend__swatch math" /><span className="calendar-legend__text">Math Enrichment</span></div>
+            <div className="calendar-legend__item"><span className="calendar-legend__swatch tutoring" /><span className="calendar-legend__text">Tutoring</span></div>
             <div className="calendar-legend__item"><span className="calendar-legend__swatch closed" /><span className="calendar-legend__text">Closed</span></div>
             <span className="calendar-legend__hint">· hover a class for details</span>
           </div>
@@ -161,15 +166,15 @@ function Calendar() {
 
                     {daySessions.map((s, i) => {
                       const key = iso + "-" + i;
-                      const mandarin = isMandarin(s.className);
+                      const kind = classKind(s.className);
                       return (
                         <div
                           key={key}
-                          className={"calendar-session-block" + (mandarin ? " mandarin" : " math")}
+                          className={"calendar-session-block " + kind}
                           onMouseEnter={() => setHoverKey(key)}
                           onMouseLeave={() => setHoverKey(null)}
                         >
-                          <span className="calendar-session-block__label">{s.startTime} · {s.className.includes("Mandarin") ? "Mandarin" : s.className}</span>
+                          <span className="calendar-session-block__label">{s.startTime} · {s.className}</span>
                           {hoverKey === key && (
                             <div className="calendar-tooltip">
                               <div className="calendar-tooltip__title">{s.className}</div>

@@ -4,6 +4,7 @@ import Hero from "../components/Hero";
 import Faq from "../components/Faq";
 import Contact from "../components/Contact";
 import Footer from "../components/Footer";
+import { useLanguage } from "../i18n/LanguageContext";
 import "../styles/variables.css";
 import "../styles/shared.css";
 import "./Home.css";
@@ -21,29 +22,55 @@ const PILLARS = [
 ];
 
 const OFFERS = [
-  { name: "Mandarin Chinese", zh: "中文", price: "$180", blurb: "Speaking, listening, characters & pinyin for beginners to advanced.", save: "", popular: false,
-    features: ["4 live small-group lessons / month", "Max 6 students per class", "Speaking, pinyin & character writing", "Weekly practice + parent updates"] },
-  { name: "Math", zh: "数学", price: "$160", blurb: "Grade-aligned math that builds real problem-solving confidence.", save: "", popular: false,
-    features: ["4 live small-group lessons / month", "Max 6 students per class", "Grade-aligned K–8 curriculum", "Homework help & progress reports"] },
-  { name: "Math + Chinese", zh: "套餐", price: "$300", blurb: "Our best value — both programs, one simple monthly plan.", save: "Save $40 / month", popular: true,
-    features: ["Everything in both programs", "8 live lessons / month total", "Priority scheduling", "Termly progress conference"] },
+  { name: "Step-In", zh: "启蒙", price: "$40", per: "/ session", blurb: "Ages 3–6 — playful entry to Mandarin listening, speaking, and everyday communication.", save: "10 for $360", popular: false,
+    features: ["Sunday 9:00–10:00 AM", "Ages 3–6", "Max 10 students, 2 teachers", "Weekly parent updates"] },
+  { name: "Step-Up", zh: "进阶", price: "$40", per: "/ session", blurb: "Ages 6–10 — confident literacy and communication in meaningful contexts.", save: "10 for $360", popular: false,
+    features: ["Sunday 10:00–11:00 AM", "Ages 6–10", "Max 10 students, 2 teachers", "Weekly parent updates"] },
+  { name: "Step-Beyond", zh: "精进", price: "$40", per: "/ session", blurb: "Ages 10+ — structured expression, critical thinking, and collaborative learning.", save: "10 for $360", popular: false,
+    features: ["Sunday 11:00 AM–12:00 PM", "Ages 10+", "Max 10 students, 2 teachers", "Weekly parent updates"] },
+  { name: "Tutoring", zh: "辅导", price: "$20", per: "/ hour", blurb: "Individualized support before or after the student's main class.", save: "10 hrs $160 · 20 hrs $300", popular: false,
+    features: ["Sunday 9:00 AM–12:00 PM", "Per hour", "10 hrs $160 · 20 hrs $300", "Homework help & review"] },
+  { name: "Math Enrichment", zh: "数学", price: "$40", per: "/ session", blurb: "Number sense, structured strategies, problem solving, and confidence.", save: "10 for $360", popular: true,
+    features: ["Sunday 11:00 AM–12:00 PM", "Public-school teachers, 3+ yrs exp.", "Max 10 students, 2 teachers", "Weekly parent updates"] },
+  { name: "Private Chinese Lessons", zh: "私教", price: "$40–$70", per: "/ session", blurb: "Flexible personalized instruction, online or in person, after consultation.", save: "", popular: false,
+    features: ["Online or in-home", "Priced by duration & format", "Individual requirements", "1-on-1 instruction"] },
 ];
 
-const STATS = [["1,200+", "students taught"], ["6", "max per class"], ["4.9★", "average parent rating"], ["98%", "renew each term"]];
+const STATS = [["10", "statMaxStudents"], ["2", "statTeachers"], ["3-5+ yrs", "statExperience"], ["Sundays", "statSchedule"]];
+
+const GLANCE = [
+  ["glanceWho", "glanceWhoVal"],
+  ["glanceWhat", "glanceWhatVal"],
+  ["glanceSchedule", "glanceScheduleVal"],
+  ["glancePricing", "glancePricingVal"],
+];
 
 function Home() {
+  const { t } = useLanguage();
   return (
     <div className="home">
       <NavBar />
       <Hero />
 
+      {/* AT A GLANCE */}
+      <div className="glance-strip">
+        <div className="glance-strip__inner">
+          {GLANCE.map(([labelKey, valueKey]) => (
+            <div key={labelKey} className="glance">
+              <span className="glance__label">{t(`home.${labelKey}`)}</span>
+              <span className="glance__value">{t(`home.${valueKey}`)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* TRUST STRIP */}
       <div className="stat-strip">
         <div className="stat-strip__inner">
-          {STATS.map(([n, l]) => (
-            <div key={l} className="stat">
+          {STATS.map(([n, labelKey]) => (
+            <div key={labelKey} className="stat">
               <span className="stat__num">{n}</span>
-              <span className="stat__label">{l}</span>
+              <span className="stat__label">{t(`home.${labelKey}`)}</span>
             </div>
           ))}
         </div>
@@ -62,19 +89,22 @@ function Home() {
             </div>
           </div>
           <div>
-            <div className="eyebrow">Who we are</div>
-            <h2 className="home-about__title">A neighborhood language school — with a global classroom.</h2>
+            <div className="eyebrow">{t("home.aboutEyebrow")}</div>
+            <h2 className="home-about__title">{t("home.aboutTitle")}</h2>
             <p className="home-about__p">
-              Hello Chinese started with a simple belief: American kids can grow up genuinely bilingual when Mandarin is taught with warmth, patience, and real conversation — not flashcards and pressure.
+              {t("home.aboutP1")}
             </p>
             <p className="home-about__p">
-              Today our certified teachers guide students from their very first <span className="home-about__zh-inline">你好</span> to confident, everyday fluency — online and in-person, in classes small enough to know every child by name.
+              {t("home.aboutP2")}
+            </p>
+            <p className="home-about__teacher-standard">
+              {t("home.teacherStandard")}
             </p>
             <div className="home-about__facts">
-              {["Certified native teachers", "Ages 5 to 17", "Online & in-person"].map((t) => (
-                <div key={t} className="home-about__fact">
+              {["factCertified", "factAges", "factOnline"].map((key) => (
+                <div key={key} className="home-about__fact">
                   <span className="home-about__fact-dot" />
-                  <span className="home-about__fact-text">{t}</span>
+                  <span className="home-about__fact-text">{t(`home.${key}`)}</span>
                 </div>
               ))}
             </div>
@@ -119,7 +149,7 @@ function Home() {
                 <p className="offer-card__blurb">{o.blurb}</p>
                 <div className="offer-card__price-row">
                   <span className="offer-card__price">{o.price}</span>
-                  <span className="offer-card__per">/ month</span>
+                  <span className="offer-card__per">{o.per}</span>
                 </div>
                 <div className="offer-card__save">{o.save}</div>
                 <div className="offer-card__features">
@@ -135,7 +165,7 @@ function Home() {
             ))}
           </div>
           <p className="home-offers__foot">
-            Sibling discount 10% · Financial aid available · <NavLink to="/Contact">Ask about custom 1-on-1 tutoring →</NavLink>
+            Sibling discount available · Financial aid available · <NavLink to="/Contact">Ask about Private Chinese Lessons →</NavLink>
           </p>
         </div>
       </section>

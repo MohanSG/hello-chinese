@@ -2,7 +2,7 @@ import { useState } from "react";
 import { apiRequest } from "../api/client";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
-import BookingForm, { PRICES, TYPE_LABELS, formatDateShort } from "../components/BookingForm";
+import BookingForm, { PRICES, TYPE_LABELS, unitFor, formatDateShort } from "../components/BookingForm";
 import "../styles/variables.css";
 import "../styles/shared.css";
 import "./Book.css";
@@ -21,8 +21,6 @@ function Book() {
   const [couponInput, setCouponInput] = useState("");
   const [couponApplied, setCouponApplied] = useState(null); // { code, type, value, label }
   const [couponError, setCouponError] = useState("");
-  const [paymentPlan, setPaymentPlan] = useState("monthly"); // "monthly" | "full"
-  const FULL_PLAN_DISCOUNT = 0.05;
   const [confirmation, setConfirmation] = useState(null); // { name, number, students, subtotal, discount, total, couponCode }
   const [emailPayload, setEmailPayload] = useState(null); // data to send in the confirmation email
 
@@ -47,9 +45,7 @@ function Book() {
     discount = Math.min(discount, subtotal);
   }
   const monthlyTotal = subtotal - discount;
-  const isFullPlan = paymentPlan === "full";
-  const fullSavings = isFullPlan ? Math.round(monthlyTotal * 12 * FULL_PLAN_DISCOUNT) : 0;
-  const total = isFullPlan ? monthlyTotal * 12 - fullSavings : monthlyTotal;
+  const total = monthlyTotal;
 
   const applyCoupon = () => {
     const code = couponInput.trim().toUpperCase();
@@ -89,7 +85,7 @@ function Book() {
       selectedDates: s.selectedDates || [],
       name: s.firstName || s.lastName ? `${s.firstName} ${s.lastName}`.trim() : `Student ${i + 1}`,
       typeLabel: TYPE_LABELS[s.type],
-      priceLabel: `$${PRICES[s.type]}/mo`,
+      priceLabel: `$${PRICES[s.type]}/${unitFor(s.type)}`,
       daysLabel: s.selectedDates && s.selectedDates.length ? [...s.selectedDates].sort().map((d) => formatDateShort(d)).join(", ") : "No dates selected",
     }));
     const payload = {
@@ -97,13 +93,11 @@ function Book() {
       confirmationNumber: number,
       recipientEmail: getRecipientEmails(),
       students,
-      paymentPlan: isFullPlan ? "full" : "monthly",
       subtotal,
       couponCode: couponApplied ? couponApplied.code : null,
       discount,
-      fullSavings,
       total,
-      totalDueLabel: isFullPlan ? `$${total} due today` : `$${total}/mo`,
+      totalDueLabel: `$${total} due`,
     };
     setEmailPayload(payload);
     try {
@@ -118,8 +112,6 @@ function Book() {
         students,
         subtotal,
         discount,
-        isFullPlan,
-        fullSavings,
         total,
         couponCode: couponApplied ? couponApplied.code : null,
       });
@@ -133,7 +125,6 @@ function Book() {
     setCouponInput("");
     setCouponApplied(null);
     setCouponError("");
-    setPaymentPlan("monthly");
     setEmailStatus("");
     setConfirmation(null);
   };
@@ -176,20 +167,15 @@ function Book() {
             </div>
             <div className="book-summary__totals">
               <div className="book-summary__row">
-                <span>Subtotal</span><span>{confirmation.isFullPlan ? `$${confirmation.subtotal * 12}/yr` : `$${confirmation.subtotal}/mo`}</span>
+                <span>Subtotal</span><span>${confirmation.subtotal}</span>
               </div>
               {confirmation.couponCode && (
                 <div className="book-summary__row book-summary__row--discount">
-                  <span>Coupon ({confirmation.couponCode})</span><span>−{confirmation.isFullPlan ? `$${confirmation.discount * 12}/yr` : `$${confirmation.discount}/mo`}</span>
-                </div>
-              )}
-              {confirmation.isFullPlan && (
-                <div className="book-summary__row book-summary__row--discount">
-                  <span>Pay-in-full savings (5%)</span><span>−${confirmation.fullSavings}</span>
+                  <span>Coupon ({confirmation.couponCode})</span><span>−${confirmation.discount}</span>
                 </div>
               )}
               <div className="book-summary__row book-summary__row--total">
-                <span>{confirmation.isFullPlan ? "Total due today" : "Total due monthly"}</span><span>{confirmation.isFullPlan ? `$${confirmation.total}` : `$${confirmation.total}/mo`}</span>
+                <span>Total due</span><span>${confirmation.total}</span>
               </div>
             </div>
           </div>
@@ -247,16 +233,34 @@ function Book() {
           </div>
           <div className="book-schedule__grid">
             <div className="book-schedule__card">
-              <div className="book-schedule__label">Chinese Lessons</div>
-              <div className="book-schedule__value">$180<span className="book-schedule__value-unit"> / mo</span></div>
+              <div className="book-schedule__label">Step-In · ages 3–6</div>
+              <div className="book-schedule__value">$40<span className="book-schedule__value-unit"> / session</span></div>
+              <div className="book-schedule__note">10 sessions: $360</div>
             </div>
             <div className="book-schedule__card">
-              <div className="book-schedule__label">Math Lessons</div>
-              <div className="book-schedule__value">$160<span className="book-schedule__value-unit"> / mo</span></div>
+              <div className="book-schedule__label">Step-Up · ages 6–10</div>
+              <div className="book-schedule__value">$40<span className="book-schedule__value-unit"> / session</span></div>
+              <div className="book-schedule__note">10 sessions: $360</div>
+            </div>
+            <div className="book-schedule__card">
+              <div className="book-schedule__label">Step-Beyond · ages 10+</div>
+              <div className="book-schedule__value">$40<span className="book-schedule__value-unit"> / session</span></div>
+              <div className="book-schedule__note">10 sessions: $360</div>
+            </div>
+            <div className="book-schedule__card">
+              <div className="book-schedule__label">Tutoring</div>
+              <div className="book-schedule__value">$20<span className="book-schedule__value-unit"> / hour</span></div>
+              <div className="book-schedule__note">10 hrs: $160 · 20 hrs: $300</div>
+            </div>
+            <div className="book-schedule__card">
+              <div className="book-schedule__label">Math Enrichment</div>
+              <div className="book-schedule__value">$40<span className="book-schedule__value-unit"> / session</span></div>
+              <div className="book-schedule__note">10 sessions: $360</div>
             </div>
             <div className="book-schedule__card book-schedule__card--dark">
-              <div className="book-schedule__label">Chinese + Math Combo</div>
-              <div className="book-schedule__value">$300<span className="book-schedule__value-unit"> / mo</span></div>
+              <div className="book-schedule__label">Private Chinese Lessons</div>
+              <div className="book-schedule__value">$40–$70<span className="book-schedule__value-unit"> / session</span></div>
+              <div className="book-schedule__note">Online or in person, by consultation</div>
             </div>
           </div>
         </section>
@@ -284,17 +288,9 @@ function Book() {
                 {pricedStudents.map((s, i) => (
                   <div className="book-summary__row" key={s.id}>
                     <span>{(s.firstName || s.lastName) ? `${s.firstName} ${s.lastName}`.trim() : `Student ${i + 1}`} — {TYPE_LABELS[s.type]}{s.selectedDates && s.selectedDates.length ? ` (${s.selectedDates.length} date${s.selectedDates.length === 1 ? "" : "s"})` : ""}</span>
-                    <span className="book-summary__row-price">${PRICES[s.type]}/mo</span>
+                    <span className="book-summary__row-price">${PRICES[s.type]}/{unitFor(s.type)}</span>
                   </div>
                 ))}
-              </div>
-
-              <div className="book-plan">
-                <span className="book-plan__label">Payment plan</span>
-                <div className="book-plan__options">
-                  <button type="button" className={`book-plan__btn${!isFullPlan ? " book-plan__btn--active" : ""}`} onClick={() => setPaymentPlan("monthly")}>Pay monthly</button>
-                  <button type="button" className={`book-plan__btn${isFullPlan ? " book-plan__btn--active" : ""}`} onClick={() => setPaymentPlan("full")}>Pay in full <span className="book-plan__note">(save 5%)</span></button>
-                </div>
               </div>
 
               <div className="book-coupon">
@@ -316,15 +312,12 @@ function Book() {
               </div>
 
               <div className="book-summary__totals">
-                <div className="book-summary__row"><span>Subtotal</span><span>{isFullPlan ? `$${subtotal * 12}/yr` : `$${subtotal}/mo`}</span></div>
+                <div className="book-summary__row"><span>Subtotal</span><span>${subtotal}</span></div>
                 {couponApplied && (
-                  <div className="book-summary__row book-summary__row--discount"><span>Discount</span><span>−{isFullPlan ? `$${discount * 12}/yr` : `$${discount}/mo`}</span></div>
-                )}
-                {isFullPlan && (
-                  <div className="book-summary__row book-summary__row--discount"><span>Pay-in-full savings (5%)</span><span>−${fullSavings}</span></div>
+                  <div className="book-summary__row book-summary__row--discount"><span>Discount</span><span>−${discount}</span></div>
                 )}
                 <div className="book-summary__row book-summary__row--total">
-                  <span>{isFullPlan ? "Total due today" : "Total due monthly"}</span><span>{isFullPlan ? `$${total}` : `$${total}/mo`}</span>
+                  <span>Total due</span><span>${total}</span>
                 </div>
               </div>
             </div>
