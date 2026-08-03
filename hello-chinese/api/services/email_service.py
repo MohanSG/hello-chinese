@@ -2,10 +2,10 @@ from flask_mail import Message
 from flask import current_app
 from extensions import mail
 from datetime import datetime
-import resend
+# import resend
 import os
 
-resend.api_key= os.environ["RESEND_API_KEY"]
+# resend.api_key= os.environ["RESEND_API_KEY"]
 
 def send_email(payload):
     with open("templates/booking_confirmation_notification.html", "r", encoding="utf-8") as f:
