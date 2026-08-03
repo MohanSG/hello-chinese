@@ -266,7 +266,7 @@ function Book() {
         </section>
 
         {/* SIGN UP */}
-        <section>
+        <section id="signup">
           <div className="book-section-head book-section-head--row">
             <div style={{ display: "flex", alignItems: "baseline", gap: "12px" }}>
               <span className="book-section-head__zh">报名</span>

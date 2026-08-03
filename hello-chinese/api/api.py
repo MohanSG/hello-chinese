@@ -4,7 +4,7 @@ from flask_cors import CORS
 from openai import OpenAI
 from dotenv import load_dotenv
 from extensions import mail
-from services.email_service import send_email
+from services.email_service import send_email, send_contact_email
 import os
 
 load_dotenv()
@@ -52,7 +52,13 @@ def send_test_email():
     
     send_email(payload)
 
-    return jsonify({'message' : 'Email Sent'})
+    return jsonify({'message' : 'Email Sent'}), 200
+
+@app.route("/contact", methods=['POST'])
+def contact():
+    data = request.get_json()
+    send_contact_email(data)
+    return jsonify({'message' : 'Email sent'}), 200
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

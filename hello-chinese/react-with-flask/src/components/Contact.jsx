@@ -2,15 +2,32 @@ import { useState } from "react";
 import "../styles/variables.css";
 import "../styles/shared.css";
 import "./Contact.css";
+import { apiRequest } from "../api/client";
 
 function Contact() {
   const [submitted, setSubmitted] = useState(false);
+  const [formList, setFormList] = useState({name : "", email : "", phone : "", Level : "", program : "", message : ""})
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // TODO: POST to your Flask API here, e.g. fetch('/api/contact', { method:'POST', body: new FormData(e.target) })
+    try {
+      await apiRequest("/contact", {
+        method : "POST",
+        body: JSON.stringify({
+          formData: formList
+        })
+      })
+    } catch {
+
+    }
     setSubmitted(true);
   };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormList(prev => ({ ...prev, [name]: value}));
+  }
 
   return (
     <section id="contact" className="contact">
@@ -24,7 +41,7 @@ function Contact() {
           <div className="contact__info">
             {[
               ["✉", "Email", "hello@hellochinese.com"],
-              ["☏", "Phone", "(800) 555-1234"],
+              ["☏", "Phone", "301-919-5863"],
               ["◷", "Hours", "Mon–Sat · 9am–7pm"],
               ["📍", "Location", "The Yard (Eastern Market), 700 Pennsylvania Ave. SE, Washington, DC 20003"],
             ].map(([icon, label, value]) => (
@@ -43,16 +60,16 @@ function Contact() {
           {!submitted ? (
             <form onSubmit={handleSubmit} className="contact__form">
               <div className="contact__row">
-                <label className="contact__field"><span className="contact__label">Your name</span><input required type="text" name="name" placeholder="Jane Smith" className="contact__input" /></label>
-                <label className="contact__field"><span className="contact__label">Email</span><input required type="email" name="email" placeholder="jane@email.com" className="contact__input" /></label>
+                <label className="contact__field"><span className="contact__label">Your name</span><input required type="text" name="name" placeholder="Jane Smith" className="contact__input" value={formList.name} onChange={handleChange} /></label>
+                <label className="contact__field"><span className="contact__label">Email</span><input required type="email" name="email" placeholder="jane@email.com" className="contact__input" value={formList.email} onChange={handleChange}/></label>
               </div>
               <div className="contact__row">
-                <label className="contact__field"><span className="contact__label">Phone</span><input required type="tel" name="phone" placeholder="(555) 123-4567" className="contact__input" /></label>
-                <label className="contact__field"><span className="contact__label">Child's age / grade</span><input required type="text" name="childAge" placeholder="e.g. 8 / 3rd grade" className="contact__input" /></label>
+                <label className="contact__field"><span className="contact__label">Phone</span><input required type="tel" name="phone" placeholder="(555) 123-4567" className="contact__input" value={formList.phone} onChange={handleChange}/></label>
+                <label className="contact__field"><span className="contact__label">Child's age</span><input required type="number" name="childAge" placeholder="e.g. 8" className="contact__input" value={formList.childLevel} onChange={handleChange}/></label>
               </div>
               <label className="contact__field">
                 <span className="contact__label">Program of interest</span>
-                <select required name="program" className="contact__input" defaultValue="">
+                <select required name="program" className="contact__input" defaultValue="" value={formList.program} onChange={handleChange}>
                   <option value="" disabled>Select a program…</option>
                   <option>Step-In</option>
                   <option>Step-Up</option>
@@ -65,7 +82,7 @@ function Contact() {
               </label>
               <label className="contact__field">
                 <span className="contact__label">Message</span>
-                <textarea rows="4" name="message" placeholder="Tell us about your child's experience level and goals…" className="contact__input contact__input--textarea" />
+                <textarea rows="4" name="message" placeholder="Tell us about your child's experience level and goals…" className="contact__input contact__input--textarea" value={formList.message} onChange={handleChange}/>
               </label>
               <button type="submit" className="contact__submit">Send &amp; request a free trial</button>
             </form>

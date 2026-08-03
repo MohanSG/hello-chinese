@@ -23,7 +23,7 @@ function NavBar() {
 
       <div className="navbar__links">
         <NavLink to="/" end className={navLinkClass}>{t("nav.home")}</NavLink>
-        <NavLink to="/About" className={navLinkClass}>About Us</NavLink>
+        {/* <NavLink to="/About" className={navLinkClass}>About Us</NavLink> */}
         <NavLink to="/Classes" className={navLinkClass}>{t("nav.classes")}</NavLink>
         <NavLink to="/Calendar" className={navLinkClass}>{t("nav.calendar")}</NavLink>
         <button type="button" className="navbar__lang" onClick={toggleLang} aria-label="Switch language">

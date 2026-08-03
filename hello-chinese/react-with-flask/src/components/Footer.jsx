@@ -36,7 +36,7 @@ function Footer() {
         <div className="footer__col">
           <div className="footer__col-head">Contact</div>
           <span className="footer__text">hello@hellochinese.com</span>
-          <span className="footer__text">(800) 555-1234</span>
+          <span className="footer__text">301-919-5863</span>
           <span className="footer__text">The Yard (Eastern Market)<br />700 Pennsylvania Ave. SE<br />Washington, DC 20003</span>
         </div>
       </div>

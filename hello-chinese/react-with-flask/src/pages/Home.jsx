@@ -20,7 +20,7 @@ const PILLARS = [
   { icon: id, t: "Small groups", d: "Six students max means every child is seen, heard, and gently pushed forward." },
   { icon: award, t: "Visible progress", d: "Clear levels, weekly practice and parent updates so you always know how it’s going." },
 ];
-
+  
 const OFFERS = [
   { name: "Step-In", zh: "启蒙", price: "$40", per: "/ session", blurb: "Ages 3–6 — playful entry to Mandarin listening, speaking, and everyday communication.", save: "10 for $360", popular: false,
     features: ["Sunday 9:00–10:00 AM", "Ages 3–6", "Max 10 students, 2 teachers", "Weekly parent updates"] },
@@ -165,7 +165,7 @@ function Home() {
             ))}
           </div>
           <p className="home-offers__foot">
-            Sibling discount available · Financial aid available · <NavLink to="/Contact">Ask about Private Chinese Lessons →</NavLink>
+            Sibling discount available · Financial aid available · <a href="#contact">Ask about Private Chinese Lessons →</a>
           </p>
         </div>
       </section>
@@ -190,7 +190,7 @@ function Home() {
             <div className="home-trial__card-title">Reserve a trial spot</div>
             <p className="home-trial__card-desc">Pick a program and we'll match you with a teacher this week.</p>
             <NavLink to="/Book" className="btn-red" style={{ display: "block" }}>Book your free trial →</NavLink>
-            <div className="home-trial__card-alt">or call <a href="tel:+18005551234">(800) 555-1234</a></div>
+            <div className="home-trial__card-alt">or call <a href="tel:+18005551234">301-919-5863</a></div>
           </div>
         </div>
       </section>

@@ -1,75 +1,49 @@
 from flask_mail import Message
 from flask import current_app
 from extensions import mail
+from datetime import datetime
 import resend
 import os
 
 resend.api_key= os.environ["RESEND_API_KEY"]
+
 def send_email(payload):
+    with open("templates/booking_confirmation_notification.html", "r", encoding="utf-8") as f:
+        html_content = f.read()
 
-    html_content = f"""
-    <html>
-        <body>
-            <p>Thank you for your submission!</p>
-            
-            <p>Please find your details below. A member of staff will get back to you
-            by phone or email within 3 business days</p>
-            
-            <p>Confirmation ID: <bold>{payload.get('confirmationNumber')}</bold></p>
-            <table border="1" cellpadding="8" cellspacing="0">
+    row_template = """
                 <tr>
-                    <th>Name</th>
-                    <th>Age</th>
-                    <th>Phone</th>
-                    <th>Class Type</th>
-                    <th>Sessions</th>
-                    <th>Preferred Dates</th>
-                    <th>Price</th>
-                </tr>
-    """
+                    <td style="padding: 10px 14px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #20201f; border-bottom: 1px solid #e7d9c2;">{name}</td>
+                    <td style="padding: 10px 14px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #20201f; border-bottom: 1px solid #e7d9c2;">{age}</td>
+                    <td style="padding: 10px 14px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #20201f; border-bottom: 1px solid #e7d9c2;">{type} Class</td>
+                    <td style="padding: 10px 14px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #20201f; border-bottom: 1px solid #e7d9c2;">{sessions} / week</td>
+                    <td style="padding: 10px 14px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #20201f; border-bottom: 1px solid #e7d9c2;">{daysLabel}</td>
+                    <td align="right" style="padding: 10px 14px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 600; color: #20201f; border-bottom: 1px solid #e7d9c2;">{priceLabel}</td>
+                </tr>"""
 
-    for student in payload.get("students"):
-        html_content += f"""
-                <tr>
-                    <td>{student.get('name')}</td>
-                    <td>{student.get('age')}</td>
-                    <td>{student.get('phone')}</td>
-                    <td>{student.get('type')} Class</td>
-                    <td>{student.get('sessions')} Sessions per week</td>
-                    <td>{student.get('daysLabel')}</td>
-                    <td>{student.get('priceLabel')}</td>
-                </tr>
-        """
-    html_content += """</table>"""
+    students_rows = "".join(
+        row_template.format(
+            name=s.get("name", ""),
+            age=s.get("age", ""),
+            type=s.get("type", ""),
+            sessions=s.get("sessions", ""),
+            daysLabel=s.get("daysLabel", ""),
+            priceLabel=s.get("priceLabel", ""),
+        )
+        for s in payload.get("students", [])
+    )
 
-    html_content += """<div style="height:24px"></div>"""
-
-    html_content += f"""
-                <table border="1" cellpadding="8" cellspacing="0">
-                    <tr>
-                        <th>Confirmation Number</th>
-                        <th>Payment Plan</th>
-                        <th>Coupon Code</th>
-                        <th>Discount</th>
-                        <th>Total</th>
-                    </tr>
-                    <tr>
-                        <td>{payload.get('confirmationNumber')}</td>
-                        <td>{payload.get('paymentPlan')}</td>
-                        <td>{"None" if not payload.get('couponCode') else payload.get('couponCode')}</td>
-                        <td>{payload.get('discount')}</td>
-                        <td>{payload.get('total')}</td>
-                    </tr>
-                </table>
-    """
-
-    html_content += """
-        </body>
-    </html>
-    """
+    html_content = html_content.replace("{{students_rows}}", students_rows)
+    html_content = html_content.replace("{{confirmationNumber}}", str(payload.get("confirmationNumber", "")))
+    html_content = html_content.replace("{{paymentPlan}}", str(payload.get("paymentPlan", "")))
+    html_content = html_content.replace(
+        "{{couponCode}}", "None" if not payload.get("couponCode") else str(payload.get("couponCode"))
+    )
+    html_content = html_content.replace("{{discount}}", str(payload.get("discount", "")))
+    html_content = html_content.replace("{{total}}", str(payload.get("total", "")))
 
     subject = f"{payload.get('confirmationNumber')} - Hello Chinese Enrollment"
-    recipients = payload.get('recipientEmail')
+    recipients = payload.get("recipientEmail")
     recipients.append("hello.nihao.chinese@gmail.com")
 
     msg = Message(
@@ -79,7 +53,6 @@ def send_email(payload):
         html=html_content,
     )
 
-    print(msg.html)
     mail.send(msg)
 
     # params: resend.Emails.SendParams = {
@@ -91,3 +64,31 @@ def send_email(payload):
 
     # email = resend.Emails.send(params)
     # print(email)
+
+def send_contact_email(formData):
+    data = formData["formData"]
+
+    with open("templates/contact_form_notification.html", "r", encoding="utf-8") as f:
+        html_content = f.read()
+
+    html_content = html_content.replace("{{name}}", data.get("name", ""))
+    html_content = html_content.replace("{{email}}", data.get("email", ""))
+    html_content = html_content.replace("{{phone}}", data.get("phone", ""))
+    html_content = html_content.replace("{{childAge}}", data.get("childAge", ""))
+    html_content = html_content.replace("{{program}}", data.get("program", ""))
+    html_content = html_content.replace("{{message}}", data.get("message", ""))
+    html_content = html_content.replace(
+        "{{submitted_at}}", datetime.now().strftime("%B %d, %Y at %I:%M %p")
+    )
+
+    subject = "New Contact"
+    recipients = ['mohansg12@gmail.com']
+
+    msg = Message(
+        subject,
+        sender=current_app.config["MAIL_USERNAME"],
+        recipients=recipients,
+        html=html_content,
+    )
+
+    mail.send(msg)
