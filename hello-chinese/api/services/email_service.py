@@ -92,3 +92,41 @@ def send_contact_email(formData):
     )
 
     mail.send(msg)
+
+from datetime import datetime
+
+def send_saturday_interest_email(payload):
+    with open("templates/saturday_interest_list_notification.html", "r", encoding="utf-8") as f:
+        html_content = f.read()
+
+    submitted = payload.get("submittedAt")
+    try:
+        submitted = datetime.fromisoformat(submitted.replace("Z", "+00:00")).strftime(
+            "%B %d, %Y at %I:%M %p"
+        )
+    except (AttributeError, ValueError):
+        submitted = submitted or ""
+
+    fields = {
+        "{{parentName}}": payload.get("parentName") or "",
+        "{{email}}": payload.get("email") or "",
+        "{{childAgeGrade}}": payload.get("childAgeGrade") or "",
+        "{{programInterest}}": payload.get("programInterest") or "",
+        "{{preferredTime}}": payload.get("preferredTime") or "No preference given",
+        "{{comments}}": payload.get("comments") or "No comments provided.",
+        "{{submittedAt}}": submitted,
+    }
+    for token, value in fields.items():
+        html_content = html_content.replace(token, str(value))
+
+    subject = f"Saturday Interest List - {payload.get('parentName')}"
+    recipients = ["mohansg12@gmail.com"]
+
+    msg = Message(
+        subject,
+        sender=current_app.config["MAIL_USERNAME"],
+        recipients=recipients,
+        html=html_content,
+    )
+
+    mail.send(msg)

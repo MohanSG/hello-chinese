@@ -1,0 +1,69 @@
+.step-page { background: #fdf8ef; min-height: 100vh; }
+
+.step-head { background: #fdf8ef; }
+.step-head__inner { max-width: 1240px; margin: 0 auto; padding: clamp(30px, 4vw, 44px) clamp(20px, 5vw, 56px) 0; }
+.step-head__back { display: inline-flex; align-items: center; gap: 8px; font-size: 14.5px; font-weight: 500; color: var(--color-brand); text-decoration: none; margin-bottom: 12px; }
+.step-head__eyebrow { font-size: 14px; font-weight: 500; color: var(--color-brand); margin-bottom: 10px; }
+.step-head__title { font-family: var(--font-serif); font-weight: 700; font-size: clamp(34px, 5vw, 48px); line-height: 1.05; letter-spacing: -1.2px; margin: 0 0 12px; color: #161d2e; }
+.step-head__desc { font-size: 16px; line-height: 1.6; color: var(--color-text-soft); margin: 0; max-width: 620px; }
+
+.step-section { background: #fdf8ef; }
+.step-container { max-width: 1240px; margin: 0 auto; padding: clamp(24px, 3vw, 32px) clamp(20px, 5vw, 56px) clamp(44px, 6vw, 64px); }
+
+.step-schedule { background: var(--color-bg-alt); border: 1px solid #ecdcba; border-radius: 14px; padding: 22px; margin-bottom: 26px; }
+.step-schedule__label { font-size: 14.5px; font-weight: 700; color: var(--color-text); margin-bottom: 16px; }
+.step-schedule__grid { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 18px; }
+.step-schedule__div { border-left: 1px solid var(--color-border-strong); height: 44px; }
+
+.step-schedule__item { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 12px; }
+.step-schedule__item--active { background: #fdf3e6; border: 1px solid #ecdcba; border-radius: 10px; }
+.step-schedule__icon { flex: none; width: 40px; height: 40px; border-radius: 999px; background: #efe7d8; display: flex; align-items: center; justify-content: center; }
+.step-schedule__icon--active { background: var(--color-brand); color: #fff; font-family: var(--font-zh); font-size: 15px; font-weight: 600; }
+.step-schedule__time { font-family: var(--font-serif); font-size: 16px; font-weight: 600; color: var(--color-text); }
+.step-schedule__time--active { color: var(--color-brand); }
+.step-schedule__label2 { font-size: 13px; color: var(--color-text-soft); }
+.step-schedule__label2--muted { color: var(--color-text-faint); }
+
+.step-plan-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.step-plan { background: var(--color-bg-alt); border: 1px solid #ecdcba; border-radius: 14px; padding: 22px; }
+.step-plan--wide { grid-column: 1 / -1; }
+
+.step-plan__inner { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; }
+.step-plan__left { display: flex; align-items: flex-start; gap: 14px; min-width: 0; }
+.step-plan__num { flex: none; width: 48px; height: 48px; border-radius: 999px; background: #f6e7e1; display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 19px; font-weight: 600; color: var(--color-brand); }
+.step-plan__name { font-family: var(--font-serif); font-weight: 600; font-size: 18px; margin: 0 0 11px; color: var(--color-text); }
+.step-plan__blocks { display: flex; flex-direction: column; gap: 8px; }
+.step-plan__block { display: grid; grid-template-columns: 13px 88px 1fr; align-items: baseline; gap: 8px; font-size: 13.5px; color: var(--color-text-soft); }
+.step-plan__tick { color: var(--color-brand); font-weight: 700; }
+.step-plan__block-time { font-weight: 600; color: var(--color-text); white-space: nowrap; }
+
+.step-plan__price { display: flex; flex-direction: column; align-items: center; gap: 12px; border-left: 1px solid var(--color-border); padding-left: 20px; min-width: 140px; }
+.step-plan__price-label { font-size: 12px; font-weight: 700; letter-spacing: 1.2px; color: var(--color-text-faint); text-transform: uppercase; text-align: center; }
+.step-plan__price-value { font-family: var(--font-serif); font-size: 24px; font-weight: 600; color: var(--color-text); margin-top: 4px; text-align: center; }
+.step-plan__price-save { font-size: 12px; font-weight: 600; color: #1e6b3e; margin-top: 2px; text-align: center; }
+.step-plan__price-term { font-size: 11.5px; color: var(--color-text-faint); margin-top: 2px; text-align: center; }
+.step-plan__cta { display: flex; align-items: center; justify-content: center; padding: 13px 24px; border-radius: 11px; background: #1e6b3e; color: #fff; font-size: 14.5px; font-weight: 700; text-decoration: none; white-space: nowrap; width: 100%; box-shadow: 0 6px 18px rgba(30, 107, 62, .24); }
+.step-plan__cta:hover { background: #164f2e; color: #fff; }
+
+.step-note { display: flex; align-items: center; justify-content: center; gap: 9px; margin: 26px 0 0; }
+.step-note__text { font-size: 13.5px; color: var(--color-text-faint); }
+
+@media (max-width: 1240px) {
+  .step-plan { display: flex; flex-direction: column; }
+  .step-plan__inner { grid-template-columns: 1fr; gap: 16px; flex: 1; align-content: space-between; }
+  .step-plan__price { border-left: none; padding-left: 0; border-top: 1px solid var(--color-border); padding-top: 16px; align-items: stretch; min-width: 0; }
+}
+
+@media (max-width: 760px) {
+  .step-schedule__grid { grid-template-columns: 1fr; gap: 10px; }
+  .step-schedule__div { display: none; }
+  .step-plan-grid { grid-template-columns: 1fr; }
+  .step-plan--wide { grid-column: auto; }
+}
+
+@media (max-width: 520px) {
+  .step-plan { padding: 18px; }
+  .step-plan__block { grid-template-columns: 13px 84px 1fr; gap: 7px; font-size: 13px; }
+  .step-schedule__item { padding: 12px 14px; }
+  .step-note { align-items: flex-start; text-align: left; }
+}

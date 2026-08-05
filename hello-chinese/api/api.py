@@ -4,7 +4,7 @@ from flask_cors import CORS
 from openai import OpenAI
 from dotenv import load_dotenv
 from extensions import mail
-from services.email_service import send_email, send_contact_email
+from services.email_service import send_email, send_contact_email, send_saturday_interest_email
 import os
 
 load_dotenv()
@@ -59,6 +59,13 @@ def contact():
     data = request.get_json()
     send_contact_email(data)
     return jsonify({'message' : 'Email sent'}), 200
+
+@app.route("/saturday_interest", methods=['POST'])
+def saturday_interest_email():
+    data = request.get_json();
+    send_saturday_interest_email(data['payload'])
+    
+    return jsonify({'message' : 'OK'}), 200
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

@@ -4,6 +4,7 @@ export const translations = {
     about: { en: "About Us", zh: "关于我们" },
     classes: { en: "Programs", zh: "课程" },
     culture: { en: "Cultural Experiences", zh: "文化体验" },
+    enroll: { en: "Enroll", zh: "报名" },
     journey: { en: "Hello Journey", zh: "Hello Journey" },
     calendar: { en: "Calendar", zh: "日历" },
     bookCta: { en: "Book a Free Trial", zh: "预约免费试听" },
