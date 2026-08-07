@@ -68,7 +68,7 @@ function EnrollPrivate() {
             <p className="enroll-header__desc enroll-confirm__desc">
               Our team will follow up by email to discuss your goals and arrange a schedule that fits your family.
             </p>
-            <NavLink to="/Enroll" className="btn-primary">Back to programs</NavLink>
+            <NavLink to="/" className="btn-primary">Back to programs</NavLink>
           </div>
         </section>
         <Footer />

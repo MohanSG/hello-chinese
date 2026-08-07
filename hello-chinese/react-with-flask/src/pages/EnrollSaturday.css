@@ -5,8 +5,8 @@
 .enroll-badge--soon { background: #e9dfc8; color: #8a6d2f; }
 .enroll-badge--live { background: var(--color-brand); color: #fff; }
 
-.btn-primary { display: inline-flex; align-items: center; justify-content: center; padding: 14px 24px; border-radius: 12px; border: none; background: var(--color-brand); color: #fff; font-family: inherit; font-size: 15px; font-weight: 700; text-decoration: none; cursor: pointer; box-shadow: 0 8px 22px rgba(167, 38, 32, .28); }
-.btn-primary:hover { background: var(--color-brand-dark); color: #fff; }
+.btn-primary { display: inline-flex; align-items: center; justify-content: center; padding: 14px 24px; border-radius: 12px; border: none; background: #1e6b3e; color: #fff; font-family: inherit; font-size: 15px; font-weight: 700; text-decoration: none; cursor: pointer; box-shadow: 0 8px 22px rgba(167, 38, 32, .28); }
+.btn-primary:hover { background: #164f2e; color: #fff; }
 .btn-primary--block { width: 100%; margin-top: 24px; padding: 16px; font-size: 16px; }
 
 .enroll-confirm { text-align: center; }

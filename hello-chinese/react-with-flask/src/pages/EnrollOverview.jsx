@@ -4,24 +4,26 @@ import Footer from "../components/Footer";
 import "../styles/variables.css";
 import "./EnrollOverview.css";
 
+// Mobile priority: the free trial comes first for new families, then Sunday
+// (enrolling now), Saturday (interest list), and Private lessons.
 const PROGRAMS = [
-  {
-    key: "saturday",
-    to: "/Enroll/Saturday",
-    variant: "soon",
-    badge: "Coming Soon",
-    title: "Saturday Programs",
-    bullets: ["English + English-led Math", "Interest List only"],
-    cta: "Join Interest List",
-  },
   {
     key: "sunday",
     to: "/Enroll/Sunday",
     variant: "live",
     badge: "Now Enrolling",
     title: "Sunday Programs",
-    bullets: ["3 Chinese Levels", "Tutoring Support + Math"],
+    bullets: ["Chinese Learning Pathway", "Chinese Learning Support", "Math Enrichment"],
     cta: "View Sunday Programs",
+  },
+  {
+    key: "saturday",
+    to: "/Enroll/Saturday",
+    variant: "soon",
+    badge: "Coming Soon",
+    title: "Saturday Programs",
+    bullets: ["English Language Learning", "English Teacher-Led Math Enrichment"],
+    cta: "Join the Interest List",
   },
   {
     key: "private",
@@ -29,8 +31,8 @@ const PROGRAMS = [
     variant: "private",
     badge: "Flexible Schedule",
     title: "Private Lessons",
-    bullets: ["Flexible 1-on-1 Chinese", "Monday–Sunday", "Inquiry form"],
-    cta: "Contact Us",
+    bullets: ["One-on-One Chinese", "Monday–Sunday", "Online or In Person"],
+    cta: "Learn More",
   },
 ];
 
@@ -39,7 +41,6 @@ function EnrollOverview() {
     <div className="enroll-overview">
       <NavBar />
 
-      {/* HEADER */}
       <section className="enroll-header">
         <div className="enroll-header__watermark">报名</div>
         <div className="enroll-header__inner">
@@ -51,9 +52,25 @@ function EnrollOverview() {
         </div>
       </section>
 
-      {/* PROGRAM CARDS */}
       <section className="enroll-programs">
         <div className="enroll-programs__container">
+          <div className="trial">
+            <div className="trial__watermark" aria-hidden="true">试</div>
+            <div className="trial__inner">
+              <h2 className="trial__title">New to Hello Chinese?</h2>
+              <p className="trial__desc">
+                Experience a class, meet our teachers, and find the right level for your child.
+              </p>
+              <NavLink to="/Book" className="trial__cta">Book a Free Trial Class</NavLink>
+            </div>
+          </div>
+
+          <div className="enroll-divider">
+            <span className="enroll-divider__rule" aria-hidden="true" />
+            <span className="enroll-divider__text">Already learning with us? Explore our fall programs below.</span>
+            <span className="enroll-divider__rule" aria-hidden="true" />
+          </div>
+
           <div className="enroll-programs__grid">
             {PROGRAMS.map((p) => (
               <NavLink key={p.key} to={p.to} className={`program-card program-card--${p.variant}`}>
@@ -61,17 +78,17 @@ function EnrollOverview() {
                 <h2 className="program-card__title">{p.title}</h2>
                 <ul className="program-card__list">
                   {p.bullets.map((b) => (
-                    <li key={b} className="program-card__item">{b}</li>
+                    <li key={b} className="program-card__item">
+                      <span className="program-card__check" aria-hidden="true">✓</span>
+                      {b}
+                    </li>
                   ))}
                 </ul>
-                <span className={`program-card__cta program-card__cta--${p.variant}`}>{p.cta}</span>
+                <span className={`program-card__cta program-card__cta--${p.variant}`}>
+                  {p.cta} <span aria-hidden="true">→</span>
+                </span>
               </NavLink>
             ))}
-          </div>
-
-          <div className="enroll-programs__secondary">
-            <NavLink to="/Book" className="btn-trial">Book a Free Trial</NavLink>
-            <p className="enroll-programs__note">Not ready to enroll? A free trial is always available.</p>
           </div>
         </div>
       </section>

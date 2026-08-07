@@ -1,0 +1,73 @@
+.plans{max-width:1240px;margin:0 auto;padding:clamp(30px,4vw,44px) clamp(20px,5vw,56px) clamp(44px,6vw,64px);background:#fdf8ef}
+.plans--empty{text-align:center;padding-top:80px}
+.plans__back{display:inline-flex;align-items:center;gap:8px;font-size:14.5px;font-weight:500;color:#a72620;text-decoration:none;margin-bottom:12px}
+.plans__childbanner{display:flex;align-items:center;gap:10px;background:#fdf3e6;border:1px solid #ecdcba;border-radius:12px;padding:13px 16px;margin-bottom:14px;font-size:13.5px;color:#5b5348}
+.plans__childnum{flex:none;width:26px;height:26px;border-radius:999px;background:#a72620;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.plans__title{font-family:'Playfair Display',serif;font-weight:700;font-size:clamp(34px,5vw,48px);line-height:1.05;letter-spacing:-1.2px;margin:0 0 12px;color:#20201f}
+.plans__subtitle{font-size:16px;line-height:1.6;color:#5b5348;margin:0 0 26px;max-width:620px}
+.plans__subtitle strong{color:#20201f}
+.plans__strip{background:#fffdf8;border:1px solid #ecdcba;border-radius:14px;padding:22px;margin-bottom:26px}
+.plans__striptitle{font-size:14.5px;font-weight:700;color:#20201f;margin-bottom:16px}
+.plans__slots{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px}
+.plans__slot{display:flex;align-items:center;gap:14px;padding:14px 18px}
+.plans__slot--chinese{background:#fdf3e6;border:1px solid #ecdcba;border-radius:10px}
+.plans__sloticon{flex:none;width:40px;height:40px;border-radius:999px;background:#efe7d8;color:#8a6d2f;display:flex;align-items:center;justify-content:center}
+.plans__slot--chinese .plans__sloticon{background:#a72620;color:#fff;font-family:'Noto Serif SC',serif;font-size:15px;font-weight:600}
+.plans__slottime{display:block;font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#20201f}
+.plans__slot--chinese .plans__slottime{color:#a72620}
+.plans__slotlabel{display:block;font-size:13px;color:#948977}
+.plans__slot--chinese .plans__slotlabel{color:#5b5348}
+.plans__slotdiv{border-left:1px solid rgba(32,32,31,.12);height:44px}
+.plans__pricing{display:flex;align-items:flex-start;gap:18px;background:#fdf3e6;border:1px solid #ecdcba;border-radius:14px;padding:22px;margin-bottom:26px}
+.plans__infomark{flex:none;width:42px;height:42px;border-radius:999px;background:#fff;border:1.5px solid #a72620;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:19px;font-weight:700;font-style:italic;color:#a72620}
+.plans__pricingtitle{font-size:14.5px;font-weight:700;color:#a72620;margin-bottom:10px}
+.plans__pricinglist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px;font-size:13.5px;line-height:1.5;color:#5b5348}
+.plans__pricinglist strong{color:#20201f}
+.plans__sectionhead{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.plans__sectionhead h2{font-family:'Playfair Display',serif;font-weight:600;font-size:clamp(21px,2.6vw,26px);margin:0;color:#20201f}
+.plans__sectionhead span{font-size:13px;color:#948977}
+.plans__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.plan{position:relative;background:#fffdf8;border:1px solid #ecdcba;border-radius:14px;padding:22px}
+.plan--wide{grid-column:1 / -1}
+.plan--popular{border-color:#a72620;box-shadow:0 8px 24px rgba(167,38,32,.1)}
+.plan--off{background:#f8f4ea;border-color:#e2d3b4;opacity:.72}
+.plan__ribbon{position:absolute;top:-11px;left:20px;display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:999px;background:#a72620;color:#fff;font-size:11.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase}
+.plan__ribbon--off{background:#8a6d2f}
+.plan__body{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center}
+.plan__main{display:flex;align-items:flex-start;gap:14px;min-width:0}
+.plan__num{flex:none;width:48px;height:48px;border-radius:999px;background:#f6e7e1;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:19px;font-weight:600;color:#a72620}
+.plan--off .plan__num{background:#efe7d8;color:#948977}
+.plan__name{font-family:'Playfair Display',serif;font-weight:600;font-size:18px;margin:0 0 11px;color:#20201f}
+.plan__blocks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.plan__blocks li{display:grid;grid-template-columns:13px 88px 1fr;align-items:baseline;gap:8px;font-size:13.5px;color:#5b5348}
+.plan__check{color:#a72620;font-weight:700}
+.plan--off .plan__check{color:#b3a894}
+.plan__time{font-weight:600;color:#20201f;white-space:nowrap}
+.plan__note{margin:12px 0 0;font-size:12.5px;line-height:1.5;color:#948977}
+.plan__save{color:#1e6b3e;font-weight:700}
+.plan__price{display:flex;flex-direction:column;align-items:center;gap:8px;border-left:1px solid rgba(32,32,31,.1);padding-left:20px;min-width:150px}
+.plan__rate{display:flex;align-items:baseline;gap:5px}
+.plan__rateamount{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:#20201f;letter-spacing:-.5px}
+.plan--off .plan__rateamount{color:#948977}
+.plan__rateunit{font-size:13px;font-weight:600;color:#948977}
+.plan__ratelabel{font-size:11.5px;font-weight:600;letter-spacing:.6px;color:#948977;text-transform:uppercase}
+.plan__cta{display:flex;align-items:center;justify-content:center;width:100%;margin-top:4px;padding:14px 24px;border-radius:11px;background:#1e6b3e;color:#fff;font-size:14.5px;font-weight:700;text-decoration:none;white-space:nowrap;box-shadow:0 6px 18px rgba(30,107,62,.24)}
+.plan__cta--off{background:#efe7d8;color:#948977;box-shadow:none;cursor:not-allowed}
+.plans__foot{display:flex;align-items:center;justify-content:center;gap:9px;margin:26px 0 0;font-size:13.5px;color:#948977}
+.plans__srhint{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:1240px){
+  .plan__body{grid-template-columns:1fr}
+  .plan__price{border-left:none;padding-left:0;border-top:1px solid rgba(32,32,31,.1);padding-top:16px;align-items:stretch;min-width:0}
+  .plan__rate{justify-content:center}
+  .plan__ratelabel{text-align:center}
+}
+@media (max-width:760px){
+  .plans__slots{grid-template-columns:1fr;gap:10px}
+  .plans__slotdiv{display:none}
+  .plans__grid{grid-template-columns:1fr}
+  .plan--wide{grid-column:auto}
+}
+@media (max-width:520px){
+  .plan{padding:18px}
+  .plan__blocks li{grid-template-columns:13px 84px 1fr;gap:7px;font-size:13px}
+}

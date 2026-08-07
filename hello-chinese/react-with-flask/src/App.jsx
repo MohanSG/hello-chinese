@@ -5,38 +5,47 @@ import {
 } from "react-router-dom";
 import { LanguageProvider } from "./i18n/LanguageContext";
 
-import Home from "./pages/Home";
+// import Home from "./pages/Home";
 // import About from "./pages/About";
-import Classes from "./pages/Classes";
-import Book from "./pages/Book";
-import Calendar from "./pages/Calendar";
+// import Classes from "./pages/Classes";
+// import Book from "./pages/Book";
+// import Calendar from "./pages/Calendar";
 // import CulturalExperiences from "./pages/CulturalExperiences";
 // import HelloJourney from "./pages/HelloJourney";
+
 import EnrollOverview from "./pages/EnrollOverview";
 import EnrollSaturday from "./pages/EnrollSaturday";
-import EnrollSunday from "./pages/EnrollSunday";
 import EnrollPrivate from "./pages/EnrollPrivate";
+import EnrollSundayProgram from "./pages/EnrollSundayProgram";
 import EnrollStepIn from "./pages/EnrollStepIn";
-import EnrollReview from "./pages/EnrollReview";
+import EnrollStepUp from "./pages/EnrollStepUp";
+import EnrollStepBeyond from "./pages/EnrollStepBeyond";
+import EnrollSelectDates from "./pages/EnrollSelectDates";
+import EnrollRegistration from "./pages/EnrollRegistration";
+
 function App() {
   return (
     <LanguageProvider>
       <BrowserRouter>
         <Routes>
-          {/* <Route path="/" element={<Home />} /> */}
+          {/* <Route path="/" element={<Home />} />
+          <Route path="/About" element={<About />} />
+          <Route path="/Classes" element={<Classes />} />
+          <Route path="/Book" element={<Book />} />
+          <Route path="/Calendar" element={<Calendar />} />
+          <Route path="/Chat" element={<Chat />} />
+          <Route path="/CulturalExperiences" element={<CulturalExperiences />} />
+          <Route path="/HelloJourney" element={<HelloJourney />} /> */}
+
           <Route path="/" element={<EnrollOverview />} />
           <Route path="/Enroll/Saturday" element={<EnrollSaturday />} />
-          <Route path="/Enroll/Sunday" element={<EnrollSunday />} />
           <Route path="/Enroll/Private" element={<EnrollPrivate />} />
+          <Route path="/Enroll/Sunday" element={<EnrollSundayProgram />} />
           <Route path="/Enroll/Step-In" element={<EnrollStepIn />} />
-          <Route path="/Enroll/Review" element={<EnrollReview />} />
-          
-          {/* <Route path="/About" element={<About />} /> */}
-          {/* <Route path="/Classes" element={<Classes />} />
-          <Route path="/Book" element={<Book />} />
-          <Route path="/Calendar" element={<Calendar />} /> */}
-          {/* <Route path="/CulturalExperiences" element={<CulturalExperiences />} />
-          <Route path="/HelloJourney" element={<HelloJourney />} /> */}
+          <Route path="/Enroll/Step-Up" element={<EnrollStepUp />} />
+          <Route path="/Enroll/Step-Beyond" element={<EnrollStepBeyond />} />
+          <Route path="/Enroll/Sundays" element={<EnrollSelectDates />} />
+          <Route path="/Enroll/Registration" element={<EnrollRegistration />} />
         </Routes>
       </BrowserRouter>
     </LanguageProvider>
