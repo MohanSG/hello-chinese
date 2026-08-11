@@ -8,6 +8,8 @@ export function LanguageProvider({ children }) {
 
   useEffect(() => {
     localStorage.setItem("hc-lang", lang);
+    // Drives the Chinese type stack in variables.css (Part 4).
+    document.documentElement.lang = lang === "zh" ? "zh" : "en";
   }, [lang]);
 
   const t = (path) => {

@@ -1,12 +1,18 @@
 .enroll-overview { background: var(--color-bg); min-height: 100vh; }
 
-/* Shared dark header band */
+/* Shared dark header band (used by Sunday, Saturday, Private, and confirmation views) */
 .enroll-header { background: var(--color-dark); position: relative; overflow: hidden; }
 .enroll-header__watermark { position: absolute; top: -90px; right: -30px; font-family: var(--font-zh); font-size: 330px; line-height: 1; color: rgba(167, 38, 32, .14); font-weight: 700; pointer-events: none; user-select: none; }
 .enroll-header__inner { position: relative; max-width: 1000px; margin: 0 auto; padding: clamp(48px, 7vw, 80px) clamp(20px, 5vw, 56px); }
 .enroll-header__eyebrow { font-size: 12.5px; font-weight: 700; letter-spacing: 2.4px; color: var(--color-brand-light); text-transform: uppercase; margin-bottom: 16px; }
 .enroll-header__title { font-family: var(--font-serif); font-weight: 600; font-size: clamp(38px, 5.5vw, 56px); line-height: 1.06; letter-spacing: -1px; margin: 0 0 18px; color: #fff; }
 .enroll-header__desc { font-size: 17px; line-height: 1.6; color: var(--color-cream-text-soft); margin: 0; max-width: 560px; }
+
+@media (max-width: 640px) {
+  .enroll-header__eyebrow { margin-bottom: 10px; }
+}
+
+
 
 /* Program cards */
 .enroll-programs { background: var(--color-bg-alt); }
@@ -40,15 +46,14 @@
 .enroll-programs__note { font-size: 13px; color: var(--color-text-faint); margin: 10px 0 0; }
 
 @media (max-width: 640px) {
-  .enroll-header__eyebrow { margin-bottom: 10px; }
   .program-card { padding: 22px; }
 }
 
 /* --- Free trial hero + divider (mobile-priority overview) --- */
 .trial{position:relative;overflow:hidden;background:#a72620;border-radius:24px;padding:clamp(26px,4vw,40px);text-align:center;box-shadow:0 14px 36px rgba(167,38,32,.22)}
-.trial__watermark{position:absolute;top:-40px;right:-14px;font-family:'Noto Serif SC',serif;font-size:170px;line-height:1;color:rgba(255,255,255,.09);font-weight:700;pointer-events:none;user-select:none}
+.trial__watermark{position:absolute;top:-40px;right:-14px;font-family:var(--font-zh);font-size:170px;line-height:1;color:rgba(255,255,255,.09);font-weight:700;pointer-events:none;user-select:none}
 .trial__inner{position:relative}
-.trial__title{font-family:'Playfair Display',serif;font-weight:600;font-size:clamp(26px,3.6vw,34px);line-height:1.15;margin:0 0 10px;color:#fff}
+.trial__title{font-family:var(--font-serif);font-weight:600;font-size:clamp(26px,3.6vw,34px);line-height:1.15;margin:0 0 10px;color:#fff}
 .trial__desc{font-size:16px;line-height:1.6;color:rgba(255,255,255,.88);margin:0 auto 24px;max-width:440px}
 .trial__cta{display:inline-flex;align-items:center;justify-content:center;width:100%;max-width:400px;padding:17px 26px;border-radius:13px;background:#fff;color:#a72620;font-size:17px;font-weight:700;text-decoration:none;box-shadow:0 8px 20px rgba(0,0,0,.14)}
 .enroll-divider{display:flex;align-items:center;gap:16px;margin:clamp(30px,4vw,42px) 0 clamp(22px,3vw,28px)}
@@ -61,4 +66,37 @@
 .program-card--private .program-card__check{color:#7fae8c}
 @media (max-width:640px){
   .enroll-divider__rule{display:none}
+}
+
+/* --- Part 1: warm brand hero -------------------------------------------- */
+/* Drop the ivory paper / Capitol / Great Wall artwork at
+   src/assets/enroll-hero.png (or repoint the URL below). */
+.enroll-hero { position: relative; display: flex; align-items: center; overflow: hidden; min-height: 560px; background: #f8f2e6; }
+.enroll-hero__art {
+  position: absolute; inset: 0;
+  background-image: url("../assets/enroll-hero.png");
+  background-size: cover; background-position: center;
+}
+.enroll-hero__scrim {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(100deg, rgba(248,242,230,.96) 0%, rgba(248,242,230,.88) 34%, rgba(248,242,230,.42) 62%, rgba(248,242,230,.05) 100%);
+}
+.enroll-hero__inner { position: relative; z-index: 2; width: 100%; max-width: 1080px; margin: 0 auto; padding: clamp(56px, 7vw, 88px) clamp(20px, 5vw, 56px); }
+.enroll-hero__copy { max-width: 620px; }
+.enroll-hero__eyebrow { font-family: var(--font-sans-en); font-size: 13.5px; font-weight: 600; letter-spacing: 3.4px; text-transform: uppercase; color: #a1783a; margin-bottom: 22px; }
+.enroll-hero__title { font-family: var(--font-serif-en); font-weight: 600; font-size: clamp(44px, 6vw, 72px); line-height: 1.04; letter-spacing: -.6px; margin: 0 0 22px; color: var(--color-text); text-wrap: balance; }
+.enroll-hero__title-accent { color: var(--color-brand); }
+.enroll-hero__desc { font-family: var(--font-sans-en); font-size: clamp(17px, 2vw, 19.5px); line-height: 1.62; color: var(--color-text-soft); margin: 0 0 36px; max-width: 500px; }
+.enroll-hero__actions { display: flex; flex-wrap: wrap; gap: 14px; }
+.enroll-hero__cta { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-serif-en); font-size: 20px; font-weight: 600; text-decoration: none; padding: 15px 30px; border-radius: 6px; transition: all .2s; }
+.enroll-hero__cta--primary { background: #8f1d18; color: #fff; box-shadow: 0 8px 22px rgba(143, 29, 24, .26); }
+.enroll-hero__cta--primary:hover { background: #741613; color: #fff; transform: translateY(-2px); }
+.enroll-hero__cta--secondary { background: rgba(255, 253, 248, .85); color: #8f1d18; border: 1.5px solid rgba(143, 29, 24, .45); }
+.enroll-hero__cta--secondary:hover { background: #fff; border-color: #8f1d18; color: #8f1d18; }
+.enroll-programs__grid { scroll-margin-top: 90px; }
+
+@media (max-width: 760px) {
+  .enroll-hero { min-height: 0; }
+  .enroll-hero__art { opacity: .5; }
+  .enroll-hero__scrim { background: linear-gradient(180deg, rgba(248,242,230,.94) 0%, rgba(248,242,230,.88) 100%); }
 }

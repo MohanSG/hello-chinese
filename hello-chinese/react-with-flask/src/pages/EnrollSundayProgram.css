@@ -1,7 +1,7 @@
 .sun-detail { background: var(--color-bg-alt); }
 .sun-detail__container { max-width: 1080px; margin: 0 auto; padding: clamp(44px, 6vw, 72px) clamp(20px, 5vw, 56px); }
 .sun-detail__head { display: flex; align-items: baseline; gap: 12px; border-bottom: 2px solid rgba(167, 38, 32, .25); padding-bottom: 12px; margin-bottom: 22px; }
-.sun-detail__zh { font-family: var(--font-zh); font-size: 19px; color: var(--color-brand); font-weight: 600; }
+.sun-detail__icon { display: flex; align-items: center; color: var(--color-brand); align-self: center; }
 .sun-detail__title { font-family: var(--font-serif); font-weight: 600; font-size: clamp(22px, 2.8vw, 28px); margin: 0; color: var(--color-text); }
 
 .sun-rows { display: flex; flex-direction: column; gap: 16px; }
@@ -85,3 +85,8 @@
 
 .enroll-childbanner{display:flex;align-items:center;gap:10px;background:#fdf3e6;border:1px solid #ecdcba;border-radius:12px;padding:13px 16px;margin:14px 0 4px;max-width:620px;font-size:13.5px;line-height:1.5;color:#5b5348;text-wrap:pretty}
 .enroll-childnum{flex:none;width:26px;height:26px;border-radius:999px;background:#a72620;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+
+.sun-row__desc--tight{margin:0 0 10px}
+.sun-row__ticks{display:flex;flex-direction:column;gap:7px}
+.sun-tick{display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:700;color:var(--color-text)}
+.sun-tick__mark{color:#1d5aa8;font-weight:700;line-height:1.3}

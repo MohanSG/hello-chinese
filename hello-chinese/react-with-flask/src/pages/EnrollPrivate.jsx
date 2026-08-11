@@ -104,7 +104,12 @@ function EnrollPrivate() {
       <div className="sat-interest">
         <form className="sat-form" onSubmit={submitInquiry}>
           <div className="private-form__head">
-            <span className="private-form__zh">咨询</span>
+            <span className="private-form__icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 15.5a2.5 2.5 0 0 1-2.5 2.5H8l-4 3V6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v9Z" />
+                <path d="M8.5 9.5h7M8.5 12.5h4.5" />
+              </svg>
+            </span>
             <h2 className="private-form__title">Request a private lesson</h2>
           </div>
 

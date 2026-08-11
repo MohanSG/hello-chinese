@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { POLICY_SUMMARY, priceQuote } from "../data/enrollment";
+import { POLICY_SUMMARY, PAYMENT_HELP_NOTE, PRIVACY_SUMMARY, PRIVACY_CONSENT_LABEL, PRIVACY_CONSENT_HINT, COUPON_INVALID_MESSAGE, SIBLING_DISCOUNT, siblingDiscountFor, ageFromDOB, lookupCoupon, couponDiscount, paymentPlan, priceQuote } from "../data/enrollment";
 import { readDraft, writeDraft, clearDraft, removeEnrollment, money } from "../data/enrollmentDraft";
 import "./EnrollRegistration.css";
 
@@ -26,6 +26,12 @@ export default function EnrollRegistration({ onSubmit }) {
   const parentDone = !!(initial.parent.name && initial.parent.email && initial.parent.phone);
   const [step, setStep] = useState(parentDone ? "student" : "parent");
   const [policyAccepted, setPolicyAccepted] = useState(false);
+  const [payment, setPayment] = useState("full");
+  const [mediaConsent, setMediaConsent] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
+  const [coupon, setCoupon] = useState(null);
+  const [couponError, setCouponError] = useState("");
+  const todayISO = new Date().toISOString().slice(0, 10);
   const [warning, setWarning] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
@@ -65,8 +71,28 @@ export default function EnrollRegistration({ onSubmit }) {
     const q = priceQuote(e.planId, (e.dates || []).length);
     return q ? q.savings : 0;
   };
-  const householdTotal = enrollments.reduce((sum, e) => sum + subtotalOf(e), 0);
-  const householdSavings = enrollments.reduce((sum, e) => sum + savingsOf(e), 0);
+  const householdSubtotal = enrollments.reduce((sum, e) => sum + subtotalOf(e), 0);
+  const sibling = siblingDiscountFor(enrollments.length);
+  const discount = couponDiscount(coupon, householdSubtotal - sibling);
+  const householdTotal = householdSubtotal - sibling - discount;
+  const packageSavings = enrollments.reduce((sum, e) => sum + savingsOf(e), 0);
+  const householdSavings = packageSavings + sibling + discount;
+  const installments = paymentPlan(householdTotal);
+
+  const applyCoupon = () => {
+    const found = lookupCoupon(couponInput);
+    if (!found) { setCoupon(null); setCouponError(COUPON_INVALID_MESSAGE); return; }
+    setCoupon(found);
+    setCouponInput(found.code);
+    setCouponError("");
+  };
+  const removeCoupon = () => { setCoupon(null); setCouponInput(""); setCouponError(""); };
+
+  const savingsDetail = [
+    packageSavings > 0 ? `${money(packageSavings)} package savings` : null,
+    sibling > 0 ? `${money(sibling)} sibling discount` : null,
+    discount > 0 && coupon ? `${money(discount)} coupon ${coupon.code}` : null,
+  ].filter(Boolean).join(" · ");
 
   if (!enrollments.length) {
     return (
@@ -121,7 +147,7 @@ export default function EnrollRegistration({ onSubmit }) {
     : "#";
 
   const submit = () => {
-    const missing = enrollments.find((e) => !e.student?.name || !e.student?.age || !e.student?.grade);
+    const missing = enrollments.find((e) => !e.student?.name || !e.student?.dob || !e.student?.grade);
     if (missing) { setWarning("One child is missing required information. Use Edit to complete it."); return; }
     if (!policyAccepted) { setWarning("Please accept the enrollment and refund policy."); return; }
     const payload = {
@@ -129,7 +155,7 @@ export default function EnrollRegistration({ onSubmit }) {
       submittedAt: new Date().toISOString(),
       parent,
       children: enrollments.map((e) => ({
-        student: e.student,
+        student: { ...e.student, age: ageFromDOB(e.student?.dob) },
         levelKey: e.levelKey,
         levelName: e.levelName,
         planId: e.planId,
@@ -138,9 +164,17 @@ export default function EnrollRegistration({ onSubmit }) {
         sessionDates: e.dates,
         pricing: priceQuote(e.planId, (e.dates || []).length),
       })),
+      householdSubtotal,
+      coupon: coupon ? { code: coupon.code, label: coupon.label, discount } : null,
+      siblingDiscount: sibling,
+      packageSavings,
       householdTotal,
       householdSavings,
+      payment: payment === "plan"
+        ? { method: "plan", installments }
+        : { method: "full", amount: householdTotal },
       policyAcknowledged: true,
+      privacy: { mediaConsent },
     };
     if (onSubmit) onSubmit(payload);
     clearDraft();
@@ -238,8 +272,13 @@ export default function EnrollRegistration({ onSubmit }) {
                 <input type="text" value={student.name || ""} onChange={updateStudent("name")} placeholder="Enter child's full name" />
               </label>
               <label className="field">
-                <span>Age *</span>
-                <input type="text" value={student.age || ""} onChange={updateStudent("age")} placeholder="e.g. 6" />
+                <span>Date of birth *</span>
+                <input type="date" value={student.dob || ""} onChange={updateStudent("dob")} max={todayISO} aria-label="Date of birth" aria-describedby="reg-age-hint" />
+                <em className="field__derived" id="reg-age-hint">
+                  {ageFromDOB(student.dob) === null
+                    ? "Age is calculated from the date of birth."
+                    : `Age ${ageFromDOB(student.dob)}`}
+                </em>
               </label>
               <label className="field">
                 <span>Grade *</span>
@@ -268,8 +307,12 @@ export default function EnrollRegistration({ onSubmit }) {
             type="button"
             className="reg__primary"
             onClick={() => {
-              if (!student.name || !student.age || !student.grade) {
-                setWarning("Please add the child's name, age, and grade.");
+              if (!student.name || !student.dob || !student.grade) {
+                setWarning("Please add the child's name, date of birth, and grade.");
+                return;
+              }
+              if (ageFromDOB(student.dob) === null) {
+                setWarning("Please check the date of birth — it cannot be in the future.");
                 return;
               }
               persist();
@@ -349,7 +392,7 @@ export default function EnrollRegistration({ onSubmit }) {
                 <div>
                   <dt>Student</dt>
                   <dd>
-                    {[e.student?.name || "Name pending", e.student?.age && `Age ${e.student.age}`, e.student?.grade, e.student?.school]
+                    {[e.student?.name || "Name pending", ageFromDOB(e.student?.dob) !== null && `Age ${ageFromDOB(e.student.dob)}`, e.student?.grade, e.student?.school]
                       .filter(Boolean)
                       .join(" · ")}
                   </dd>
@@ -372,15 +415,88 @@ export default function EnrollRegistration({ onSubmit }) {
                 </div>
               ))}
             </dl>
+            <div className="coupon">
+              <input
+                type="text"
+                className="coupon__input"
+                placeholder="Coupon code"
+                value={couponInput}
+                onChange={(e) => { setCouponInput(e.target.value); setCouponError(""); }}
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); applyCoupon(); } }}
+              />
+              <button type="button" className="coupon__btn" onClick={applyCoupon}>Apply</button>
+            </div>
+            {coupon && (
+              <p className="coupon__applied">
+                {coupon.code} applied &mdash; {coupon.label}
+                <button type="button" className="coupon__remove" onClick={removeCoupon}>Remove</button>
+              </p>
+            )}
+            {couponError && <p className="coupon__error">{couponError}</p>}
+            {(coupon || sibling > 0) && (
+              <div className="household__sub">
+                <span>Subtotal</span><span>{money(householdSubtotal)}</span>
+              </div>
+            )}
+            {sibling > 0 && (
+              <div className="household__sub household__sub--off">
+                <span>Sibling discount ({enrollments.length} children)</span><span>&minus;{money(sibling)}</span>
+              </div>
+            )}
+            {coupon && (
+              <div className="household__sub household__sub--off">
+                <span>Coupon ({coupon.code})</span><span>&minus;{money(discount)}</span>
+              </div>
+            )}
             <div className="household__total">
               <span>Total due</span>
               <strong>{money(householdTotal)}</strong>
             </div>
+            {householdSavings > 0 && (
+              <div className="savings">
+                <span className="savings__amount">You save {money(householdSavings)}</span>
+                <span className="savings__detail">{savingsDetail}</span>
+              </div>
+            )}
             <p className="household__note">
-              {householdSavings > 0
-                ? `Includes ${money(householdSavings)} in package savings, applied automatically. All rates are per student.`
-                : "All rates are per student. Package savings apply automatically once a component reaches an eligible quantity."}
+              {enrollments.length < 2
+                ? `All rates are per student. Enroll a second child and the household saves ${money(SIBLING_DISCOUNT)} more.`
+                : "All rates are per student. Package and sibling savings are applied automatically."}
             </p>
+          </section>
+
+          <section className="card">
+            <h2 className="card__title">How would you like to pay?</h2>
+            <div className="pay">
+              <label className={`pay__opt${payment === "full" ? " pay__opt--on" : ""}`}>
+                <input type="radio" name="payment" checked={payment === "full"} onChange={() => setPayment("full")} />
+                <span className="pay__body">
+                  <span className="pay__name">Pay in full</span>
+                  <span className="pay__meta">One payment before the first Sunday</span>
+                </span>
+                <span className="pay__amount">{money(householdTotal)}</span>
+              </label>
+              <label className={`pay__opt${payment === "plan" ? " pay__opt--on" : ""}`}>
+                <input type="radio" name="payment" checked={payment === "plan"} onChange={() => setPayment("plan")} />
+                <span className="pay__body">
+                  <span className="pay__name">Payment plan — 3 months</span>
+                  <span className="pay__meta">September, October, and November · no fees</span>
+                </span>
+                <span className="pay__amount">{money(installments[1].amount)}<em>/mo</em></span>
+              </label>
+            </div>
+            {payment === "plan" && (
+              <ul className="split">
+                {installments.map((p) => (
+                  <li key={p.due}>
+                    <span className="split__month">{p.label}</span>
+                    <span className="split__due">Due {p.due}</span>
+                    <strong>{money(p.amount)}</strong>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <p className="pay__help">{PAYMENT_HELP_NOTE}</p>
           </section>
 
           <section className="card">
@@ -389,6 +505,18 @@ export default function EnrollRegistration({ onSubmit }) {
             <label className="policy">
               <input type="checkbox" checked={policyAccepted} onChange={() => { setPolicyAccepted((v) => !v); setWarning(""); }} />
               <span>I have read and accept the enrollment and refund policy. *</span>
+            </label>
+          </section>
+
+          <section className="card">
+            <h2 className="card__title">Your child&rsquo;s privacy</h2>
+            <p className="card__text">{PRIVACY_SUMMARY}</p>
+            <label className="policy">
+              <input type="checkbox" checked={mediaConsent} onChange={() => setMediaConsent((v) => !v)} />
+              <span>
+                {PRIVACY_CONSENT_LABEL}
+                <em className="policy__hint">{PRIVACY_CONSENT_HINT}</em>
+              </span>
             </label>
           </section>
 

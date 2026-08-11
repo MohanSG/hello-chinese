@@ -4,25 +4,26 @@ import Footer from "../components/Footer";
 import "../styles/variables.css";
 import "./EnrollOverview.css";
 import "./EnrollSaturday.css";
+import { LEVEL_ICONS, MathIcon, PathwayIcon } from "../components/EnrollIcons";
 import "./EnrollSundayProgram.css";
 
 const LEVELS = [
   {
-    key: "stepin", tone: "green", zh: "启蒙",
+    key: "stepin", tone: "green",
     title: "Step-In Chinese", subtitle: "Building Language Foundations",
     age: "Recommended Ages 3–6+", time: "9:00 – 10:00 AM",
     desc: "Build a strong foundation through vocabulary, sentence formation, and early literacy, while developing confidence and a natural feel for Chinese.",
     to: "/Enroll/Step-In",
   },
   {
-    key: "stepup", tone: "blue", zh: "进阶",
+    key: "stepup", tone: "blue",
     title: "Step-Up Chinese", subtitle: "Developing Language Skills",
     age: "Recommended Ages 7–10", time: "10:00 – 11:00 AM",
     desc: "Develop core language skills through expanded sentence patterns, structured reading and writing, and comprehension, while applying Chinese in meaningful contexts.",
     to: "/Enroll/Step-Up",
   },
   {
-    key: "stepbeyond", tone: "purple", zh: "精进",
+    key: "stepbeyond", tone: "purple",
     title: "Step-Beyond Chinese", subtitle: "Advancing Language Independence",
     age: "Recommended Ages 10+", time: "11:00 AM – 12:00 PM",
     desc: "Advance toward independent language use through deeper reading, more complex writing, real-world communication, and project-based learning, while developing the confidence to express ideas with greater depth and clarity.",
@@ -39,12 +40,6 @@ const SUPPORT_FEATURES = [
   { title: "Review & Reinforce", desc: "Strengthen key learning through guided practice." },
   { title: "Speak with Confidence", desc: "Build communication skills through conversation and role-play." },
   { title: "Personalized Support", desc: "Learn at your own pace with small-group guidance." },
-];
-
-const MATH_FEATURES = [
-  { title: "Strengthen Mathematical Foundations", desc: "Build accuracy, fluency, and strong core skills." },
-  { title: "Cultivate Mathematical Thinking", desc: "Develop reasoning and problem-solving strategies." },
-  { title: "Support Academic Growth", desc: "Build confidence and support stronger academic performance." },
 ];
 
 function PeopleIcon() {
@@ -100,7 +95,7 @@ function EnrollSundayProgram() {
       <section className="sun-detail">
         <div className="sun-detail__container">
           <div className="sun-detail__head">
-            <span className="sun-detail__zh">课程</span>
+            <span className="sun-detail__icon" aria-hidden="true"><PathwayIcon /></span>
             <h2 className="sun-detail__title">Chinese Learning Pathway</h2>
           </div>
           <p className="sun-detail__intro">{PATHWAY_INTRO}</p>
@@ -109,7 +104,9 @@ function EnrollSundayProgram() {
             {/* LEVEL ROWS */}
             {LEVELS.map((lvl) => (
               <div key={lvl.key} className={`sun-row sun-row--${lvl.tone}`}>
-                <div className={`sun-row__badge sun-row__badge--${lvl.tone}`}>{lvl.zh}</div>
+                <div className={`sun-row__badge sun-row__badge--${lvl.tone}`}>
+                  {(() => { const Icon = LEVEL_ICONS[lvl.key]; return Icon ? <Icon /> : null; })()}
+                </div>
                 <div>
                   <div className={`sun-row__title sun-row__title--${lvl.tone}`}>{lvl.title}</div>
                   <div className={`sun-row__subtitle sun-row__subtitle--${lvl.tone}`}>{lvl.subtitle}</div>
@@ -147,35 +144,25 @@ function EnrollSundayProgram() {
 
             {/* MATH ENRICHMENT — independent */}
             <div className="sun-row sun-row--math">
-              <div className="sun-row__badge sun-row__badge--blue">数学</div>
+              <div className="sun-row__badge sun-row__badge--blue"><MathIcon /></div>
               <div>
-                <div className="sun-row__eyebrow">Independent Sunday course</div>
                 <div className="sun-row__title sun-row__title--blue">Math Enrichment</div>
                 <div className="sun-row__subtitle sun-row__subtitle--blue">Grouped by Grade &amp; Skill Level</div>
                 <div className="sun-row__age">Recommended Ages 7–12</div>
-                <div className="sun-row__time sun-row__time--inline"><CalendarIcon />11:00 AM – 12:00 PM</div>
               </div>
+              <div className="sun-row__time"><CalendarIcon />11:00 AM – 12:00 PM</div>
               <div>
-                <p className="sun-row__desc">
-                  Math instruction designed to strengthen foundations, calculation skills, logical reasoning,
-                  problem-solving, confidence, and academic performance.
+                <p className="sun-row__desc sun-row__desc--tight">
+                  An independent Sunday course that builds core skills, reasoning, and confidence.
+                  Students are grouped by both grade level and mathematical ability.
                 </p>
-                <div className="sun-row__features">
-                  {MATH_FEATURES.map((f) => (
-                    <div key={f.title} className="sun-feature">
-                      <span className="sun-feature__tick sun-feature__tick--blue" aria-hidden="true">✓</span>
-                      <span>
-                        <span className="sun-feature__title">{f.title}</span>
-                        <span className="sun-feature__desc">{f.desc}</span>
-                      </span>
-                    </div>
-                  ))}
+                <div className="sun-row__ticks">
+                  <div className="sun-tick"><span className="sun-tick__mark" aria-hidden="true">✓</span><span>Strengthen Mathematical Foundations</span></div>
+                  <div className="sun-tick"><span className="sun-tick__mark" aria-hidden="true">✓</span><span>Cultivate Mathematical Thinking</span></div>
+                  <div className="sun-tick"><span className="sun-tick__mark" aria-hidden="true">✓</span><span>Support Academic Growth</span></div>
                 </div>
-                <p className="sun-row__grouping">
-                  Students are grouped based on both grade level and mathematical ability.
-                </p>
               </div>
-              <NavLink to={"/Enroll/Step-In" + childQuery} className="sun-row__cta sun-row__cta--ghost">Choose Your Plan →</NavLink>
+              <NavLink to={"/enroll/math" + childQuery} className="sun-row__cta sun-row__cta--ghost">Choose Your Plan →</NavLink>
             </div>
 
             {/* NEXT STEP */}

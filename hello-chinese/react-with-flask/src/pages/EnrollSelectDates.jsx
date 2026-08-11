@@ -1,13 +1,12 @@
 import React, { useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
-  LEVELS, PLANS, TERMS, planConflict, planTitle, priceQuote, scheduleFor,
+  LEVELS, PLANS, TERMS, MIN_SESSION_DATES, MAX_SESSION_DATES, minimumDatesFor, planConflict, planTitle, priceQuote, scheduleFor,
   sundaysByMonth, eligibleSundays, validateDateSelection, formatDateShort,
 } from "../data/enrollment";
 import { readDraft, saveEnrollment, nextOpenIndex, money, pluralUnit } from "../data/enrollmentDraft";
+import { ChineseIcon, MathIcon } from "../components/EnrollIcons";
 import "./EnrollSelectDates.css";
-import NavBar from "../components/NavBar";
-import Footer from "../components/Footer";
 
 // Step 2 of the Sunday flow: pick any combination of the term's Sundays and see
 // the price update live. Each component earns its package discount on its own
@@ -44,6 +43,8 @@ export default function EnrollSelectDates() {
   const months = sundaysByMonth(term);
   const quote = priceQuote(planId, selected.length);
   const validation = validateDateSelection(selected, term);
+  const minimum = minimumDatesFor(term);
+  const minimumReduced = minimum < MIN_SESSION_DATES;
   const childQuery = childIndex > 0 ? `?child=${childIndex + 1}` : "";
 
   const toggle = (iso) => {
@@ -91,7 +92,9 @@ export default function EnrollSelectDates() {
       <div className="sundays__cols">
         <div className="sundays__main">
           <section className="selected-plan">
-            <span className="selected-plan__icon" aria-hidden="true">中</span>
+            <span className="selected-plan__icon" aria-hidden="true">
+              {levelKey === "math" ? <MathIcon size={22} /> : <ChineseIcon size={22} />}
+            </span>
             <div>
               <div className="selected-plan__level">{level.name} Chinese</div>
               <div className="selected-plan__plan">{planTitle(planId)}</div>
@@ -113,7 +116,11 @@ export default function EnrollSelectDates() {
               <h2>Select Your Sundays</h2>
               <span className="picker__counter">{selected.length} of {term.dates.length} Sundays selected</span>
             </div>
-            <p className="picker__hint">{term.label} runs on {term.dates.length} Sundays. Pick any combination.</p>
+            <p className="picker__hint">
+              {minimumReduced
+                ? `Some Sundays in ${term.label} have already passed. Choose at least ${minimum} of the ${minimum === 1 ? "remaining Sunday" : "remaining Sundays"} to enroll.`
+                : `${term.label} runs on ${term.dates.length} Sundays. Choose at least ${MIN_SESSION_DATES}, up to all ${MAX_SESSION_DATES}.`}
+            </p>
 
             <div className="picker__quick">
               <button type="button" onClick={() => { setWarning(""); setSelected(eligibleSundays(term).map((s) => s.iso)); }}>

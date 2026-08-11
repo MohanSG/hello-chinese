@@ -41,14 +41,30 @@ function EnrollOverview() {
     <div className="enroll-overview">
       <NavBar />
 
-      <section className="enroll-header">
-        <div className="enroll-header__watermark">报名</div>
-        <div className="enroll-header__inner">
-          <div className="enroll-header__eyebrow">Fall Enrollment</div>
-          <h1 className="enroll-header__title">Which program is your family enrolling in?</h1>
-          <p className="enroll-header__desc">
-            Choose a schedule to see programs, levels, and packages built for that day.
-          </p>
+      {/* Part 1 — warm, brand-led hero (replaces the old dark header band) */}
+      <section className="enroll-hero">
+        <div className="enroll-hero__art" aria-hidden="true" />
+        <div className="enroll-hero__scrim" aria-hidden="true" />
+        <div className="enroll-hero__inner">
+          <div className="enroll-hero__copy">
+            <div className="enroll-hero__eyebrow">Fall Enrollment</div>
+            <h1 className="enroll-hero__title">
+              Find the Right<br />
+              <span className="enroll-hero__title-accent">Program</span> for Your Child
+            </h1>
+            <p className="enroll-hero__desc">
+              Explore our Sunday Chinese programs, free trial options, and flexible learning
+              opportunities for Fall 2026.
+            </p>
+            <div className="enroll-hero__actions">
+              <NavLink to="/Enroll/Sunday" className="enroll-hero__cta enroll-hero__cta--primary">
+                View Sunday Programs <span aria-hidden="true">→</span>
+              </NavLink>
+              <NavLink to="/FreeTrial" className="enroll-hero__cta enroll-hero__cta--secondary">
+                Book a Free Trial <span aria-hidden="true">→</span>
+              </NavLink>
+            </div>
+          </div>
         </div>
       </section>
 

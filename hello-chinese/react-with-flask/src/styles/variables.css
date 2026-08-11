@@ -1,12 +1,21 @@
 /* HelloChinese — design tokens + global reset.
    Import once, at the app root (App.jsx already does this). */
 
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;600&family=LXGW+WenKai+TC:wght@400;700&display=swap");
 
 :root {
-  --font-serif: 'Playfair Display', serif;
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-zh: 'Noto Serif SC', serif;
+  /* Brief Part 4 — type system.
+     English: Cormorant Garamond for headings, Source Sans 3 for body/buttons/nav.
+     Chinese: WenKai/KaiTi for the brand title only, Noto Serif SC for subheadings,
+     Noto Sans SC for body text. */
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Source Sans 3', system-ui, sans-serif;
+  --font-serif-en: var(--font-serif);
+  --font-sans-en: var(--font-sans);
+
+  --font-zh: var(--font-zh);          /* Chinese subheadings */
+  --font-zh-body: 'Noto Sans SC', sans-serif; /* Chinese body text */
+  --font-zh-brand: 'LXGW WenKai TC', 'Kaiti SC', KaiTi, serif; /* brand phrases only */
   --font-mono: ui-monospace, Menlo, monospace;
 
   --color-bg: #f7f1e7;
@@ -51,6 +60,20 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Chinese type stack — body in Noto Sans SC, headings in Noto Serif SC (Part 4). */
+html[lang="zh"] body { font-family: var(--font-zh-body); }
+html[lang="zh"] h1,
+html[lang="zh"] h2,
+html[lang="zh"] h3 { font-family: var(--font-zh); font-weight: 500; }
+
+/* Descriptor / eyebrow treatment (Part 4) */
+.eyebrow, .navbar__brand-sub, .footer__descriptor {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2.4px;
 }
 
 a { color: var(--color-brand); }

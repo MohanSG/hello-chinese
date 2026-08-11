@@ -1,7 +1,8 @@
 import React from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { LEVELS, PLANS, planConflict, planTitle, scheduleFor } from "../data/enrollment";
+import { LEVELS, PLANS, plansInOrder, planConflict, planTitle, scheduleFor } from "../data/enrollment";
 import { money } from "../data/enrollmentDraft";
+import { ChineseIcon } from "./EnrollIcons";
 import "./PlanSelection.css";
 
 // One plan page for every Chinese level. The level's own times drive the
@@ -70,7 +71,6 @@ export default function PlanSelection({ levelKey: levelKeyProp }) {
       </section>
 
       <section className="plans__pricing">
-        <span className="plans__infomark" aria-hidden="true">i</span>
         <div>
           <div className="plans__pricingtitle">How Pricing Works</div>
           <ul className="plans__pricinglist">
@@ -87,8 +87,12 @@ export default function PlanSelection({ levelKey: levelKeyProp }) {
       </div>
 
       <div className="plans__grid">
-        {Object.values(PLANS).map((plan) => {
-          const conflict = planConflict(levelKey, plan.id);
+        {plansInOrder()
+          .filter((plan) => (levelKey === "math" ? !plan.chinese : plan.chinese))
+          .map((plan) => ({ plan, conflict: planConflict(levelKey, plan.id) }))
+          .sort((a, b) => Number(!!a.conflict) - Number(!!b.conflict))
+          .map(({ plan, conflict }) => {
+          const planNo = plan.order;
           const blocks = conflict
             ? [{ time: level.chinese, label: "Chinese Class" }, { time: level.math, label: "Math Enrichment" }]
             : scheduleFor(levelKey, plan.id);
@@ -106,9 +110,9 @@ export default function PlanSelection({ levelKey: levelKeyProp }) {
               {conflict && <span className="plan__ribbon plan__ribbon--off">Not available at this level</span>}
               <div className="plan__body">
                 <div className="plan__main">
-                  <span className="plan__num">{plan.id}</span>
+                  <span className="plan__num">{planNo}</span>
                   <div>
-                    <h3 className="plan__name">{plan.id}. {plan.name}</h3>
+                    <h3 className="plan__name">{planNo}. {plan.name}</h3>
                     <ul className="plan__blocks">
                       {blocks.map((b, i) => (
                         <li key={b.time + i}>
@@ -118,13 +122,16 @@ export default function PlanSelection({ levelKey: levelKeyProp }) {
                         </li>
                       ))}
                     </ul>
-                    <p className="plan__note">
-                      {conflict || (
-                        <>
-                          {packageLine(plan)} · <span className="plan__save">Save {money(plan.save)}</span>
-                        </>
-                      )}
-                    </p>
+                    {conflict ? (
+                      <p className="plan__note">{conflict}</p>
+                    ) : (
+                      <div className="plan__deal">
+                        <span className="plan__dealsave">Save {money(plan.save)}</span>
+                        <span className="plan__dealline">
+                          <s>{money(plan.regular)}</s> {money(plan.total)} &mdash; {packageLine(plan)}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="plan__price">
@@ -160,7 +167,7 @@ function packageLine(plan) {
   const parts = ["10 Chinese classes"];
   if (plan.tutoringHours > 0) parts.push(`${plan.tutoringHours * 10} tutoring hours`);
   if (plan.math) parts.push("10 math classes");
-  return `${parts.join(" + ")}: ${money(plan.total)}`;
+  return `${parts.join(" + ")}`;
 }
 
 function startMinutes(range) {
@@ -169,7 +176,7 @@ function startMinutes(range) {
 }
 
 const ICON = {
-  chinese: "中",
+  chinese: <ChineseIcon size={20} />,
   tutoring: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <circle cx="9" cy="8.5" r="3.2" stroke="currentColor" strokeWidth="1.7" />

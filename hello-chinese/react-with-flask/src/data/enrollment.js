@@ -2,9 +2,14 @@
 // rules and sibling discount. Used by the plan pages, the registration form and
 // the review summary so the numbers can never drift apart.
 
-// Sibling discounts are no longer applied: each child's enrollment is priced
-// independently and the household total is the sum of the child subtotals.
-export const SIBLING_DISCOUNT = 0;
+// Each child's enrollment is priced independently, then the household gets
+// SIBLING_DISCOUNT off for every child after the first.
+export const SIBLING_DISCOUNT = 30;
+
+export function siblingDiscountFor(childCount) {
+  const n = Math.max(0, Math.floor(Number(childCount) || 0));
+  return SIBLING_DISCOUNT * Math.max(0, n - 1);
+}
 
 // Component rates. Each component's package price is triggered by ITS OWN
 // quantity, independently of the other components and of how many Sundays the
@@ -53,19 +58,42 @@ export const LEVELS = {
     chinese: "11:00–12:00", tutoring: ["9:00–10:00", "10:00–11:00"], math: "11:00–12:00",
     theme: "Advanced Language & Projects",
   },
+  // Math Enrichment is an independent Sunday course: no Chinese class, no
+  // tutoring hours, so it has a single plan of its own (Plan 6).
+  "math": {
+    key: "math", name: "Math Enrichment", levelLabel: "Grouped by Grade & Skill Level", ages: "Recommended Ages 7–12",
+    chinese: null, tutoring: [], math: "11:00–12:00",
+    theme: "Foundations, Reasoning & Confidence",
+  },
 };
 
 // Package totals come straight from the proposal's pricing table.
 // `perSunday` is the standard weekly rate shown on the plan cards.
 // `total`/`save` are the reference figures at a full 10 Sundays — display only;
 // live prices always come from priceQuote().
+// `order` is the position families see. The full combination leads, so the id
+// (which URLs and saved drafts use) no longer matches the displayed number —
+// planNumber() is the only thing that should be shown to a family.
+// `regular` is the undiscounted 10-Sunday price, shown struck through.
 export const PLANS = {
-  1: { id: 1, name: "Chinese Only", perSunday: 40, total: 360, save: 40, chinese: true, tutoringHours: 0, math: false },
-  2: { id: 2, name: "Chinese + 1 Tutoring", perSunday: 60, total: 520, save: 80, chinese: true, tutoringHours: 1, math: false },
-  3: { id: 3, name: "Chinese + 2 Tutoring", perSunday: 80, total: 660, save: 140, chinese: true, tutoringHours: 2, math: false },
-  4: { id: 4, name: "Chinese + Math", perSunday: 80, total: 720, save: 80, chinese: true, tutoringHours: 0, math: true },
-  5: { id: 5, name: "Chinese + Tutoring + Math", perSunday: 100, total: 880, save: 120, chinese: true, tutoringHours: 1, math: true },
+  1: { id: 1, order: 2, name: "Chinese Only", perSunday: 40, regular: 400, total: 360, save: 40, chinese: true, tutoringHours: 0, math: false },
+  2: { id: 2, order: 3, name: "Chinese + 1 Tutoring", perSunday: 60, regular: 600, total: 520, save: 80, chinese: true, tutoringHours: 1, math: false },
+  3: { id: 3, order: 4, name: "Chinese + 2 Tutoring", perSunday: 80, regular: 800, total: 660, save: 140, chinese: true, tutoringHours: 2, math: false },
+  4: { id: 4, order: 5, name: "Chinese + Math", perSunday: 80, regular: 800, total: 720, save: 80, chinese: true, tutoringHours: 0, math: true },
+  5: { id: 5, order: 1, name: "Chinese + Tutoring + Math", perSunday: 100, regular: 1000, total: 880, save: 120, chinese: true, tutoringHours: 1, math: true },
+  6: { id: 6, order: 6, name: "Math Enrichment Only", perSunday: 40, regular: 400, total: 360, save: 40, chinese: false, tutoringHours: 0, math: true },
 };
+
+// Plans in the order families see them.
+export function plansInOrder() {
+  return Object.values(PLANS).sort((a, b) => a.order - b.order);
+}
+
+// The number shown next to a plan's name.
+export function planNumber(planId) {
+  const plan = PLANS[planId];
+  return plan ? plan.order : 0;
+}
 
 // Step-Beyond Chinese and Math both run 11:00 AM–12:00 PM, so any plan that
 // pairs them is invalid for that level.
@@ -73,7 +101,7 @@ export function planConflict(levelKey, planId) {
   const level = LEVELS[levelKey];
   const plan = PLANS[planId];
   if (!level || !plan) return "Unknown level or plan.";
-  if (plan.math && level.math === level.chinese) {
+  if (plan.chinese && plan.math && level.math === level.chinese) {
     return `${level.name} Chinese and Math Enrichment both run ${level.chinese}, so they cannot be combined.`;
   }
   return null;
@@ -88,7 +116,8 @@ export function scheduleFor(levelKey, planId) {
   const level = LEVELS[levelKey];
   const plan = PLANS[planId];
   if (!level || !plan) return [];
-  const blocks = [{ time: level.chinese, label: "Chinese Class" }];
+  const blocks = [];
+  if (plan.chinese && level.chinese) blocks.push({ time: level.chinese, label: "Chinese Class" });
   const hours = level.tutoring.slice(0, plan.tutoringHours);
   const usedByMath = plan.math ? level.math : null;
   hours.forEach((time) => {
@@ -150,15 +179,15 @@ export function quote(planId, childCount, sundayCount = 10) {
     components: q.components,
     perChild,
     subtotal: perChild * children,
-    siblingDiscount: 0,
-    total: perChild * children,
+    siblingDiscount: siblingDiscountFor(children),
+    total: perChild * children - siblingDiscountFor(children),
     packageSavings: q.savings * children,
   };
 }
 
 export function planTitle(planId) {
   const plan = PLANS[planId];
-  return plan ? `Plan ${plan.id} — ${plan.name}` : "";
+  return plan ? `Plan ${plan.order} — ${plan.name}` : "";
 }
 
 // ---------------------------------------------------------------------------
@@ -169,7 +198,7 @@ export function planTitle(planId) {
 // selected Sundays is held as their make-up date.
 // ---------------------------------------------------------------------------
 
-export const MIN_SESSION_DATES = 1;
+export const MIN_SESSION_DATES = 6;
 export const MAX_SESSION_DATES = 11;
 
 // The Fall 2026 term runs on these 11 Sundays only (published calendar).
@@ -221,6 +250,13 @@ export function eligibleSundays(term, today = new Date()) {
   return termSundays(term, today).filter((s) => !s.unavailable);
 }
 
+// Late in a term most Sundays have already passed, so the published minimum
+// can become impossible to meet. The minimum then falls back to whatever is
+// still selectable.
+export function minimumDatesFor(term, today = new Date()) {
+  return Math.min(MIN_SESSION_DATES, eligibleSundays(term, today).length);
+}
+
 // Sundays grouped by month, for the picker UI.
 export function sundaysByMonth(term, today = new Date()) {
   const groups = [];
@@ -232,13 +268,18 @@ export function sundaysByMonth(term, today = new Date()) {
   return groups;
 }
 
-// Server-side rules, mirrored on the client. Any combination of the published
-// Sundays is valid; there is no make-up date requirement.
+// Server-side rules, mirrored on the client. Enrollment requires a minimum of
+// MIN_SESSION_DATES Sundays, up to the full term; no make-up date requirement.
 export function validateDateSelection(selected, term, today = new Date()) {
   const eligible = new Set(eligibleSundays(term, today).map((s) => s.iso));
   const list = selected || [];
   if ([...new Set(list)].length !== list.length) return "Please remove duplicate dates.";
-  if (list.length < MIN_SESSION_DATES) return "Please select at least one Sunday.";
+  const minimum = minimumDatesFor(term, today);
+  if (list.length < minimum) {
+    return minimum === 1
+      ? "Please select at least 1 Sunday to enroll."
+      : `Please select at least ${minimum} Sundays to enroll.`;
+  }
   if (list.length > MAX_SESSION_DATES) return `Please select no more than ${MAX_SESSION_DATES} Sundays.`;
   const bad = list.find((iso) => !eligible.has(iso));
   if (bad) return "One of your dates is no longer available. Please review your selection.";
@@ -262,3 +303,88 @@ export const LOCATION = {
 
 export const POLICY_SUMMARY =
   "You pay only for the Sundays you select, at the standard weekly rate per student. Package savings are applied automatically when a component reaches an eligible quantity — Chinese classes, Math classes, and tutoring hours each qualify independently. There is no long-term commitment. Refunds are calculated from tuition actually paid and itemized in writing.";
+
+// ---------------------------------------------------------------------------
+// Payment options
+// ---------------------------------------------------------------------------
+
+// Families may pay the full balance up front or spread it across three monthly
+// installments during the Fall term. Installments are whole dollars; any
+// remainder is added to the first payment.
+export const PAYMENT_MONTHS = ["September 1", "October 1", "November 1"];
+
+export function paymentPlan(total) {
+  const amount = Math.max(0, Math.round(Number(total) || 0));
+  const n = PAYMENT_MONTHS.length;
+  const base = Math.floor(amount / n);
+  const remainder = amount - base * n;
+  return PAYMENT_MONTHS.map((due, i) => ({
+    due,
+    label: due.split(" ")[0],
+    amount: i === 0 ? base + remainder : base,
+  }));
+}
+
+export const PAYMENT_HELP_NOTE =
+  "Need more time to pay? Let our team know and we will work out a schedule that fits your family.";
+
+// ---------------------------------------------------------------------------
+// Child privacy
+// ---------------------------------------------------------------------------
+
+export const PRIVACY_SUMMARY =
+  "We collect your child's information only to place them in the right class and to reach you about their learning. We never sell or share it with anyone outside our teaching team.";
+
+export const PRIVACY_CONSENT_LABEL =
+  "I give permission for photos or video of my child taken in class to be used in Hello Chinese newsletters and social posts.";
+
+export const PRIVACY_CONSENT_HINT =
+  "Optional — leave unchecked and we will keep your child out of all photos and videos.";
+
+// ---------------------------------------------------------------------------
+// Coupon codes
+// ---------------------------------------------------------------------------
+
+export const COUPONS = {
+  WELCOME10: { type: "percent", value: 10, label: "10% off" },
+  FAMILY20: { type: "flat", value: 20, label: "$20 off" },
+};
+
+// Returns { code, type, value, label } for a valid code, or null.
+export function lookupCoupon(input) {
+  const code = String(input || "").trim().toUpperCase();
+  if (!code) return null;
+  const found = COUPONS[code];
+  return found ? { code, ...found } : null;
+}
+
+// Dollar amount a coupon takes off a subtotal, never more than the subtotal.
+export function couponDiscount(coupon, subtotal) {
+  if (!coupon) return 0;
+  const base = Math.max(0, Math.round(Number(subtotal) || 0));
+  const off = coupon.type === "percent"
+    ? Math.round((base * coupon.value) / 100)
+    : Math.round(coupon.value);
+  return Math.min(off, base);
+}
+
+export const COUPON_INVALID_MESSAGE = "That code isn't valid. Check the spelling and try again.";
+
+// ---------------------------------------------------------------------------
+// Date of birth
+// ---------------------------------------------------------------------------
+
+// Age in whole years on `today`. Returns null for a missing or unparseable date.
+export function ageFromDOB(iso, today = new Date()) {
+  if (!iso) return null;
+  const [y, m, d] = String(iso).split("-").map(Number);
+  if (!y || !m || !d) return null;
+  const birth = new Date(y, m - 1, d);
+  if (isNaN(birth.getTime()) || birth > today) return null;
+  let age = today.getFullYear() - birth.getFullYear();
+  const beforeBirthday =
+    today.getMonth() < birth.getMonth() ||
+    (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate());
+  if (beforeBirthday) age -= 1;
+  return age < 0 || age > 120 ? null : age;
+}

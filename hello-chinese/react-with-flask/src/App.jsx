@@ -22,6 +22,7 @@ import EnrollStepUp from "./pages/EnrollStepUp";
 import EnrollStepBeyond from "./pages/EnrollStepBeyond";
 import EnrollSelectDates from "./pages/EnrollSelectDates";
 import EnrollRegistration from "./pages/EnrollRegistration";
+import FreeTrial from "./pages/FreeTrial";
 
 function App() {
   return (
@@ -46,6 +47,8 @@ function App() {
           <Route path="/Enroll/Step-Beyond" element={<EnrollStepBeyond />} />
           <Route path="/Enroll/Sundays" element={<EnrollSelectDates />} />
           <Route path="/Enroll/Registration" element={<EnrollRegistration />} />
+          <Route path="/FreeTrial" element={<FreeTrial />} />
+
         </Routes>
       </BrowserRouter>
     </LanguageProvider>
