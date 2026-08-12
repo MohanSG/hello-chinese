@@ -23,11 +23,13 @@ import EnrollStepBeyond from "./pages/EnrollStepBeyond";
 import EnrollSelectDates from "./pages/EnrollSelectDates";
 import EnrollRegistration from "./pages/EnrollRegistration";
 import FreeTrial from "./pages/FreeTrial";
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   return (
     <LanguageProvider>
       <BrowserRouter>
+      <ScrollToTop />
         <Routes>
           {/* <Route path="/" element={<Home />} />
           <Route path="/About" element={<About />} />

@@ -201,14 +201,14 @@ export function planTitle(planId) {
 export const MIN_SESSION_DATES = 6;
 export const MAX_SESSION_DATES = 11;
 
-// The Fall 2026 term runs on these 11 Sundays only (published calendar).
-// Families may select any combination of them.
+// The Fall 2026 term runs on these Sundays only (published calendar). Sep 6 is
+// the first class date. Families may select any combination of the open dates.
 export const TERMS = [
   {
     key: "fall-2026",
     label: "Fall Term 2026",
     dates: [
-      "2026-09-13", "2026-09-20", "2026-09-27",
+      "2026-09-06", "2026-09-13", "2026-09-20", "2026-09-27",
       "2026-10-04", "2026-10-18", "2026-10-25",
       "2026-11-08", "2026-11-15", "2026-11-22",
       "2026-12-06", "2026-12-13",
@@ -218,6 +218,12 @@ export const TERMS = [
 
 // Sundays whose groups have reached the student cap. Supplied by the backend.
 export const FULL_DATES = [];
+
+// Published term Sundays that are visible but not bookable, with the reason
+// shown on the date. Nov 22 is reserved for the YCT Test.
+export const BLOCKED_DATES = {
+  "2026-11-22": "YCT Test",
+};
 
 export function toISODate(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -234,7 +240,8 @@ export function termSundays(term, today = new Date()) {
   return (term.dates || []).map((iso) => {
     const d = parseISODate(iso);
     let unavailable = null;
-    if (d < floor) unavailable = "Past date";
+    if (BLOCKED_DATES[iso]) unavailable = BLOCKED_DATES[iso];
+    else if (d < floor) unavailable = "Past date";
     else if (FULL_DATES.includes(iso)) unavailable = "Group full";
     return {
       iso,

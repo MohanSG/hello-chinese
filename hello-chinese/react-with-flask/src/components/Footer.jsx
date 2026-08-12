@@ -32,10 +32,9 @@ function Footer() {
 
         <div className="footer__col">
           <div className="footer__col-head">Explore</div>
-          <NavLink to="/About" className="footer__link">About Us</NavLink>
-          <NavLink to="/Enroll" className="footer__link">Programs</NavLink>
+          <NavLink to="/" className="footer__link">Programs</NavLink>
           <NavLink to="/FreeTrial" className="footer__link">Book a Free Trial</NavLink>
-          <a href="/#contact" className="footer__link">Contact Us</a>
+          <a href="mailto:hello.nihao.chinese@gmail.com" className="footer__link">Contact Us</a>
         </div>
 
         <div className="footer__col">

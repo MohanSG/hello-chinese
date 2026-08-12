@@ -149,6 +149,7 @@ export default function EnrollSelectDates() {
                       >
                         <span className="day__dot" aria-hidden="true">{on ? "✓" : ""}</span>
                         <span className="day__label">{day.dayLabel}</span>
+                        {day.unavailable ? <span className="day__reason">{day.unavailable}</span> : null}
                       </button>
                     );
                   })}
