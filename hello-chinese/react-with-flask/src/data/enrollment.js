@@ -316,25 +316,82 @@ export const POLICY_SUMMARY =
 // Payment options
 // ---------------------------------------------------------------------------
 
-// Families may pay the full balance up front or spread it across three monthly
-// installments during the Fall term. Installments are whole dollars; any
-// remainder is added to the first payment.
-export const PAYMENT_MONTHS = ["September 1", "October 1", "November 1"];
+// Families may pay the full balance up front or spread it across monthly
+// installments, each due on a class date: Sep 6, Oct 4, Nov 8.
+//
+// Two date rules apply to late enrollers:
+//   1. If an installment's class date has already passed but that month still
+//      has a term Sunday left, the payment moves to the next remaining Sunday
+//      in the same month (e.g. Sep 6 -> Sep 13).
+//   2. If a month has no remaining Sundays, that installment is dropped.
+// Fewer than two remaining installments is not a plan — paymentSchedule()
+// reports available: false and the UI shows the option disabled.
+//
+// Installments are whole dollars; any remainder is added to the first payment.
+export const PAYMENT_DUE_DATES = ["2026-09-06", "2026-10-04", "2026-11-08"];
 
-export function paymentPlan(total) {
+export const MIN_PLAN_INSTALLMENTS = 2;
+
+function startOfDay(d) {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
+
+// The due date actually charged for one scheduled installment, or null when the
+// month has run out of Sundays.
+function resolveDueDate(iso, today, term) {
+  const floor = startOfDay(today);
+  const due = parseISODate(iso);
+  if (due >= floor) return iso;
+  const month = iso.slice(0, 7);
+  const next = (term && term.dates ? term.dates : [])
+    .filter((d) => d.startsWith(month) && parseISODate(d) >= floor)
+    .sort()[0];
+  return next || null;
+}
+
+// The full monthly plan for a total, resolved against today's calendar.
+export function paymentSchedule(total, today = new Date(), term = TERMS[0]) {
   const amount = Math.max(0, Math.round(Number(total) || 0));
-  const n = PAYMENT_MONTHS.length;
-  const base = Math.floor(amount / n);
-  const remainder = amount - base * n;
-  return PAYMENT_MONTHS.map((due, i) => ({
-    due,
-    label: due.split(" ")[0],
-    amount: i === 0 ? base + remainder : base,
-  }));
+  const dates = PAYMENT_DUE_DATES
+    .map((iso) => resolveDueDate(iso, today, term))
+    .filter(Boolean);
+  const n = dates.length;
+  const base = n ? Math.floor(amount / n) : 0;
+  const remainder = n ? amount - base * n : 0;
+  const installments = dates.map((iso, i) => {
+    const d = parseISODate(iso);
+    return {
+      iso,
+      due: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      label: d.toLocaleDateString("en-US", { month: "long" }),
+      amount: i === 0 ? base + remainder : base,
+    };
+  });
+  return {
+    installments,
+    available: n >= MIN_PLAN_INSTALLMENTS,
+    // "Payment plan — 2 months", "October and November · no fees"
+    lengthLabel: n + (n === 1 ? " month" : " months"),
+    monthsLabel: installments.length === 1
+      ? installments[0].label
+      : installments.slice(0, -1).map((p) => p.label).join(", ")
+        + (installments.length === 2 ? " and " : ", and ")
+        + (installments[installments.length - 1] || {}).label,
+  };
+}
+
+// Back-compat: the installment rows only.
+export function paymentPlan(total, today = new Date(), term = TERMS[0]) {
+  return paymentSchedule(total, today, term).installments;
 }
 
 export const PAYMENT_HELP_NOTE =
   "Need more time to pay? Let our team know and we will work out a schedule that fits your family.";
+
+export const PAYMENT_PLAN_CLOSED_NOTE =
+  "The monthly plan is no longer available for this term — too few payment dates remain. Pay in full to enroll, or contact us to arrange a schedule.";
 
 // ---------------------------------------------------------------------------
 // Child privacy

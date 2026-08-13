@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { POLICY_SUMMARY, PAYMENT_HELP_NOTE, PRIVACY_SUMMARY, PRIVACY_CONSENT_LABEL, PRIVACY_CONSENT_HINT, COUPON_INVALID_MESSAGE, SIBLING_DISCOUNT, siblingDiscountFor, ageFromDOB, lookupCoupon, couponDiscount, paymentPlan, priceQuote } from "../data/enrollment";
+import { POLICY_SUMMARY, PAYMENT_HELP_NOTE, PAYMENT_PLAN_CLOSED_NOTE, PRIVACY_SUMMARY, PRIVACY_CONSENT_LABEL, PRIVACY_CONSENT_HINT, COUPON_INVALID_MESSAGE, SIBLING_DISCOUNT, siblingDiscountFor, ageFromDOB, lookupCoupon, couponDiscount, paymentSchedule, priceQuote } from "../data/enrollment";
 import { readDraft, writeDraft, clearDraft, removeEnrollment, money } from "../data/enrollmentDraft";
 import "./EnrollRegistration.css";
 
@@ -77,7 +77,11 @@ export default function EnrollRegistration({ onSubmit }) {
   const householdTotal = householdSubtotal - sibling - discount;
   const packageSavings = enrollments.reduce((sum, e) => sum + savingsOf(e), 0);
   const householdSavings = packageSavings + sibling + discount;
-  const installments = paymentPlan(householdTotal);
+  const schedule = paymentSchedule(householdTotal);
+  const installments = schedule.installments;
+  const planClosed = !schedule.available;
+  // A closed plan falls back to paying in full.
+  const payMethod = planClosed ? "full" : payment;
 
   const applyCoupon = () => {
     const found = lookupCoupon(couponInput);
@@ -170,7 +174,7 @@ export default function EnrollRegistration({ onSubmit }) {
       packageSavings,
       householdTotal,
       householdSavings,
-      payment: payment === "plan"
+      payment: payMethod === "plan"
         ? { method: "plan", installments }
         : { method: "full", amount: householdTotal },
       policyAcknowledged: true,
@@ -468,27 +472,33 @@ export default function EnrollRegistration({ onSubmit }) {
           <section className="card">
             <h2 className="card__title">How would you like to pay?</h2>
             <div className="pay">
-              <label className={`pay__opt${payment === "full" ? " pay__opt--on" : ""}`}>
-                <input type="radio" name="payment" checked={payment === "full"} onChange={() => setPayment("full")} />
+              <label className={`pay__opt${payMethod === "full" ? " pay__opt--on" : ""}`}>
+                <input type="radio" name="payment" checked={payMethod === "full"} onChange={() => setPayment("full")} />
                 <span className="pay__body">
                   <span className="pay__name">Pay in full</span>
                   <span className="pay__meta">One payment before the first Sunday</span>
                 </span>
                 <span className="pay__amount">{money(householdTotal)}</span>
               </label>
-              <label className={`pay__opt${payment === "plan" ? " pay__opt--on" : ""}`}>
-                <input type="radio" name="payment" checked={payment === "plan"} onChange={() => setPayment("plan")} />
+              <label className={`pay__opt${payMethod === "plan" ? " pay__opt--on" : ""}${planClosed ? " pay__opt--off" : ""}`}>
+                <input type="radio" name="payment" checked={payMethod === "plan"} disabled={planClosed} onChange={() => setPayment("plan")} />
                 <span className="pay__body">
-                  <span className="pay__name">Payment plan — 3 months</span>
-                  <span className="pay__meta">September, October, and November · no fees</span>
+                  <span className="pay__name">
+                    {planClosed ? "Payment plan — unavailable" : `Payment plan — ${schedule.lengthLabel}`}
+                  </span>
+                  <span className="pay__meta">
+                    {planClosed ? "Too few payment dates remain this term" : `${schedule.monthsLabel} · no fees`}
+                  </span>
                 </span>
-                <span className="pay__amount">{money(installments[1].amount)}<em>/mo</em></span>
+                <span className="pay__amount">
+                  {money(installments.length ? installments[installments.length - 1].amount : 0)}<em>/mo</em>
+                </span>
               </label>
             </div>
-            {payment === "plan" && (
+            {payMethod === "plan" && (
               <ul className="split">
                 {installments.map((p) => (
-                  <li key={p.due}>
+                  <li key={p.iso}>
                     <span className="split__month">{p.label}</span>
                     <span className="split__due">Due {p.due}</span>
                     <strong>{money(p.amount)}</strong>
@@ -496,7 +506,7 @@ export default function EnrollRegistration({ onSubmit }) {
                 ))}
               </ul>
             )}
-            <p className="pay__help">{PAYMENT_HELP_NOTE}</p>
+            <p className="pay__help">{planClosed ? PAYMENT_PLAN_CLOSED_NOTE : PAYMENT_HELP_NOTE}</p>
           </section>
 
           <section className="card">

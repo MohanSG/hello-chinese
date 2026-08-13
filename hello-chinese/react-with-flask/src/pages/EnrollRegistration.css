@@ -70,6 +70,8 @@
 .pay{display:flex;flex-direction:column;gap:12px;margin-top:4px}
 .pay__opt{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;padding:16px 18px;border:1.5px solid #ecdcba;border-radius:12px;background:#fff;cursor:pointer}
 .pay__opt--on{border-color:#a72620;background:#fdf3e6;box-shadow:0 2px 10px rgba(167,38,32,.1)}
+.pay__opt--off{opacity:.5;cursor:not-allowed}
+.pay__opt--off input{cursor:not-allowed}
 .pay__opt input{width:18px;height:18px;accent-color:#a72620;cursor:pointer}
 .pay__body{display:flex;flex-direction:column;gap:4px}
 .pay__name{font-size:15px;font-weight:700;color:#20201f}
