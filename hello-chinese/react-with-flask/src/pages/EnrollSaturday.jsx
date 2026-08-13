@@ -101,7 +101,6 @@ function EnrollSaturday() {
       <div className="enroll-overview">
         <NavBar />
         <section className="enroll-header">
-          <div className="enroll-header__watermark">谢谢</div>
           <div className="enroll-header__inner enroll-confirm">
             <div className="enroll-confirm__check">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -127,7 +126,6 @@ function EnrollSaturday() {
 
       {/* HEADER */}
       <section className="enroll-header">
-        <div className="enroll-header__watermark">周六</div>
         <div className="enroll-header__inner">
           <div className="enroll-back">
             <NavLink to="/" className="enroll-back__link">← Back to Programs</NavLink>

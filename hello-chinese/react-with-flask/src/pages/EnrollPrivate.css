@@ -1,8 +1,8 @@
-.enroll-badge--private { background: rgba(255, 255, 255, .1); color: #e9dfc8; }
+.enroll-badge--private { background: #e9dfc8; color: #8a6d2f; }
 
 .private-header__desc { margin-bottom: 24px; }
 .private-tags { display: flex; flex-wrap: wrap; gap: 10px; }
-.private-tag { padding: 8px 14px; border-radius: 999px; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14); font-size: 13px; font-weight: 600; color: var(--color-cream-text); }
+.private-tag { padding: 8px 14px; border-radius: 999px; background: rgba(255, 253, 248, .8); border: 1px solid rgba(143, 29, 24, .22); font-size: 13px; font-weight: 600; color: #5b5348; }
 
 /* ---------- inquiry form header ---------- */
 .pform__head { display: flex; align-items: center; gap: 16px; margin-bottom: 6px; }

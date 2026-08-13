@@ -8,14 +8,15 @@
      English: Cormorant Garamond for headings, Source Sans 3 for body/buttons/nav.
      Chinese: WenKai/KaiTi for the brand title only, Noto Serif SC for subheadings,
      Noto Sans SC for body text. */
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-sans: 'Source Sans 3', system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Source Sans 3", system-ui, sans-serif;
   --font-serif-en: var(--font-serif);
   --font-sans-en: var(--font-sans);
 
-  --font-zh: var(--font-zh);          /* Chinese subheadings */
-  --font-zh-body: 'Noto Sans SC', sans-serif; /* Chinese body text */
-  --font-zh-brand: 'LXGW WenKai TC', 'Kaiti SC', KaiTi, serif; /* brand phrases only */
+  --font-zh: var(--font-zh); /* Chinese subheadings */
+  --font-zh-body: "Noto Sans SC", sans-serif; /* Chinese body text */
+  --font-zh-brand:
+    "LXGW WenKai TC", "Kaiti SC", KaiTi, serif; /* brand phrases only */
   --font-mono: ui-monospace, Menlo, monospace;
 
   --color-bg: #f7f1e7;
@@ -39,10 +40,27 @@
   --color-cream-text-faint: #a89c8a;
 
   --color-footer-head: #7d7263;
-  --color-border: rgba(32, 32, 31, .09);
-  --color-border-strong: rgba(32, 32, 31, .14);
+  --color-border: rgba(32, 32, 31, 0.09);
+  --color-border-strong: rgba(32, 32, 31, 0.14);
   --color-green: #3f7d6e;
   --color-gold: #c6a15b;
+
+  /* Ink-wash backgrounds. Each token is a complete `background` shorthand, so a
+     rule is just `background: var(--bg-hero);` — swap artwork here, once.
+     Files live in public/assets/. Wide art is 2172x724, portrait is 1164x1351.
+       --bg-hero      open sky top-left, wall low right — safest under headlines
+       --bg-hero-alt  blossom top-left, wall + calligraphy right
+       --bg-band      wall left, calligraphy centre, blossom right — CTA bands
+       --bg-card      portrait crop for the program cards */
+  --bg-hero: #f8f2e6 url("/assets/bg-wide-3.png") center/cover no-repeat;
+  --bg-hero-alt: #f8f2e6 url("/assets/bg-wide-1.png") center/cover no-repeat;
+  --bg-band:
+    linear-gradient(rgba(248, 242, 230, 0.55), rgba(248, 242, 230, 0.55)),
+    url("/assets/bg-wide-2.png") center/cover no-repeat #f8f2e6;
+  --bg-card:
+    linear-gradient(rgba(248, 242, 230, 0.62), rgba(248, 242, 230, 0.62)),
+    url("/assets/bg-portrait.png") center/cover no-repeat #f8f2e6;
+  --bg-edge: #e2ccae;
 
   --tan-1: #efe3d0;
   --tan-2: #e7d9c2;
@@ -52,8 +70,12 @@
   --sage-2: #d7ddce;
 }
 
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
 body {
   margin: 0;
   font-family: var(--font-sans);
@@ -63,23 +85,39 @@ body {
 }
 
 /* Chinese type stack — body in Noto Sans SC, headings in Noto Serif SC (Part 4). */
-html[lang="zh"] body { font-family: var(--font-zh-body); }
+html[lang="zh"] body {
+  font-family: var(--font-zh-body);
+}
 html[lang="zh"] h1,
 html[lang="zh"] h2,
-html[lang="zh"] h3 { font-family: var(--font-zh); font-weight: 500; }
+html[lang="zh"] h3 {
+  font-family: var(--font-zh);
+  font-weight: 500;
+}
 
 /* Descriptor / eyebrow treatment (Part 4) */
-.eyebrow, .navbar__brand-sub, .footer__descriptor {
+.eyebrow,
+.navbar__brand-sub,
+.footer__descriptor {
   font-family: var(--font-sans);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 2.4px;
 }
 
-a { color: var(--color-brand); }
-a:hover { color: var(--color-brand-dark); }
+a {
+  color: var(--color-brand);
+}
+a:hover {
+  color: var(--color-brand-dark);
+}
 
 @keyframes hcFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-9px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
 }

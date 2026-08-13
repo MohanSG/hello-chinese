@@ -72,7 +72,6 @@ function EnrollSundayProgram() {
 
       {/* HEADER */}
       <section className="enroll-header">
-        <div className="enroll-header__watermark">周日</div>
         <div className="enroll-header__inner">
           <div className="enroll-back">
             <NavLink to="/" className="enroll-back__link">← Back to Programs</NavLink>
