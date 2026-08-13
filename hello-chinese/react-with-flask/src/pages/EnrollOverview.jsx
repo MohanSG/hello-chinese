@@ -75,7 +75,7 @@ function EnrollOverview() {
             <div className="trial__inner">
               <h2 className="trial__title">New to Hello Chinese?</h2>
               <p className="trial__desc">
-                Experience a class, meet our teachers, and find the right level for your child.
+                Join us for a free trial class and discover how your child can learn, connect, and grow with Hello Chinese.
               </p>
               <NavLink to="/Book" className="trial__cta">Book a Free Trial Class</NavLink>
             </div>

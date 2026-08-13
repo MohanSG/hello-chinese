@@ -1,0 +1,339 @@
+.math {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(30px, 4vw, 44px) clamp(20px, 5vw, 56px) clamp(44px, 6vw, 64px);
+}
+
+/* ---------- header ---------- */
+.math__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 18px 11px 14px;
+  border-radius: 11px;
+  background: #fffdf8;
+  border: 1.5px solid #a72620;
+  box-shadow: 0 2px 8px rgba(167, 38, 32, .1);
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #a72620;
+  text-decoration: none;
+  margin-bottom: 12px;
+}
+.math__back:hover { background: #a72620; color: #fff; }
+
+.math__childbanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fdf3e6;
+  border: 1px solid #ecdcba;
+  border-radius: 12px;
+  padding: 13px 16px;
+  margin-bottom: 14px;
+  font-size: 13.5px;
+  color: #5b5348;
+}
+.math__childnum {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: #a72620;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.math__title {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-weight: 700;
+  font-size: clamp(34px, 5vw, 48px);
+  line-height: 1.05;
+  letter-spacing: -1.2px;
+  margin: 0 0 12px;
+  color: #161d2e;
+}
+.math__subtitle {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #5b5348;
+  margin: 0 0 clamp(24px, 3vw, 32px);
+  max-width: 620px;
+}
+.math__subtitle strong { color: #20201f; }
+
+/* ---------- schedule strip ---------- */
+.math__strip {
+  background: #fffdf8;
+  border: 1px solid #dbe7f5;
+  border-radius: 14px;
+  padding: 22px;
+  margin-bottom: 26px;
+}
+.math__striptitle {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #20201f;
+  margin-bottom: 16px;
+}
+.math__slot {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #f5f9fe;
+  border: 1px solid #dbe7f5;
+  border-radius: 10px;
+  padding: 14px 18px;
+}
+.math__sloticon {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: #1d5aa8;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.math__slottime {
+  display: block;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1d5aa8;
+}
+.math__slotlabel { display: block; font-size: 13px; color: #5b5348; }
+.math__stripnote {
+  margin: 14px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #948977;
+}
+
+/* ---------- benefits ---------- */
+.math__benefits {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 26px;
+}
+.math__benefit {
+  background: #fffdf8;
+  border: 1px solid #ecdcba;
+  border-radius: 14px;
+  padding: 18px 20px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #20201f;
+}
+
+/* ---------- pricing explainer ---------- */
+.math__pricing {
+  background: #fdf3e6;
+  border: 1px solid #ecdcba;
+  border-radius: 14px;
+  padding: 22px;
+  margin-bottom: 26px;
+}
+.math__pricingtitle {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #a72620;
+  margin-bottom: 10px;
+}
+.math__pricinglist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #5b5348;
+}
+.math__pricinglist strong { color: #20201f; }
+
+/* ---------- section head ---------- */
+.math__sectionhead {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.math__sectionhead h2 {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(21px, 2.6vw, 26px);
+  margin: 0;
+  color: #20201f;
+}
+.math__sectionhead span { font-size: 13px; color: #948977; }
+
+/* ---------- the single plan ---------- */
+.mathplan {
+  background: #fffdf8;
+  border: 1px solid #1d5aa8;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 8px 24px rgba(29, 90, 168, .1);
+}
+.mathplan__body {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: center;
+}
+.mathplan__main {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  min-width: 0;
+}
+.mathplan__icon {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  background: #d9e6f8;
+  color: #1d5aa8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mathplan__name {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-weight: 600;
+  font-size: 18px;
+  margin: 0 0 11px;
+  color: #20201f;
+}
+.mathplan__blocks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mathplan__blocks li {
+  display: grid;
+  grid-template-columns: 13px 88px 1fr;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13.5px;
+  color: #5b5348;
+}
+.mathplan__check { color: #1d5aa8; font-weight: 700; }
+.mathplan__time { font-weight: 600; color: #20201f; white-space: nowrap; }
+
+.mathplan__deal {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 9px 13px;
+  border-radius: 10px;
+  background: #e6f2e9;
+  border: 1px solid rgba(30, 107, 62, .3);
+}
+.mathplan__dealsave {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e6b3e;
+  white-space: nowrap;
+}
+.mathplan__dealline { font-size: 12.5px; line-height: 1.5; color: #5b5348; }
+.mathplan__dealline s { color: #948977; }
+
+.mathplan__price {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  border-left: 1px solid rgba(32, 32, 31, .1);
+  padding-left: 20px;
+  min-width: 150px;
+  text-align: center;
+}
+.mathplan__rate {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 5px;
+}
+.mathplan__rateamount {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #20201f;
+  letter-spacing: -.5px;
+}
+.mathplan__rateunit { font-size: 13px; font-weight: 600; color: #948977; }
+.mathplan__ratelabel {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .6px;
+  color: #948977;
+  text-transform: uppercase;
+}
+.mathplan__cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 24px;
+  border-radius: 11px;
+  background: #1e6b3e;
+  color: #fff;
+  font-size: 14.5px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  width: 100%;
+  box-shadow: 0 6px 18px rgba(30, 107, 62, .24);
+}
+.mathplan__cta:hover { background: #185733; color: #fff; }
+
+/* ---------- footnotes ---------- */
+.math__note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin: 26px 0 0;
+  font-size: 13.5px;
+  color: #948977;
+}
+.math__note svg { flex: none; color: #a72620; }
+.math__foot {
+  text-align: center;
+  font-size: 13.5px;
+  color: #948977;
+  margin: 18px 0 0;
+}
+.math__foot a { font-weight: 600; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1240px) {
+  .mathplan__body { grid-template-columns: 1fr; gap: 16px; }
+  .mathplan__price {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid rgba(32, 32, 31, .1);
+    padding-top: 16px;
+    min-width: 0;
+  }
+}
+@media (max-width: 760px) {
+  .math__benefits { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .mathplan { padding: 18px; }
+  .math__note { align-items: flex-start; text-align: left; }
+}
