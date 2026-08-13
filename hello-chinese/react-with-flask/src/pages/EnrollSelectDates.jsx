@@ -119,7 +119,7 @@ export default function EnrollSelectDates() {
             <p className="picker__hint">
               {minimumReduced
                 ? `Some Sundays in ${term.label} have already passed. Choose at least ${minimum} of the ${minimum === 1 ? "remaining Sunday" : "remaining Sundays"} to enroll.`
-                : `${term.label} runs on ${term.dates.length} Sundays. Choose at least ${MIN_SESSION_DATES}, up to all ${MAX_SESSION_DATES}.`}
+                : `${term.label} runs on ${term.dates.length} Sundays. Pick any combination — choose at least ${MIN_SESSION_DATES}.`}
             </p>
 
             <div className="picker__quick">
@@ -141,21 +141,43 @@ export default function EnrollSelectDates() {
                       <button
                         type="button"
                         key={day.iso}
-                        className={`day${on ? " day--on" : ""}${day.unavailable ? " day--off" : ""}`}
+                        className={`day${on ? " day--on" : ""}${day.unavailable ? " day--off" : ""}${day.note ? " day--noted" : ""}`}
                         onClick={() => toggle(day.iso)}
                         disabled={!!day.unavailable}
                         aria-pressed={on}
-                        title={day.unavailable || (on ? "Selected" : "Available")}
+                        title={day.unavailable || day.note || (on ? "Selected" : "Available")}
                       >
                         <span className="day__dot" aria-hidden="true">{on ? "✓" : ""}</span>
                         <span className="day__label">{day.dayLabel}</span>
-                        {day.unavailable ? <span className="day__reason">{day.unavailable}</span> : null}
+                        {day.note ? (
+                          <span className="day__badge">{day.note}</span>
+                        ) : day.unavailable ? (
+                          <span className="day__reason">{day.unavailable}</span>
+                        ) : null}
                       </button>
                     );
                   })}
                 </div>
               </div>
             ))}
+
+            <aside className="yct">
+              <span className="yct__icon" aria-hidden="true">i</span>
+              <div>
+                <h3 className="yct__title">YCT Level 1 Exam Day &mdash; November 22</h3>
+                <p>
+                  If your child plans to take the YCT Level 1 exam, please select this date. The exam
+                  lasts approximately 40 minutes, and all other scheduled classes continue as usual
+                  afterward. The $15 YCT exam registration fee is already included in the November 22
+                  session fee &mdash; there is nothing extra to pay.
+                </p>
+                <p>
+                  Not sure if your child is ready for the YCT Level 1 exam?{" "}
+                  <a href="mailto:hello.nihao.chinese@gmail.com">Email us</a> in advance to confirm
+                  with your child's teacher.
+                </p>
+              </div>
+            </aside>
           </section>
 
           <section className="summary">

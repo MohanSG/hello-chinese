@@ -219,10 +219,11 @@ export const TERMS = [
 // Sundays whose groups have reached the student cap. Supplied by the backend.
 export const FULL_DATES = [];
 
-// Published term Sundays that are visible but not bookable, with the reason
-// shown on the date. Nov 22 is reserved for the YCT Test.
-export const BLOCKED_DATES = {
-  "2026-11-22": "YCT Test",
+// Term Sundays that carry a badge on the date tile. These remain fully
+// selectable — the note is informational only and adds no cost, since the YCT
+// exam registration is already included in the normal session fee.
+export const NOTED_DATES = {
+  "2026-11-22": "YCT Exam Day",
 };
 
 export function toISODate(d) {
@@ -240,14 +241,14 @@ export function termSundays(term, today = new Date()) {
   return (term.dates || []).map((iso) => {
     const d = parseISODate(iso);
     let unavailable = null;
-    if (BLOCKED_DATES[iso]) unavailable = BLOCKED_DATES[iso];
-    else if (d < floor) unavailable = "Past date";
+    if (d < floor) unavailable = "Past date";
     else if (FULL_DATES.includes(iso)) unavailable = "Group full";
     return {
       iso,
       date: d,
       month: d.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
       dayLabel: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      note: NOTED_DATES[iso] || null,
       unavailable,
     };
   });

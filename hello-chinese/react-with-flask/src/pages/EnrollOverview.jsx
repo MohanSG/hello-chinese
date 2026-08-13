@@ -77,7 +77,7 @@ function EnrollOverview() {
               <p className="trial__desc">
                 Join us for a free trial class and discover how your child can learn, connect, and grow with Hello Chinese.
               </p>
-              <NavLink to="/Book" className="trial__cta">Book a Free Trial Class</NavLink>
+              <NavLink to="/FreeTrial" className="trial__cta">Book a Free Trial Class</NavLink>
             </div>
           </div>
 
