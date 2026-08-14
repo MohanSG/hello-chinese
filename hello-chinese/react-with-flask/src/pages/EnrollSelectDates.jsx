@@ -1,10 +1,13 @@
 import React, { useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
-  LEVELS, PLANS, TERMS, MIN_SESSION_DATES, MAX_SESSION_DATES, minimumDatesFor, planConflict, planTitle, priceQuote, scheduleFor,
-  sundaysByMonth, eligibleSundays, validateDateSelection, formatDateShort,
+  LEVELS, PLANS, TERMS, MIN_SESSION_DATES, minimumDatesFor, planConflictInfo, planTitle, priceQuote, scheduleFor,
+  sundaysByMonth, eligibleSundays, validateDateSelectionInfo, formatDateShort,
 } from "../data/enrollment";
-import { readDraft, saveEnrollment, nextOpenIndex, money, pluralUnit } from "../data/enrollmentDraft";
+import { readDraft, saveEnrollment, nextOpenIndex, money } from "../data/enrollmentDraft";
+import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
+import { useLanguage } from "../i18n/LanguageContext";
 import { ChineseIcon, MathIcon } from "../components/EnrollIcons";
 import "./EnrollSelectDates.css";
 
@@ -14,6 +17,7 @@ import "./EnrollSelectDates.css";
 export default function EnrollSelectDates() {
   const [search] = useSearchParams();
   const navigate = useNavigate();
+  const { t, locale } = useLanguage();
   const levelKey = search.get("level") || "";
   const planId = Number(search.get("plan")) || 0;
   const term = TERMS[0];
@@ -25,36 +29,64 @@ export default function EnrollSelectDates() {
   const existing = draft.enrollments[childIndex];
 
   const [selected, setSelected] = useState(existing?.dates || []);
-  const [warning, setWarning] = useState("");
+  // Warning is held as a code + values so it re-renders in the active language.
+  const [warning, setWarning] = useState(null);
+
+  const termLabel = t("enrollDates.termFall2026");
+  const planLabel = (id) =>
+    t("enrollDates.planTitle", { order: PLANS[id].order, name: t(`enrollData.planName.${id}`) });
+  const messageFor = (info) => {
+    if (!info) return "";
+    if (info.code === "tooFewDates" && info.vars.minimum === 1) {
+      return t("enrollValidation.tooFewDatesOne");
+    }
+    return t(`enrollValidation.${info.code}`, info.vars);
+  };
 
   const known = !!LEVELS[levelKey] && !!PLANS[planId];
-  const conflict = known ? planConflict(levelKey, planId) : "We could not tell which level and plan you selected.";
+  const conflict = known ? planConflictInfo(levelKey, planId) : { code: "unknownSelection", vars: {} };
   if (!known || conflict) {
+    const text = !known
+      ? t("enrollValidation.unknownSelection")
+      : t(`enrollData.${conflict.code}`, {
+          ...conflict.vars,
+          level: conflict.vars.levelKey ? t(`enrollData.levelName.${conflict.vars.levelKey}`) : "",
+        });
     return (
-      <main className="sundays sundays--empty">
-        <h1>We lost track of your plan</h1>
-        <p>{conflict}</p>
-        <Link className="sundays__cta" to="/enroll/sunday">Back to Sunday Programs</Link>
-      </main>
+      <>
+        <NavBar />
+        <main className="sundays sundays--empty">
+          <h1>{t("enrollDates.lostPlanTitle")}</h1>
+          <p>{text}</p>
+          <Link className="sundays__cta" to="/enroll/sunday">{t("enrollDates.backToSunday")}</Link>
+        </main>
+        <Footer />
+      </>
     );
   }
 
   const level = LEVELS[levelKey];
-  const months = sundaysByMonth(term);
+  const months = sundaysByMonth(term, new Date(), locale);
   const quote = priceQuote(planId, selected.length);
-  const validation = validateDateSelection(selected, term);
+  const validation = validateDateSelectionInfo(selected, term);
   const minimum = minimumDatesFor(term);
   const minimumReduced = minimum < MIN_SESSION_DATES;
   const childQuery = childIndex > 0 ? `?child=${childIndex + 1}` : "";
 
+  const levelTitle =
+    t(`enrollData.levelName.${levelKey}`) +
+    (levelKey !== "math" ? ` ${t("enrollPlans.titleSuffix")}` : "");
+
   const toggle = (iso) => {
-    setWarning("");
+    setWarning(null);
     setSelected((prev) => (prev.includes(iso) ? prev.filter((d) => d !== iso) : [...prev, iso].sort()));
   };
 
   const onContinue = (event) => {
     event.preventDefault();
     if (validation) { setWarning(validation); return; }
+    // The draft keeps English names — it feeds the backend and the confirmation
+    // email, which are not language-switched.
     saveEnrollment(childIndex, {
       levelKey,
       levelName: level.name,
@@ -69,24 +101,29 @@ export default function EnrollSelectDates() {
     navigate(`/enroll/registration?child=${childIndex + 1}`);
   };
 
-  return (
-    <main className="sundays">
-      <Link className="sundays__back" to={`/enroll/${levelKey}${childQuery}`}>← Back to plans</Link>
+  const qtyUnit = (unit, qty) => {
+    if (unit === "hour") return t(qty === 1 ? "enrollDates.qtyHourOne" : "enrollDates.qtyHour");
+    return t(qty === 1 ? "enrollDates.qtyClassOne" : "enrollDates.qtyClass");
+  };
 
-      <ol className="stepper" aria-label="Enrollment progress">
-        <li className="stepper__item stepper__item--done"><span className="stepper__dot">✓</span><span className="stepper__label">Plan</span></li>
-        <li className="stepper__item stepper__item--active"><span className="stepper__dot">2</span><span className="stepper__label">Sundays</span></li>
-        <li className="stepper__item"><span className="stepper__dot">3</span><span className="stepper__label">Registration</span></li>
+  return (
+    <>
+      <NavBar />
+      <main className="sundays">
+      <Link className="sundays__back" to={`/enroll/${levelKey}${childQuery}`}>{t("enrollDates.backToPlans")}</Link>
+
+      <ol className="stepper" aria-label={t("enrollDates.stepperAria")}>
+        <li className="stepper__item stepper__item--done"><span className="stepper__dot">✓</span><span className="stepper__label">{t("enrollDates.stepPlan")}</span></li>
+        <li className="stepper__item stepper__item--active"><span className="stepper__dot">2</span><span className="stepper__label">{t("enrollDates.stepSundays")}</span></li>
+        <li className="stepper__item"><span className="stepper__dot">3</span><span className="stepper__label">{t("enrollDates.stepRegistration")}</span></li>
       </ol>
 
-      <h1 className="sundays__title">Choose Your Sundays</h1>
-      <p className="sundays__lede">
-        Select the class dates that work best for your family. Eligible package discounts are applied automatically.
-      </p>
+      <h1 className="sundays__title">{t("enrollDates.title")}</h1>
+      <p className="sundays__lede">{t("enrollDates.lede")}</p>
       <p className="sundays__childline">
         {childIndex === 0
-          ? "Child 1 enrollment"
-          : `Child ${childIndex + 1} enrollment — this child can have a different level, plan, and schedule.`}
+          ? t("enrollDates.childLineFirst")
+          : t("enrollDates.childLineOther", { n: childIndex + 1 })}
       </p>
 
       <div className="sundays__cols">
@@ -96,38 +133,47 @@ export default function EnrollSelectDates() {
               {levelKey === "math" ? <MathIcon size={22} /> : <ChineseIcon size={22} />}
             </span>
             <div>
-              <div className="selected-plan__level">{level.name} Chinese</div>
-              <div className="selected-plan__plan">{planTitle(planId)}</div>
+              <div className="selected-plan__level">{levelTitle}</div>
+              <div className="selected-plan__plan">{planLabel(planId)}</div>
               <ul className="selected-plan__blocks">
                 {scheduleFor(levelKey, planId).map((b, i) => (
                   <li key={b.time + i}>
                     <span aria-hidden="true">✓</span>
                     <span className="selected-plan__time">{b.time}</span>
-                    <span>· {b.label}</span>
+                    <span>· {t(`enrollData.slot.${b.labelKey}`)}</span>
                   </li>
                 ))}
               </ul>
-              <p className="selected-plan__note">Standard weekly rates shown are per student.</p>
+              <p className="selected-plan__note">{t("enrollDates.perStudentNote")}</p>
             </div>
           </section>
 
           <section className="picker">
             <div className="picker__head">
-              <h2>Select Your Sundays</h2>
-              <span className="picker__counter">{selected.length} of {term.dates.length} Sundays selected</span>
+              <h2>{t("enrollDates.pickerTitle")}</h2>
+              <span className="picker__counter">
+                {t("enrollDates.counter", { selected: selected.length, total: term.dates.length })}
+              </span>
             </div>
             <p className="picker__hint">
               {minimumReduced
-                ? `Some Sundays in ${term.label} have already passed. Choose at least ${minimum} of the ${minimum === 1 ? "remaining Sunday" : "remaining Sundays"} to enroll.`
-                : `${term.label} runs on ${term.dates.length} Sundays. Pick any combination — choose at least ${MIN_SESSION_DATES}.`}
+                ? t(minimum === 1 ? "enrollDates.hintReducedOne" : "enrollDates.hintReduced", {
+                    term: termLabel,
+                    minimum,
+                  })
+                : t("enrollDates.hintFull", {
+                    term: termLabel,
+                    total: term.dates.length,
+                    minimum: MIN_SESSION_DATES,
+                  })}
             </p>
 
             <div className="picker__quick">
-              <button type="button" onClick={() => { setWarning(""); setSelected(eligibleSundays(term).map((s) => s.iso)); }}>
-                Select all Sundays
+              <button type="button" onClick={() => { setWarning(null); setSelected(eligibleSundays(term).map((s) => s.iso)); }}>
+                {t("enrollDates.selectAll")}
               </button>
-              <button type="button" className="picker__clear" onClick={() => { setWarning(""); setSelected([]); }}>
-                Clear
+              <button type="button" className="picker__clear" onClick={() => { setWarning(null); setSelected([]); }}>
+                {t("enrollDates.clear")}
               </button>
             </div>
 
@@ -137,6 +183,8 @@ export default function EnrollSelectDates() {
                 <div className="picker__days">
                   {group.dates.map((day) => {
                     const on = selected.includes(day.iso);
+                    const noteText = day.noteCode ? t(`enrollValidation.${day.noteCode}`) : null;
+                    const blockedText = day.unavailableCode ? t(`enrollValidation.${day.unavailableCode}`) : null;
                     return (
                       <button
                         type="button"
@@ -145,14 +193,14 @@ export default function EnrollSelectDates() {
                         onClick={() => toggle(day.iso)}
                         disabled={!!day.unavailable}
                         aria-pressed={on}
-                        title={day.unavailable || day.note || (on ? "Selected" : "Available")}
+                        title={blockedText || noteText || t(on ? "enrollDates.daySelected" : "enrollDates.dayAvailable")}
                       >
                         <span className="day__dot" aria-hidden="true">{on ? "✓" : ""}</span>
                         <span className="day__label">{day.dayLabel}</span>
-                        {day.note ? (
-                          <span className="day__badge">{day.note}</span>
-                        ) : day.unavailable ? (
-                          <span className="day__reason">{day.unavailable}</span>
+                        {noteText ? (
+                          <span className="day__badge">{noteText}</span>
+                        ) : blockedText ? (
+                          <span className="day__reason">{blockedText}</span>
                         ) : null}
                       </button>
                     );
@@ -164,17 +212,12 @@ export default function EnrollSelectDates() {
             <aside className="yct">
               <span className="yct__icon" aria-hidden="true">i</span>
               <div>
-                <h3 className="yct__title">YCT Level 1 Exam Day &mdash; November 22</h3>
+                <h3 className="yct__title">{t("enrollDates.yctTitle")}</h3>
+                <p>{t("enrollDates.yctBody")}</p>
                 <p>
-                  If your child plans to take the YCT Level 1 exam, please select this date. The exam
-                  lasts approximately 40 minutes, and all other scheduled classes continue as usual
-                  afterward. The $15 YCT exam registration fee is already included in the November 22
-                  session fee &mdash; there is nothing extra to pay.
-                </p>
-                <p>
-                  Not sure if your child is ready for the YCT Level 1 exam?{" "}
-                  <a href="mailto:hello.nihao.chinese@gmail.com">Email us</a> in advance to confirm
-                  with your child's teacher.
+                  {t("enrollDates.yctAskPre")}{" "}
+                  <a href="mailto:hello.nihao.chinese@gmail.com">{t("enrollDates.yctAskLink")}</a>{" "}
+                  {t("enrollDates.yctAskPost")}
                 </p>
               </div>
             </aside>
@@ -182,63 +225,81 @@ export default function EnrollSelectDates() {
 
           <section className="summary">
             <div className="summary__head">
-              <h2>Pricing Summary</h2>
-              {quote.savings > 0 && <span className="summary__badge">✓ Package Savings Applied</span>}
+              <h2>{t("enrollDates.summaryTitle")}</h2>
+              {quote.savings > 0 && <span className="summary__badge">{t("enrollDates.savingsBadge")}</span>}
             </div>
 
             {quote.components.map((c) => (
               <div className="summary__row" key={c.key}>
                 <div>
-                  <div className="summary__label">{c.label}</div>
+                  <div className="summary__label">
+                    {t(`enrollDates.component${c.key.charAt(0).toUpperCase()}${c.key.slice(1)}`)}
+                  </div>
                   <div className="summary__meta">
-                    {c.qty} {pluralUnit(c.unit, c.qty)} · Regular: {money(c.regular)}
+                    {c.qty} {qtyUnit(c.unit, c.qty)} · {t("enrollDates.regularLine", { amount: money(c.regular) })}
                   </div>
                 </div>
                 <div className="summary__prices">
                   <span className="summary__price">{money(c.price)}</span>
-                  {c.savings > 0 && <span className="summary__save">Save {money(c.savings)}</span>}
+                  {c.savings > 0 && (
+                    <span className="summary__save">{t("enrollDates.save", { amount: money(c.savings) })}</span>
+                  )}
                 </div>
               </div>
             ))}
 
             <div className="summary__total">
-              <span>Total</span>
+              <span>{t("enrollDates.total")}</span>
               <span className="summary__totalamount">{money(quote.total)}</span>
             </div>
-            {quote.savings > 0 && <div className="summary__savings">Total savings: {money(quote.savings)}</div>}
-            <p className="summary__note">All rates shown are per student.</p>
+            {quote.savings > 0 && (
+              <div className="summary__savings">
+                {t("enrollDates.totalSavings", { amount: money(quote.savings) })}
+              </div>
+            )}
+            <p className="summary__note">{t("enrollDates.allPerStudent")}</p>
           </section>
 
-          {warning && <p className="sundays__warning">{warning}</p>}
+          {warning && <p className="sundays__warning">{messageFor(warning)}</p>}
 
           <a className="sundays__continue" href="#continue" onClick={onContinue}>
-            Continue to Registration ›
+            {t("enrollDates.continue")}
           </a>
           <p className="sundays__alt">
-            Need a different option? <Link to={`/enroll/${levelKey}${childQuery}`}>Back to Plans</Link>
+            {t("enrollDates.altPre")}{" "}
+            <Link to={`/enroll/${levelKey}${childQuery}`}>{t("enrollDates.altLink")}</Link>
           </p>
         </div>
 
         <aside className="recap">
-          <div className="recap__eyebrow">Your selection</div>
-          <div className="recap__level">{level.name} Chinese</div>
-          <div className="recap__plan">{planTitle(planId)}</div>
+          <div className="recap__eyebrow">{t("enrollDates.recapEyebrow")}</div>
+          <div className="recap__level">{levelTitle}</div>
+          <div className="recap__plan">{planLabel(planId)}</div>
           <dl className="recap__list">
-            <div><dt>Sundays selected</dt><dd>{selected.length}</dd></div>
-            <div><dt>Weekly rate</dt><dd>{money(PLANS[planId].perSunday)} / Sunday</dd></div>
-            <div><dt>Savings</dt><dd className="recap__savings">{money(quote.savings)}</dd></div>
+            <div><dt>{t("enrollDates.recapSundays")}</dt><dd>{selected.length}</dd></div>
+            <div>
+              <dt>{t("enrollDates.recapRate")}</dt>
+              <dd>{t("enrollDates.recapRateValue", { amount: money(PLANS[planId].perSunday) })}</dd>
+            </div>
+            <div><dt>{t("enrollDates.recapSavings")}</dt><dd className="recap__savings">{money(quote.savings)}</dd></div>
           </dl>
           <div className="recap__total">
-            <span>Subtotal</span>
+            <span>{t("enrollDates.recapSubtotal")}</span>
             <span className="recap__totalamount">{money(quote.total)}</span>
           </div>
           <p className="recap__dates">
             {selected.length
-              ? "Selected: " + selected.map((iso) => formatDateShort(iso).replace(", 2026", "")).join(" · ")
-              : "No Sundays selected yet."}
+              ? t("enrollDates.recapDates", {
+                  dates: selected
+                    .map((iso) => formatDateShort(iso, locale).replace(", 2026", "").replace("2026年", ""))
+                    .join(" · "),
+                })
+              : t("enrollDates.recapNone")}
           </p>
         </aside>
       </div>
-    </main>
+      </main>
+      <Footer />
+    </>
   );
 }

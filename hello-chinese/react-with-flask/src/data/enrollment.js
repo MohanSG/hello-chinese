@@ -107,6 +107,19 @@ export function planConflict(levelKey, planId) {
   return null;
 }
 
+// Same rule, but as a code + values instead of a sentence, so the UI can render
+// it in the active language. planConflict() above stays as-is for truthiness
+// checks and for any caller that just needs an English string.
+export function planConflictInfo(levelKey, planId) {
+  const level = LEVELS[levelKey];
+  const plan = PLANS[planId];
+  if (!level || !plan) return { code: "conflictUnknown", vars: {} };
+  if (plan.chinese && plan.math && level.math === level.chinese) {
+    return { code: "conflictMathClash", vars: { levelKey, time: level.chinese } };
+  }
+  return null;
+}
+
 export function isPlanAvailable(levelKey, planId) {
   return !planConflict(levelKey, planId);
 }
@@ -117,13 +130,13 @@ export function scheduleFor(levelKey, planId) {
   const plan = PLANS[planId];
   if (!level || !plan) return [];
   const blocks = [];
-  if (plan.chinese && level.chinese) blocks.push({ time: level.chinese, label: "Chinese Class" });
+  if (plan.chinese && level.chinese) blocks.push({ time: level.chinese, label: "Chinese Class", labelKey: "chineseClass" });
   const hours = level.tutoring.slice(0, plan.tutoringHours);
   const usedByMath = plan.math ? level.math : null;
   hours.forEach((time) => {
-    if (time !== usedByMath) blocks.push({ time, label: "Learning Support Tutoring" });
+    if (time !== usedByMath) blocks.push({ time, label: "Learning Support Tutoring", labelKey: "tutoring" });
   });
-  if (plan.math) blocks.push({ time: level.math, label: "Math Enrichment" });
+  if (plan.math) blocks.push({ time: level.math, label: "Math Enrichment", labelKey: "math" });
   return blocks.sort((a, b) => startMinutes(a.time) - startMinutes(b.time));
 }
 
@@ -190,6 +203,12 @@ export function planTitle(planId) {
   return plan ? `Plan ${plan.order} — ${plan.name}` : "";
 }
 
+// The pieces of a plan title, for UIs that need to translate the name.
+export function planTitleParts(planId) {
+  const plan = PLANS[planId];
+  return plan ? { order: plan.order, id: plan.id } : null;
+}
+
 // ---------------------------------------------------------------------------
 // Sunday scheduling
 //
@@ -207,6 +226,7 @@ export const TERMS = [
   {
     key: "fall-2026",
     label: "Fall Term 2026",
+    labelKey: "fall2026",
     dates: [
       "2026-09-06", "2026-09-13", "2026-09-20", "2026-09-27",
       "2026-10-04", "2026-10-18", "2026-10-25",
@@ -226,6 +246,12 @@ export const NOTED_DATES = {
   "2026-11-22": "YCT Exam Day",
 };
 
+// Same notes as translation codes — the UI renders these, NOTED_DATES stays
+// English for logs and the backend.
+export const NOTED_DATE_CODES = {
+  "2026-11-22": "yctExamDay",
+};
+
 export function toISODate(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
@@ -236,20 +262,23 @@ function parseISODate(iso) {
 }
 
 // Every published Sunday in a term, with the reason a date cannot be picked.
-export function termSundays(term, today = new Date()) {
+export function termSundays(term, today = new Date(), locale = "en-US") {
   const floor = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   return (term.dates || []).map((iso) => {
     const d = parseISODate(iso);
     let unavailable = null;
-    if (d < floor) unavailable = "Past date";
-    else if (FULL_DATES.includes(iso)) unavailable = "Group full";
+    let unavailableCode = null;
+    if (d < floor) { unavailable = "Past date"; unavailableCode = "pastDate"; }
+    else if (FULL_DATES.includes(iso)) { unavailable = "Group full"; unavailableCode = "groupFull"; }
     return {
       iso,
       date: d,
-      month: d.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
-      dayLabel: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      month: d.toLocaleDateString(locale, { month: "long", year: "numeric" }),
+      dayLabel: d.toLocaleDateString(locale, { month: "short", day: "numeric" }),
       note: NOTED_DATES[iso] || null,
+      noteCode: NOTED_DATE_CODES[iso] || null,
       unavailable,
+      unavailableCode,
     };
   });
 }
@@ -266,9 +295,9 @@ export function minimumDatesFor(term, today = new Date()) {
 }
 
 // Sundays grouped by month, for the picker UI.
-export function sundaysByMonth(term, today = new Date()) {
+export function sundaysByMonth(term, today = new Date(), locale = "en-US") {
   const groups = [];
-  termSundays(term, today).forEach((s) => {
+  termSundays(term, today, locale).forEach((s) => {
     const last = groups[groups.length - 1];
     if (last && last.month === s.month) last.dates.push(s);
     else groups.push({ month: s.month, dates: [s] });
@@ -294,8 +323,21 @@ export function validateDateSelection(selected, term, today = new Date()) {
   return null;
 }
 
-export function formatDateShort(iso) {
-  return parseISODate(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+// Same rules as validateDateSelection, reported as a code + values instead of a
+// sentence. validateDateSelection() is unchanged and still returns English.
+export function validateDateSelectionInfo(selected, term, today = new Date()) {
+  const eligible = new Set(eligibleSundays(term, today).map((s) => s.iso));
+  const list = selected || [];
+  if ([...new Set(list)].length !== list.length) return { code: "duplicateDates", vars: {} };
+  const minimum = minimumDatesFor(term, today);
+  if (list.length < minimum) return { code: "tooFewDates", vars: { minimum } };
+  if (list.length > MAX_SESSION_DATES) return { code: "tooManyDates", vars: { maximum: MAX_SESSION_DATES } };
+  if (list.find((iso) => !eligible.has(iso))) return { code: "dateUnavailable", vars: {} };
+  return null;
+}
+
+export function formatDateShort(iso, locale = "en-US") {
+  return parseISODate(iso).toLocaleDateString(locale, { month: "short", day: "numeric", year: "numeric" });
 }
 
 export function formatSunday(date) {
@@ -352,7 +394,7 @@ function resolveDueDate(iso, today, term) {
 }
 
 // The full monthly plan for a total, resolved against today's calendar.
-export function paymentSchedule(total, today = new Date(), term = TERMS[0]) {
+export function paymentSchedule(total, today = new Date(), term = TERMS[0], locale = "en-US") {
   const amount = Math.max(0, Math.round(Number(total) || 0));
   const dates = PAYMENT_DUE_DATES
     .map((iso) => resolveDueDate(iso, today, term))
@@ -364,13 +406,17 @@ export function paymentSchedule(total, today = new Date(), term = TERMS[0]) {
     const d = parseISODate(iso);
     return {
       iso,
-      due: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-      label: d.toLocaleDateString("en-US", { month: "long" }),
+      due: d.toLocaleDateString(locale, { month: "short", day: "numeric" }),
+      label: d.toLocaleDateString(locale, { month: "long" }),
       amount: i === 0 ? base + remainder : base,
     };
   });
   return {
     installments,
+    // count + month names let the UI build "2 months" and "October and November"
+    // with its own grammar; the two *Label fields below stay English.
+    count: n,
+    monthNames: installments.map((p) => p.label),
     available: n >= MIN_PLAN_INSTALLMENTS,
     // "Payment plan — 2 months", "October and November · no fees"
     lengthLabel: n + (n === 1 ? " month" : " months"),
@@ -411,8 +457,8 @@ export const PRIVACY_CONSENT_HINT =
 // ---------------------------------------------------------------------------
 
 export const COUPONS = {
-  WELCOME10: { type: "percent", value: 10, label: "10% off" },
-  FAMILY20: { type: "flat", value: 20, label: "$20 off" },
+  WELCOME10: { type: "percent", value: 10, label: "10% off", labelKey: "couponPercent10" },
+  FAMILY20: { type: "flat", value: 20, label: "$20 off", labelKey: "couponFlat20" },
 };
 
 // Returns { code, type, value, label } for a valid code, or null.

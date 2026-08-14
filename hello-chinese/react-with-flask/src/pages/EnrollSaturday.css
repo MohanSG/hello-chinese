@@ -32,16 +32,19 @@
 
 .sat-form { background: var(--color-bg-alt); border: 1px solid rgba(32, 32, 31, .1); border-radius: 20px; padding: clamp(26px, 4vw, 40px); box-shadow: 0 2px 10px rgba(32, 32, 31, .05); }
 .sat-form__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+/* Form controls carry an intrinsic width, and a grid item will not shrink below
+   it — without min-width: 0 the inputs push past the card's padding. */
+.sat-form__grid > * { min-width: 0; }
 .sat-form__error { font-size: 13.5px; font-weight: 600; color: var(--color-brand); margin: 18px 0 0; }
 .sat-form__note { text-align: center; font-size: 13px; color: var(--color-text-faint); margin: 14px 0 0; }
 
-.field { display: flex; flex-direction: column; gap: 7px; }
+.field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
 .field--full { grid-column: 1 / -1; }
 .field__label { font-size: 13px; font-weight: 600; color: var(--color-text); }
 .field__optional { font-weight: 500; color: var(--color-text-faint); }
-.field__input { padding: 13px 15px; border-radius: 10px; border: 1.5px solid var(--color-border-strong); background: #f9f5ee; font-family: inherit; font-size: 15px; color: var(--color-text); outline: none; transition: border-color .2s; }
+.field__input { width: 100%; max-width: 100%; padding: 13px 15px; border-radius: 10px; border: 1.5px solid var(--color-border-strong); background: #f9f5ee; font-family: inherit; font-size: 15px; color: var(--color-text); outline: none; transition: border-color .2s; }
 .field__input:focus { border-color: var(--color-brand); }
-.field__input--area { resize: vertical; }
+.field__input--area { resize: vertical; display: block; }
 
 @media (max-width: 640px) {
   .sat-interest__cards { grid-template-columns: 1fr; }

@@ -2,27 +2,17 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+import { useLanguage } from "../i18n/LanguageContext";
 import "../styles/variables.css";
 import "./EnrollOverview.css";
 import "./EnrollSaturday.css";
 
+// `value` is what gets submitted and stored — it stays English on purpose, so
+// the interest list reads the same whichever language the parent used.
+// Display copy comes from i18n/translations.js under enrollSat.
 const PROGRAM_CARDS = [
-  {
-    key: "english",
-    value: "English Language Learning",
-    title: "English Language Learning",
-    desc: "Build strong English foundations through engaging reading, writing, and language activities.",
-    bullets: ["Reading & writing foundations", "Vocabulary and grammar building", "Small group instruction"],
-    icon: "book",
-  },
-  {
-    key: "math",
-    value: "English-Led Math Enrichment",
-    title: "Math Enrichment",
-    desc: "Strengthen math thinking and problem-solving skills in a supportive and interactive setting.",
-    bullets: ["Conceptual understanding", "Problem solving", "Math fluency and confidence"],
-    icon: "calculator",
-  },
+  { key: "english", value: "English Language Learning", icon: "book" },
+  { key: "math", value: "English-Led Math Enrichment", icon: "calculator" },
 ];
 
 const EMPTY_FORM = {
@@ -57,26 +47,28 @@ function CalculatorIcon() {
 }
 
 function EnrollSaturday() {
+  const { t, tList } = useLanguage();
   const [form, setForm] = useState(EMPTY_FORM);
-  const [error, setError] = useState("");
+  // Held as a code so the message follows a language switch.
+  const [error, setError] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [submittedName, setSubmittedName] = useState("");
 
   const onField = (e) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
-    setError("");
+    setError(null);
   };
 
   const pickProgram = (value) => {
     setForm((f) => ({ ...f, programInterest: value }));
-    setError("");
+    setError(null);
   };
 
   const submitInterest = async (e) => {
     e.preventDefault();
     if (!form.parentName || !form.email || !form.programInterest) {
-      setError("Please fill in parent name, email, and program of interest.");
+      setError("warnFields");
       return;
     }
     const payload = {
@@ -107,12 +99,10 @@ function EnrollSaturday() {
                 <path d="M4 12.5L9.5 18L20 6" stroke="#e08a7c" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <div className="enroll-header__eyebrow">You're on the list</div>
-            <h1 className="enroll-header__title">Thanks, {submittedName}.</h1>
-            <p className="enroll-header__desc enroll-confirm__desc">
-              We'll email you as soon as Saturday enrollment opens, with final schedule, pricing, and teacher details.
-            </p>
-            <NavLink to="/" className="btn-primary">Back to programs</NavLink>
+            <div className="enroll-header__eyebrow">{t("enrollSat.doneEyebrow")}</div>
+            <h1 className="enroll-header__title">{t("enrollSat.doneTitle", { name: submittedName })}</h1>
+            <p className="enroll-header__desc enroll-confirm__desc">{t("enrollSat.doneDesc")}</p>
+            <NavLink to="/" className="btn-primary">{t("enrollSat.doneCta")}</NavLink>
           </div>
         </section>
         <Footer />
@@ -128,14 +118,11 @@ function EnrollSaturday() {
       <section className="enroll-header">
         <div className="enroll-header__inner">
           <div className="enroll-back">
-            <NavLink to="/" className="enroll-back__link">← Back to Programs</NavLink>
+            <NavLink to="/" className="enroll-back__link">{t("enrollSat.back")}</NavLink>
           </div>
-          <span className="enroll-badge enroll-badge--soon">Coming Soon</span>
-          <h1 className="enroll-header__title">Saturday Programs Interest List</h1>
-          <p className="enroll-header__desc">
-            English Language Learning and English-Led Math Enrichment are launching soon. Tell us who you're enrolling
-            and we'll notify you the moment registration opens — schedule, pricing, and teachers to be announced.
-          </p>
+          <span className="enroll-badge enroll-badge--soon">{t("enrollCommon.comingSoon")}</span>
+          <h1 className="enroll-header__title">{t("enrollSat.title")}</h1>
+          <p className="enroll-header__desc">{t("enrollSat.desc")}</p>
         </div>
       </section>
 
@@ -154,12 +141,12 @@ function EnrollSaturday() {
                   {c.icon === "book" ? <BookIcon /> : <CalculatorIcon />}
                 </div>
                 <div>
-                  <h3 className="sat-program__title">{c.title}</h3>
-                  <p className="sat-program__desc">{c.desc}</p>
+                  <h3 className="sat-program__title">{t(`enrollSat.${c.key}Title`)}</h3>
+                  <p className="sat-program__desc">{t(`enrollSat.${c.key}Desc`)}</p>
                 </div>
               </div>
               <div className="sat-program__list">
-                {c.bullets.map((b) => (
+                {tList(`enrollSat.${c.key}Bullets`).map((b) => (
                   <span key={b} className="sat-program__item"><span className="sat-program__check">✓</span>{b}</span>
                 ))}
               </div>
@@ -171,40 +158,44 @@ function EnrollSaturday() {
         <form className="sat-form" onSubmit={submitInterest}>
           <div className="sat-form__grid">
             <label className="field field--full">
-              <span className="field__label">Parent name</span>
+              <span className="field__label">{t("enrollSat.parentName")}</span>
               <input type="text" name="parentName" value={form.parentName ?? ""} onChange={onField} className="field__input" />
             </label>
             <label className="field">
-              <span className="field__label">Email</span>
-              <input type="email" name="email" placeholder="parent@email.com" value={form.email ?? ""} onChange={onField} className="field__input" />
+              <span className="field__label">{t("enrollSat.email")}</span>
+              <input type="email" name="email" placeholder={t("enrollSat.emailPlaceholder")} value={form.email ?? ""} onChange={onField} className="field__input" />
             </label>
             <label className="field">
-              <span className="field__label">Child age / grade</span>
-              <input type="text" name="childAgeGrade" placeholder="e.g. Age 7 / 2nd grade" value={form.childAgeGrade ?? ""} onChange={onField} className="field__input" />
+              <span className="field__label">{t("enrollSat.childAgeGrade")}</span>
+              <input type="text" name="childAgeGrade" placeholder={t("enrollSat.childAgeGradePlaceholder")} value={form.childAgeGrade ?? ""} onChange={onField} className="field__input" />
             </label>
             <label className="field field--full">
-              <span className="field__label">Program of interest</span>
+              <span className="field__label">{t("enrollSat.programInterest")}</span>
               <select name="programInterest" value={form.programInterest ?? ""} onChange={onField} className="field__input">
-                <option value="">Select a program</option>
-                <option value="English Language Learning">English Language Learning</option>
-                <option value="English-Led Math Enrichment">English-Led Math Enrichment</option>
-                <option value="Both">Both</option>
+                <option value="">{t("enrollSat.programSelect")}</option>
+                <option value="English Language Learning">{t("enrollSat.englishTitle")}</option>
+                <option value="English-Led Math Enrichment">{t("enrollSat.mathTitle")}</option>
+                <option value="Both">{t("enrollSat.programBoth")}</option>
               </select>
             </label>
             <label className="field field--full">
-              <span className="field__label">Preferred Saturday time <span className="field__optional">(optional)</span></span>
-              <input type="text" name="preferredTime" placeholder="e.g. Morning, early afternoon..." value={form.preferredTime ?? ""} onChange={onField} className="field__input" />
+              <span className="field__label">
+                {t("enrollSat.preferredTime")} <span className="field__optional">{t("enrollSat.optional")}</span>
+              </span>
+              <input type="text" name="preferredTime" placeholder={t("enrollSat.preferredTimePlaceholder")} value={form.preferredTime ?? ""} onChange={onField} className="field__input" />
             </label>
             <label className="field field--full">
-              <span className="field__label">Comments <span className="field__optional">(optional)</span></span>
+              <span className="field__label">
+                {t("enrollSat.comments")} <span className="field__optional">{t("enrollSat.optional")}</span>
+              </span>
               <textarea name="comments" rows="4" value={form.comments ?? ""} onChange={onField} className="field__input field__input--area" />
             </label>
           </div>
 
-          {error && <p className="sat-form__error">{error}</p>}
+          {error && <p className="sat-form__error">{t(`enrollSat.${error}`)}</p>}
 
-          <button type="submit" className="btn-primary btn-primary--block">Join Interest List</button>
-          <p className="sat-form__note">No enrollment or payment yet — this only adds you to the notification list.</p>
+          <button type="submit" className="btn-primary btn-primary--block">{t("enrollSat.submit")}</button>
+          <p className="sat-form__note">{t("enrollSat.note")}</p>
         </form>
       </div>
 

@@ -1,46 +1,24 @@
 import { NavLink, useSearchParams } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+import { useLanguage } from "../i18n/LanguageContext";
 import "../styles/variables.css";
 import "./EnrollOverview.css";
 import "./EnrollSaturday.css";
 import { LEVEL_ICONS, MathIcon, PathwayIcon } from "../components/EnrollIcons";
 import "./EnrollSundayProgram.css";
 
+// Copy lives in i18n/translations.js under enrollSundayProgram — this array
+// carries only the route, the colour tone, the icon key and the key prefix.
 const LEVELS = [
-  {
-    key: "stepin", tone: "green",
-    title: "Step-In Chinese", subtitle: "Building Language Foundations",
-    age: "Recommended Ages 3–6+", time: "9:00 – 10:00 AM",
-    desc: "Build a strong foundation through vocabulary, sentence formation, and early literacy, while developing confidence and a natural feel for Chinese.",
-    to: "/Enroll/Step-In",
-  },
-  {
-    key: "stepup", tone: "blue",
-    title: "Step-Up Chinese", subtitle: "Developing Language Skills",
-    age: "Recommended Ages 7–10", time: "10:00 – 11:00 AM",
-    desc: "Develop core language skills through expanded sentence patterns, structured reading and writing, and comprehension, while applying Chinese in meaningful contexts.",
-    to: "/Enroll/Step-Up",
-  },
-  {
-    key: "stepbeyond", tone: "purple",
-    title: "Step-Beyond Chinese", subtitle: "Advancing Language Independence",
-    age: "Recommended Ages 10+", time: "11:00 AM – 12:00 PM",
-    desc: "Advance toward independent language use through deeper reading, more complex writing, real-world communication, and project-based learning, while developing the confidence to express ideas with greater depth and clarity.",
-    to: "/Enroll/Step-Beyond",
-  },
+  { key: "stepIn", iconKey: "stepin", tone: "green", to: "/Enroll/Step-In" },
+  { key: "stepUp", iconKey: "stepup", tone: "blue", to: "/Enroll/Step-Up" },
+  { key: "stepBeyond", iconKey: "stepbeyond", tone: "purple", to: "/Enroll/Step-Beyond" },
 ];
-
-const PATHWAY_INTRO =
-  "A structured Mandarin pathway designed to support continuous growth from foundational language skills to increasingly independent Chinese use.";
 
 // Support layers onto any level; math is an independent course, so it never
 // uses the Step-In / Step-Up / Step-Beyond names.
-const SUPPORT_FEATURES = [
-  { title: "Review & Reinforce", desc: "Strengthen key learning through guided practice." },
-  { title: "Speak with Confidence", desc: "Build communication skills through conversation and role-play." },
-  { title: "Personalized Support", desc: "Learn at your own pace with small-group guidance." },
-];
+const SUPPORT_FEATURES = ["supportFeature1", "supportFeature2", "supportFeature3"];
 
 function PeopleIcon() {
   return (
@@ -64,8 +42,10 @@ function CalendarIcon() {
 
 function EnrollSundayProgram() {
   const [search] = useSearchParams();
+  const { t, tList } = useLanguage();
   const childNo = Number(search.get("child")) || 1;
   const childQuery = childNo > 1 ? `?child=${childNo}` : "";
+
   return (
     <div className="enroll-overview">
       <NavBar />
@@ -74,20 +54,17 @@ function EnrollSundayProgram() {
       <section className="enroll-header">
         <div className="enroll-header__inner">
           <div className="enroll-back">
-            <NavLink to="/" className="enroll-back__link">← Back to Programs</NavLink>
+            <NavLink to="/" className="enroll-back__link">{t("enrollCommon.backToPrograms")}</NavLink>
           </div>
-          <span className="enroll-badge enroll-badge--live">Now Enrolling</span>
+          <span className="enroll-badge enroll-badge--live">{t("enrollCommon.nowEnrolling")}</span>
           {childNo > 1 && (
             <div className="enroll-childbanner">
               <span className="enroll-childnum">{childNo}</span>
-              You are enrolling Child {childNo}. This child can choose a different level, plan, and
-              Sundays — parent information is already saved.
+              {t("enrollSundayProgram.childBanner", { n: childNo })}
             </div>
           )}
-          <h1 className="enroll-header__title">Sunday Programs</h1>
-          <p className="enroll-header__desc">
-            Chinese language classes, learning support, and math enrichment on Sunday mornings.
-          </p>
+          <h1 className="enroll-header__title">{t("enrollSunday.title")}</h1>
+          <p className="enroll-header__desc">{t("enrollSunday.desc")}</p>
         </div>
       </section>
 
@@ -95,25 +72,33 @@ function EnrollSundayProgram() {
         <div className="sun-detail__container">
           <div className="sun-detail__head">
             <span className="sun-detail__icon" aria-hidden="true"><PathwayIcon /></span>
-            <h2 className="sun-detail__title">Chinese Learning Pathway</h2>
+            <h2 className="sun-detail__title">{t("enrollSundayProgram.pathwayTitle")}</h2>
           </div>
-          <p className="sun-detail__intro">{PATHWAY_INTRO}</p>
+          <p className="sun-detail__intro">{t("enrollSundayProgram.pathwayIntro")}</p>
 
           <div className="sun-rows">
             {/* LEVEL ROWS */}
             {LEVELS.map((lvl) => (
               <div key={lvl.key} className={`sun-row sun-row--${lvl.tone}`}>
                 <div className={`sun-row__badge sun-row__badge--${lvl.tone}`}>
-                  {(() => { const Icon = LEVEL_ICONS[lvl.key]; return Icon ? <Icon /> : null; })()}
+                  {(() => { const Icon = LEVEL_ICONS[lvl.iconKey]; return Icon ? <Icon /> : null; })()}
                 </div>
                 <div>
-                  <div className={`sun-row__title sun-row__title--${lvl.tone}`}>{lvl.title}</div>
-                  <div className={`sun-row__subtitle sun-row__subtitle--${lvl.tone}`}>{lvl.subtitle}</div>
-                  <div className="sun-row__age">{lvl.age}</div>
+                  <div className={`sun-row__title sun-row__title--${lvl.tone}`}>
+                    {t(`enrollSundayProgram.${lvl.key}Title`)}
+                  </div>
+                  <div className={`sun-row__subtitle sun-row__subtitle--${lvl.tone}`}>
+                    {t(`enrollSundayProgram.${lvl.key}Subtitle`)}
+                  </div>
+                  <div className="sun-row__age">{t(`enrollSundayProgram.${lvl.key}Age`)}</div>
                 </div>
-                <div className="sun-row__time"><CalendarIcon />{lvl.time}</div>
-                <p className="sun-row__desc">{lvl.desc}</p>
-                <NavLink to={lvl.to + childQuery} className="sun-row__cta">Choose Your Plan →</NavLink>
+                <div className="sun-row__time">
+                  <CalendarIcon />{t(`enrollSundayProgram.${lvl.key}Time`)}
+                </div>
+                <p className="sun-row__desc">{t(`enrollSundayProgram.${lvl.key}Desc`)}</p>
+                <NavLink to={lvl.to + childQuery} className="sun-row__cta">
+                  {t("enrollSundayProgram.choosePlan")}
+                </NavLink>
               </div>
             ))}
 
@@ -121,20 +106,22 @@ function EnrollSundayProgram() {
             <div className="sun-row sun-row--support">
               <div className="sun-row__badge sun-row__badge--icon"><PeopleIcon /></div>
               <div>
-                <div className="sun-row__eyebrow sun-row__eyebrow--brand">Supports all three Chinese levels</div>
-                <div className="sun-row__title">Chinese Learning Support</div>
-                <div className="sun-row__subtitle sun-row__subtitle--amber">Optional Before- &amp; After-Class Tutoring</div>
-                <div className="sun-row__age">
-                  Personalized support to review class learning, strengthen communication skills, and provide homework guidance.
+                <div className="sun-row__eyebrow sun-row__eyebrow--brand">
+                  {t("enrollSundayProgram.supportEyebrow")}
                 </div>
+                <div className="sun-row__title">{t("enrollSundayProgram.supportTitle")}</div>
+                <div className="sun-row__subtitle sun-row__subtitle--amber">
+                  {t("enrollSundayProgram.supportSubtitle")}
+                </div>
+                <div className="sun-row__age">{t("enrollSundayProgram.supportDesc")}</div>
               </div>
               <div className="sun-row__features">
                 {SUPPORT_FEATURES.map((f) => (
-                  <div key={f.title} className="sun-feature">
+                  <div key={f} className="sun-feature">
                     <span className="sun-feature__tick sun-feature__tick--amber" aria-hidden="true">✓</span>
                     <span>
-                      <span className="sun-feature__title">{f.title}</span>
-                      <span className="sun-feature__desc">{f.desc}</span>
+                      <span className="sun-feature__title">{t(`enrollSundayProgram.${f}Title`)}</span>
+                      <span className="sun-feature__desc">{t(`enrollSundayProgram.${f}Desc`)}</span>
                     </span>
                   </div>
                 ))}
@@ -145,28 +132,33 @@ function EnrollSundayProgram() {
             <div className="sun-row sun-row--math">
               <div className="sun-row__badge sun-row__badge--blue"><MathIcon /></div>
               <div>
-                <div className="sun-row__title sun-row__title--blue">Math Enrichment</div>
-                <div className="sun-row__subtitle sun-row__subtitle--blue">Grouped by Grade &amp; Skill Level</div>
-                <div className="sun-row__age">Recommended Ages 7–12</div>
+                <div className="sun-row__title sun-row__title--blue">{t("enrollSundayProgram.mathTitle")}</div>
+                <div className="sun-row__subtitle sun-row__subtitle--blue">
+                  {t("enrollSundayProgram.mathSubtitle")}
+                </div>
+                <div className="sun-row__age">{t("enrollSundayProgram.mathAge")}</div>
               </div>
-              <div className="sun-row__time"><CalendarIcon />11:00 AM – 12:00 PM</div>
+              <div className="sun-row__time"><CalendarIcon />{t("enrollSundayProgram.mathTime")}</div>
               <div>
-                <p className="sun-row__desc sun-row__desc--tight">
-                  An independent Sunday course that builds core skills, reasoning, and confidence.
-                  Students are grouped by both grade level and mathematical ability.
-                </p>
+                <p className="sun-row__desc sun-row__desc--tight">{t("enrollSundayProgram.mathDesc")}</p>
                 <div className="sun-row__ticks">
-                  <div className="sun-tick"><span className="sun-tick__mark" aria-hidden="true">✓</span><span>Strengthen Mathematical Foundations</span></div>
-                  <div className="sun-tick"><span className="sun-tick__mark" aria-hidden="true">✓</span><span>Cultivate Mathematical Thinking</span></div>
-                  <div className="sun-tick"><span className="sun-tick__mark" aria-hidden="true">✓</span><span>Support Academic Growth</span></div>
+                  {tList("enrollSundayProgram.mathTicks").map((tick) => (
+                    <div key={tick} className="sun-tick">
+                      <span className="sun-tick__mark" aria-hidden="true">✓</span><span>{tick}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <NavLink to={"/enroll/math" + childQuery} className="sun-row__cta sun-row__cta--ghost">Choose Your Plan →</NavLink>
+              <NavLink to={"/enroll/math" + childQuery} className="sun-row__cta sun-row__cta--ghost">
+                {t("enrollSundayProgram.choosePlan")}
+              </NavLink>
             </div>
 
             {/* NEXT STEP */}
             <div className="sun-next">
-              <span><strong>Next step:</strong> choose your child's level to view available Sunday plans.</span>
+              <span>
+                <strong>{t("enrollCommon.nextStepLabel")}</strong> {t("enrollSunday.nextStep")}
+              </span>
             </div>
           </div>
         </div>

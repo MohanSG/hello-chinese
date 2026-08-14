@@ -10,10 +10,12 @@
      Noto Sans SC for body text. */
   --font-serif: "Cormorant Garamond", Georgia, serif;
   --font-sans: "Source Sans 3", system-ui, sans-serif;
-  --font-serif-en: var(--font-serif);
-  --font-sans-en: var(--font-sans);
+  /* Literal, not aliases: the -en tokens must stay Latin even under lang="zh"
+     (brand name, prices, "Hello Journey"). */
+  --font-serif-en: "Cormorant Garamond", Georgia, serif;
+  --font-sans-en: "Source Sans 3", system-ui, sans-serif;
 
-  --font-zh: var(--font-zh); /* Chinese subheadings */
+  --font-zh: "Noto Serif SC", serif; /* Chinese subheadings */
   --font-zh-body: "Noto Sans SC", sans-serif; /* Chinese body text */
   --font-zh-brand:
     "LXGW WenKai TC", "Kaiti SC", KaiTi, serif; /* brand phrases only */
@@ -51,9 +53,15 @@
        --bg-hero      open sky top-left, wall low right — safest under headlines
        --bg-hero-alt  blossom top-left, wall + calligraphy right
        --bg-band      wall left, calligraphy centre, blossom right — CTA bands
-       --bg-card      portrait crop for the program cards */
-  --bg-hero: #f8f2e6 url("/assets/bg-wide-3.png") center/cover no-repeat;
-  --bg-hero-alt: #f8f2e6 url("/assets/bg-wide-1.png") center/cover no-repeat;
+       --bg-card      portrait crop for the program cards
+     A flat cream scrim is layered over each image (first layer wins) so text
+     reads against it — raise the alpha to lighten further, lower it for more art. */
+  --bg-hero:
+    linear-gradient(rgba(248, 242, 230, 0.55), rgba(248, 242, 230, 0.55)),
+    url("/assets/bg-wide-3.png") center/cover no-repeat #f8f2e6;
+  --bg-hero-alt:
+    linear-gradient(rgba(248, 242, 230, 0.55), rgba(248, 242, 230, 0.55)),
+    url("/assets/bg-wide-1.png") center/cover no-repeat #f8f2e6;
   --bg-band:
     linear-gradient(rgba(248, 242, 230, 0.55), rgba(248, 242, 230, 0.55)),
     url("/assets/bg-wide-2.png") center/cover no-repeat #f8f2e6;
@@ -84,7 +92,13 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Chinese type stack — body in Noto Sans SC, headings in Noto Serif SC (Part 4). */
+/* Chinese type stack — body in Noto Sans SC, headings in Noto Serif SC (Part 4).
+   Redefining the tokens here carries the swap into every rule that uses
+   var(--font-serif) / var(--font-sans), which is most of the enroll flow. */
+html[lang="zh"] {
+  --font-serif: "Noto Serif SC", serif;
+  --font-sans: "Noto Sans SC", sans-serif;
+}
 html[lang="zh"] body {
   font-family: var(--font-zh-body);
 }
@@ -93,6 +107,38 @@ html[lang="zh"] h2,
 html[lang="zh"] h3 {
   font-family: var(--font-zh);
   font-weight: 500;
+}
+
+/* Enroll pages that pin the -en tokens or hardcode Cormorant — their copy is
+   translated, so they follow the Chinese stack too. */
+html[lang="zh"] .enroll-hero__title,
+html[lang="zh"] .math__title,
+html[lang="zh"] .mathplan__name {
+  font-family: var(--font-zh);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+html[lang="zh"] .enroll-hero__desc,
+html[lang="zh"] .enroll-hero__eyebrow {
+  font-family: var(--font-zh-body);
+}
+
+/* Uppercase + wide tracking is a Latin device — it makes Chinese unreadable. */
+html[lang="zh"] .eyebrow,
+html[lang="zh"] .navbar__brand-sub,
+html[lang="zh"] .footer__descriptor,
+html[lang="zh"] .enroll-header__eyebrow,
+html[lang="zh"] .enroll-hero__eyebrow,
+html[lang="zh"] .math-card__label,
+html[lang="zh"] .pfoot__name {
+  font-family: var(--font-zh-body);
+  text-transform: none;
+  letter-spacing: 1px;
+}
+
+/* The brand name stays Latin in both languages. */
+html[lang="zh"] .navbar__brand-name {
+  font-family: var(--font-serif-en);
 }
 
 /* Descriptor / eyebrow treatment (Part 4) */

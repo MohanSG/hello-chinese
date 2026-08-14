@@ -1,20 +1,25 @@
 import React, { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { POLICY_SUMMARY, PAYMENT_HELP_NOTE, PAYMENT_PLAN_CLOSED_NOTE, PRIVACY_SUMMARY, PRIVACY_CONSENT_LABEL, PRIVACY_CONSENT_HINT, COUPON_INVALID_MESSAGE, SIBLING_DISCOUNT, siblingDiscountFor, ageFromDOB, lookupCoupon, couponDiscount, paymentSchedule, priceQuote } from "../data/enrollment";
+import { PLANS, SIBLING_DISCOUNT, siblingDiscountFor, ageFromDOB, lookupCoupon, couponDiscount, paymentSchedule, priceQuote } from "../data/enrollment";
 import { readDraft, writeDraft, clearDraft, removeEnrollment, money } from "../data/enrollmentDraft";
+import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
+import { useLanguage } from "../i18n/LanguageContext";
 import "./EnrollRegistration.css";
 
+// Copy lives in i18n/translations.js under enrollReg. Steps carry only a key.
 const STEPS = [
-  { key: "parent", label: "Parent Info" },
-  { key: "student", label: "Student Info" },
-  { key: "addchild", label: "Add Child?" },
-  { key: "review", label: "Review & Submit" },
+  { key: "parent", labelKey: "stepParent" },
+  { key: "student", labelKey: "stepStudent" },
+  { key: "addchild", labelKey: "stepAddChild" },
+  { key: "review", labelKey: "stepReview" },
 ];
 
 // Steps 5-8: parent information is collected once, then each child gets its own
 // student details, and the household is reviewed as a whole before submitting.
 export default function EnrollRegistration({ onSubmit }) {
   const [search] = useSearchParams();
+  const { t, lang, locale } = useLanguage();
   const initial = useMemo(() => readDraft(), []);
 
   const [parent, setParent] = useState(initial.parent);
@@ -30,10 +35,21 @@ export default function EnrollRegistration({ onSubmit }) {
   const [mediaConsent, setMediaConsent] = useState(false);
   const [couponInput, setCouponInput] = useState("");
   const [coupon, setCoupon] = useState(null);
-  const [couponError, setCouponError] = useState("");
+  // Warnings and the coupon error are held as { code, vars } so they re-render
+  // in the active language if a parent switches mid-form.
+  const [couponError, setCouponError] = useState(null);
   const todayISO = new Date().toISOString().slice(0, 10);
-  const [warning, setWarning] = useState("");
+  const [warning, setWarning] = useState(null);
   const [submitted, setSubmitted] = useState(false);
+
+  const msg = (info) => (info ? t(`enrollReg.${info.code}`, info.vars) : "");
+  const childLabel = (e, i) => e?.student?.name || t("enrollReg.childFallback", { n: i + 1 });
+  const joinMonths = (names) => {
+    if (!names || !names.length) return "";
+    if (lang === "zh") return names.join("、");
+    if (names.length === 1) return names[0];
+    return names.slice(0, -1).join(", ") + (names.length === 2 ? " and " : ", and ") + names[names.length - 1];
+  };
 
   const persist = (nextParent = parent, nextEnrollments = enrollments) =>
     writeDraft({ parent: nextParent, enrollments: nextEnrollments });
@@ -41,7 +57,7 @@ export default function EnrollRegistration({ onSubmit }) {
   const updateParent = (field) => (event) => {
     const next = { ...parent, [field]: event.target.value };
     setParent(next);
-    setWarning("");
+    setWarning(null);
     persist(next, enrollments);
   };
 
@@ -50,17 +66,17 @@ export default function EnrollRegistration({ onSubmit }) {
     const next = enrollments.map((e, i) =>
       i === childIndex ? { ...e, student: { ...(e.student || {}), [field]: value } } : e);
     setEnrollments(next);
-    setWarning("");
+    setWarning(null);
     persist(parent, next);
   };
 
   const removeChild = (i) => {
-    const label = enrollments[i]?.student?.name || `Child ${i + 1}`;
-    if (!window.confirm(`Remove ${label} from this enrollment?`)) return;
+    const label = childLabel(enrollments[i], i);
+    if (!window.confirm(t("enrollReg.removeConfirm", { name: label }))) return;
     const next = removeEnrollment(i);
     setEnrollments(next);
     setChildIndex((idx) => Math.min(idx, Math.max(0, next.length - 1)));
-    setWarning("");
+    setWarning(null);
   };
 
   const subtotalOf = (e) => {
@@ -77,53 +93,69 @@ export default function EnrollRegistration({ onSubmit }) {
   const householdTotal = householdSubtotal - sibling - discount;
   const packageSavings = enrollments.reduce((sum, e) => sum + savingsOf(e), 0);
   const householdSavings = packageSavings + sibling + discount;
-  const schedule = paymentSchedule(householdTotal);
+  const schedule = paymentSchedule(householdTotal, new Date(), undefined, locale);
   const installments = schedule.installments;
   const planClosed = !schedule.available;
   // A closed plan falls back to paying in full.
   const payMethod = planClosed ? "full" : payment;
+  const monthsLabel = joinMonths(schedule.monthNames);
+  const lengthLabel = t(schedule.count === 1 ? "enrollReg.payMonthsOne" : "enrollReg.payMonthsMany", {
+    n: schedule.count,
+  });
 
   const applyCoupon = () => {
     const found = lookupCoupon(couponInput);
-    if (!found) { setCoupon(null); setCouponError(COUPON_INVALID_MESSAGE); return; }
+    if (!found) { setCoupon(null); setCouponError({ code: "couponInvalid", vars: {} }); return; }
     setCoupon(found);
     setCouponInput(found.code);
-    setCouponError("");
+    setCouponError(null);
   };
-  const removeCoupon = () => { setCoupon(null); setCouponInput(""); setCouponError(""); };
+  const removeCoupon = () => { setCoupon(null); setCouponInput(""); setCouponError(null); };
 
   const savingsDetail = [
-    packageSavings > 0 ? `${money(packageSavings)} package savings` : null,
-    sibling > 0 ? `${money(sibling)} sibling discount` : null,
-    discount > 0 && coupon ? `${money(discount)} coupon ${coupon.code}` : null,
+    packageSavings > 0 ? t("enrollReg.savePackage", { amount: money(packageSavings) }) : null,
+    sibling > 0 ? t("enrollReg.saveSibling", { amount: money(sibling) }) : null,
+    discount > 0 && coupon ? t("enrollReg.saveCoupon", { amount: money(discount), code: coupon.code }) : null,
   ].filter(Boolean).join(" · ");
 
   if (!enrollments.length) {
     return (
-      <main className="reg reg--empty">
-        <h1>Let's pick up your enrollment</h1>
-        <p>We do not have a plan and Sundays on file yet. Choose a level and plan to begin.</p>
-        <Link className="reg__cta" to="/enroll/sunday">Back to Sunday Programs</Link>
-      </main>
+      <>
+        <NavBar />
+        <main className="reg reg--empty">
+        <h1>{t("enrollReg.emptyTitle")}</h1>
+        <p>{t("enrollReg.emptyDesc")}</p>
+        <Link className="reg__cta" to="/enroll/sunday">{t("enrollReg.emptyCta")}</Link>
+        </main>
+        <Footer />
+      </>
     );
   }
 
   if (submitted) {
+    const childCount = enrollments.length === 1
+      ? t("enrollReg.childCountOne")
+      : t("enrollReg.childCountMany", { n: enrollments.length });
     return (
-      <main className="reg reg--done">
+      <>
+        <NavBar />
+        <main className="reg reg--done">
         <span className="reg__tick" aria-hidden="true">✓</span>
-        <h1>Registration received</h1>
+        <h1>{t("enrollReg.doneTitle")}</h1>
         <p>
-          Thank you, {parent.name.split(" ")[0] || "there"}. We have your household enrollment for{" "}
-          {enrollments.length === 1 ? "1 child" : `${enrollments.length} children`} and will confirm
-          placement by email. No payment is taken now.
+          {t("enrollReg.doneBody", {
+            name: parent.name.split(" ")[0] || t("enrollReg.doneThere"),
+            children: childCount,
+          })}
         </p>
         <div className="reg__doneTotal">
-          <span>Total due after confirmation</span>
+          <span>{t("enrollReg.doneTotalLabel")}</span>
           <strong>{money(householdTotal)}</strong>
         </div>
-        <Link className="reg__cta" to="/">Back to Programs</Link>
-      </main>
+        <Link className="reg__cta" to="/">{t("enrollReg.doneCta")}</Link>
+        </main>
+        <Footer />
+      </>
     );
   }
 
@@ -135,16 +167,16 @@ export default function EnrollRegistration({ onSubmit }) {
     const prev = { student: "parent", addchild: "student", review: "addchild" }[step];
     if (!prev) return;
     event.preventDefault();
-    setWarning("");
+    setWarning(null);
     setStep(prev);
   };
 
-  const backLabel = {
-    parent: "Back to Choose Your Sundays",
-    student: "Back to Parent Information",
-    addchild: "Back to Student Information",
-    review: "Back to Add Another Child",
-  }[step];
+  const backLabel = t({
+    parent: "enrollReg.backToSundays",
+    student: "enrollReg.backToParent",
+    addchild: "enrollReg.backToStudent",
+    review: "enrollReg.backToAddChild",
+  }[step]);
 
   const backTo = step === "parent" && current
     ? `/enroll/sundays?level=${current.levelKey}&plan=${current.planId}&child=${childIndex + 1}`
@@ -152,11 +184,14 @@ export default function EnrollRegistration({ onSubmit }) {
 
   const submit = () => {
     const missing = enrollments.find((e) => !e.student?.name || !e.student?.dob || !e.student?.grade);
-    if (missing) { setWarning("One child is missing required information. Use Edit to complete it."); return; }
-    if (!policyAccepted) { setWarning("Please accept the enrollment and refund policy."); return; }
+    if (missing) { setWarning({ code: "warnMissingChild", vars: {} }); return; }
+    if (!policyAccepted) { setWarning({ code: "warnPolicy", vars: {} }); return; }
     const payload = {
       type: "enrollment",
       submittedAt: new Date().toISOString(),
+      // Recorded so the confirmation email can be sent in the language the
+      // family actually enrolled in.
+      language: lang,
       parent,
       children: enrollments.map((e) => ({
         student: { ...e.student, age: ageFromDOB(e.student?.dob) },
@@ -182,64 +217,66 @@ export default function EnrollRegistration({ onSubmit }) {
     };
     if (onSubmit) onSubmit(payload);
     clearDraft();
-    setWarning("");
+    setWarning(null);
     setSubmitted(true);
   };
 
   return (
-    <main className="reg">
+    <>
+      <NavBar />
+      <main className="reg">
       <Link className="reg__back" to={backTo} onClick={goBack}>← {backLabel}</Link>
 
-      <ol className="stepper" aria-label="Registration progress">
+      <ol className="stepper" aria-label={t("enrollReg.stepperAria")}>
         {STEPS.map((s, i) => (
           <li
             key={s.key}
             className={`stepper__item${i < activeIdx ? " stepper__item--done" : ""}${i === activeIdx ? " stepper__item--active" : ""}`}
           >
             <span className="stepper__dot">{i < activeIdx ? "✓" : i + 1}</span>
-            <span className="stepper__label">{s.label}</span>
+            <span className="stepper__label">{t(`enrollReg.${s.labelKey}`)}</span>
           </li>
         ))}
       </ol>
 
       {step === "parent" && (
         <>
-          <h1 className="reg__title">Parent / Guardian Information</h1>
-          <p className="reg__lede">Parent information is shared once and applies to every child in this registration.</p>
+          <h1 className="reg__title">{t("enrollReg.parentTitle")}</h1>
+          <p className="reg__lede">{t("enrollReg.parentLede")}</p>
           <section className="card">
             <div className="field-grid">
               <label className="field">
-                <span>Parent / Guardian name *</span>
-                <input type="text" value={parent.name} onChange={updateParent("name")} placeholder="Enter full name" />
+                <span>{t("enrollReg.parentName")}</span>
+                <input type="text" value={parent.name} onChange={updateParent("name")} placeholder={t("enrollReg.parentNamePlaceholder")} />
               </label>
               <label className="field">
-                <span>Email *</span>
-                <input type="email" value={parent.email} onChange={updateParent("email")} placeholder="Enter email address" />
+                <span>{t("enrollReg.parentEmail")}</span>
+                <input type="email" value={parent.email} onChange={updateParent("email")} placeholder={t("enrollReg.parentEmailPlaceholder")} />
               </label>
               <label className="field">
-                <span>Phone number *</span>
-                <input type="tel" value={parent.phone} onChange={updateParent("phone")} placeholder="(555) 123-4567" />
+                <span>{t("enrollReg.parentPhone")}</span>
+                <input type="tel" value={parent.phone} onChange={updateParent("phone")} placeholder={t("enrollReg.parentPhonePlaceholder")} />
               </label>
             </div>
             <label className="field field--full">
-              <span>Optional notes</span>
-              <textarea rows={3} value={parent.notes} onChange={updateParent("notes")} placeholder="Anything we should know?" />
+              <span>{t("enrollReg.parentNotes")}</span>
+              <textarea rows={3} value={parent.notes} onChange={updateParent("notes")} placeholder={t("enrollReg.parentNotesPlaceholder")} />
             </label>
           </section>
-          {warning && <p className="reg__warning">{warning}</p>}
+          {warning && <p className="reg__warning">{msg(warning)}</p>}
           <button
             type="button"
             className="reg__primary"
             onClick={() => {
               if (!parent.name.trim() || !parent.email.trim() || !parent.phone.trim()) {
-                setWarning("Please add your name, email, and phone number.");
+                setWarning({ code: "warnParentFields", vars: {} });
                 return;
               }
               persist();
               setStep("student");
             }}
           >
-            Continue to Student Information →
+            {t("enrollReg.parentContinue")}
           </button>
         </>
       )}
@@ -247,144 +284,157 @@ export default function EnrollRegistration({ onSubmit }) {
       {step === "student" && (
         <>
           <h1 className="reg__title">
-            Student Information{enrollments.length > 1 ? ` — Child ${childIndex + 1}` : ""}
+            {enrollments.length > 1
+              ? t("enrollReg.studentTitleChild", { n: childIndex + 1 })
+              : t("enrollReg.studentTitle")}
           </h1>
-          <p className="reg__lede">Tell us about the child enrolling in this plan.</p>
+          <p className="reg__lede">{t("enrollReg.studentLede")}</p>
 
           <section className="plancard">
-            <div className="plancard__level">{current.levelName} Chinese</div>
-            <div className="plancard__plan">{current.planName}</div>
+            <div className="plancard__level">
+              {t(`enrollData.levelName.${current.levelKey}`)}
+              {current.levelKey !== "math" ? ` ${t("enrollPlans.titleSuffix")}` : ""}
+            </div>
+            <div className="plancard__plan">
+              {t("enrollDates.planTitle", {
+                order: PLANS[current.planId] ? PLANS[current.planId].order : current.planId,
+                name: t(`enrollData.planName.${current.planId}`),
+              })}
+            </div>
             <ul className="plancard__blocks">
               {(current.schedule || []).map((b, i) => (
                 <li key={b.time + i}>
                   <span aria-hidden="true">✓</span>
                   <span className="plancard__time">{b.time}</span>
-                  <span>· {b.label}</span>
+                  <span>· {b.labelKey ? t(`enrollData.slot.${b.labelKey}`) : b.label}</span>
                 </li>
               ))}
             </ul>
             <div className="plancard__foot">
-              <span>{(current.dates || []).length} Sundays selected</span>
-              <strong>Subtotal {money(subtotalOf(current))}</strong>
+              <span>{t("enrollReg.sundaysSelected", { n: (current.dates || []).length })}</span>
+              <strong>{t("enrollReg.subtotalLabel", { amount: money(subtotalOf(current)) })}</strong>
             </div>
           </section>
 
           <section className="card">
             <div className="field-grid">
               <label className="field">
-                <span>Child name *</span>
-                <input type="text" value={student.name || ""} onChange={updateStudent("name")} placeholder="Enter child's full name" />
+                <span>{t("enrollReg.childName")}</span>
+                <input type="text" value={student.name || ""} onChange={updateStudent("name")} placeholder={t("enrollReg.childNamePlaceholder")} />
               </label>
               <label className="field">
-                <span>Date of birth *</span>
-                <input type="date" value={student.dob || ""} onChange={updateStudent("dob")} max={todayISO} aria-label="Date of birth" aria-describedby="reg-age-hint" />
+                <span>{t("enrollReg.dob")}</span>
+                <input type="date" value={student.dob || ""} onChange={updateStudent("dob")} max={todayISO} aria-label={t("enrollReg.dob")} aria-describedby="reg-age-hint" />
                 <em className="field__derived" id="reg-age-hint">
                   {ageFromDOB(student.dob) === null
-                    ? "Age is calculated from the date of birth."
-                    : `Age ${ageFromDOB(student.dob)}`}
+                    ? t("enrollReg.dobHint")
+                    : t("enrollReg.ageValue", { age: ageFromDOB(student.dob) })}
                 </em>
               </label>
               <label className="field">
-                <span>Grade *</span>
-                <input type="text" value={student.grade || ""} onChange={updateStudent("grade")} placeholder="e.g. 1st Grade" />
+                <span>{t("enrollReg.grade")}</span>
+                <input type="text" value={student.grade || ""} onChange={updateStudent("grade")} placeholder={t("enrollReg.gradePlaceholder")} />
               </label>
               <label className="field">
-                <span>School <em>(optional)</em></span>
-                <input type="text" value={student.school || ""} onChange={updateStudent("school")} placeholder="Enter school name" />
+                <span>{t("enrollReg.school")} <em>{t("enrollReg.optional")}</em></span>
+                <input type="text" value={student.school || ""} onChange={updateStudent("school")} placeholder={t("enrollReg.schoolPlaceholder")} />
               </label>
             </div>
             <label className="field field--full">
-              <span>Chinese learning background <em>(optional)</em></span>
+              <span>{t("enrollReg.background")} <em>{t("enrollReg.optional")}</em></span>
               <select value={student.background || ""} onChange={updateStudent("background")}>
-                <option value="">Select background level</option>
-                <option value="none">No prior Chinese</option>
-                <option value="home">Spoken at home</option>
-                <option value="some">Some experience</option>
-                <option value="year">1+ year of classes</option>
-                <option value="fluent">Reads and writes confidently</option>
+                <option value="">{t("enrollReg.backgroundSelect")}</option>
+                <option value="none">{t("enrollReg.backgroundNone")}</option>
+                <option value="home">{t("enrollReg.backgroundHome")}</option>
+                <option value="some">{t("enrollReg.backgroundSome")}</option>
+                <option value="year">{t("enrollReg.backgroundYear")}</option>
+                <option value="fluent">{t("enrollReg.backgroundFluent")}</option>
               </select>
             </label>
           </section>
 
-          {warning && <p className="reg__warning">{warning}</p>}
+          {warning && <p className="reg__warning">{msg(warning)}</p>}
           <button
             type="button"
             className="reg__primary"
             onClick={() => {
               if (!student.name || !student.dob || !student.grade) {
-                setWarning("Please add the child's name, date of birth, and grade.");
+                setWarning({ code: "warnStudentFields", vars: {} });
                 return;
               }
               if (ageFromDOB(student.dob) === null) {
-                setWarning("Please check the date of birth — it cannot be in the future.");
+                setWarning({ code: "warnDob", vars: {} });
                 return;
               }
               persist();
               setStep("addchild");
             }}
           >
-            Continue →
+            {t("enrollReg.continue")}
           </button>
         </>
       )}
 
       {step === "addchild" && (
         <>
-          <h1 className="reg__title">Add another child?</h1>
-          <p className="reg__lede">One parent can register multiple students. Each child's enrollment is independent.</p>
+          <h1 className="reg__title">{t("enrollReg.addChildTitle")}</h1>
+          <p className="reg__lede">{t("enrollReg.addChildLede")}</p>
           <section className="card">
-            <h2 className="card__title">Would you like to enroll another child?</h2>
-            <p className="card__text">
-              Each additional child chooses their own level, plan, and Sundays, and receives a separate
-              subtotal. You will not need to re-enter parent information.
-            </p>
+            <h2 className="card__title">{t("enrollReg.addChildQuestion")}</h2>
+            <p className="card__text">{t("enrollReg.addChildText")}</p>
             <div className="choice">
-              <button type="button" className="choice__no" onClick={() => setStep("review")}>No, Continue</button>
+              <button type="button" className="choice__no" onClick={() => setStep("review")}>
+                {t("enrollReg.addChildNo")}
+              </button>
               <Link
                 className="choice__yes"
                 to={`/enroll/sunday?child=${enrollments.length + 1}`}
                 onClick={() => persist()}
               >
-                Yes, Add Another Child
+                {t("enrollReg.addChildYes")}
               </Link>
             </div>
           </section>
           <p className="reg__hint">
-            Enrolled so far: {enrollments.map((e, i) => e.student?.name || `Child ${i + 1}`).join(", ")} ·
-            Household total {money(householdTotal)}
+            {t("enrollReg.enrolledSoFar", {
+              names: enrollments.map((e, i) => childLabel(e, i)).join(", "),
+              amount: money(householdTotal),
+            })}
           </p>
         </>
       )}
 
       {step === "review" && (
         <>
-          <h1 className="reg__title">Final Review &amp; Submit</h1>
-          <p className="reg__lede">Check every detail below, then submit your household registration.</p>
+          <h1 className="reg__title">{t("enrollReg.reviewTitle")}</h1>
+          <p className="reg__lede">{t("enrollReg.reviewLede")}</p>
 
           <section className="card">
             <div className="card__head">
-              <h2 className="card__title">Parent / Guardian Information</h2>
-              <button type="button" className="edit" onClick={() => setStep("parent")}>Edit</button>
+              <h2 className="card__title">{t("enrollReg.parentTitle")}</h2>
+              <button type="button" className="edit" onClick={() => setStep("parent")}>{t("enrollReg.edit")}</button>
             </div>
             <dl className="sumlist">
-              <div><dt>Name</dt><dd>{parent.name}</dd></div>
-              <div><dt>Email</dt><dd>{parent.email}</dd></div>
-              <div><dt>Phone</dt><dd>{parent.phone}</dd></div>
+              <div><dt>{t("enrollReg.fieldName")}</dt><dd>{parent.name}</dd></div>
+              <div><dt>{t("enrollReg.fieldEmail")}</dt><dd>{parent.email}</dd></div>
+              <div><dt>{t("enrollReg.fieldPhone")}</dt><dd>{parent.phone}</dd></div>
             </dl>
           </section>
 
           {enrollments.map((e, i) => (
             <section className="card" key={i}>
               <div className="card__head">
-                <h2 className="card__title">Child {i + 1} Enrollment Summary</h2>
+                <h2 className="card__title">{t("enrollReg.childSummary", { n: i + 1 })}</h2>
                 <div className="card__actions">
-                  <button type="button" className="edit" onClick={() => { setChildIndex(i); setStep("student"); }}>Edit</button>
+                  <button type="button" className="edit" onClick={() => { setChildIndex(i); setStep("student"); }}>
+                    {t("enrollReg.edit")}
+                  </button>
                   {enrollments.length > 1 && (
                     <button
                       type="button"
                       className="remove"
-                      title="Remove this child"
-                      aria-label={`Remove ${e.student?.name || `Child ${i + 1}`}`}
+                      title={t("enrollReg.removeTitle")}
+                      aria-label={t("enrollReg.removeAria", { name: childLabel(e, i) })}
                       onClick={() => removeChild(i)}
                     >
                       ✕
@@ -394,27 +444,48 @@ export default function EnrollRegistration({ onSubmit }) {
               </div>
               <dl className="sumlist">
                 <div>
-                  <dt>Student</dt>
+                  <dt>{t("enrollReg.fieldStudent")}</dt>
                   <dd>
-                    {[e.student?.name || "Name pending", ageFromDOB(e.student?.dob) !== null && `Age ${ageFromDOB(e.student.dob)}`, e.student?.grade, e.student?.school]
+                    {[
+                      e.student?.name || t("enrollReg.namePending"),
+                      ageFromDOB(e.student?.dob) !== null && t("enrollReg.ageValue", { age: ageFromDOB(e.student.dob) }),
+                      e.student?.grade,
+                      e.student?.school,
+                    ]
                       .filter(Boolean)
                       .join(" · ")}
                   </dd>
                 </div>
-                <div><dt>Program</dt><dd>{e.levelName} · {e.planName}</dd></div>
-                <div><dt>Schedule</dt><dd>{(e.schedule || []).map((b) => `${b.time} ${b.label}`).join(" · ")}</dd></div>
-                <div><dt>Sundays</dt><dd>{(e.dates || []).length} selected</dd></div>
-                <div><dt>Subtotal</dt><dd><strong>{money(subtotalOf(e))}</strong></dd></div>
+                <div>
+                  <dt>{t("enrollReg.fieldProgram")}</dt>
+                  <dd>
+                    {t(`enrollData.levelName.${e.levelKey}`)} ·{" "}
+                    {t(`enrollData.planName.${e.planId}`)}
+                  </dd>
+                </div>
+                <div>
+                  <dt>{t("enrollReg.fieldSchedule")}</dt>
+                  <dd>
+                    {(e.schedule || [])
+                      .map((b) => `${b.time} ${b.labelKey ? t(`enrollData.slot.${b.labelKey}`) : b.label}`)
+                      .join(" · ")}
+                  </dd>
+                </div>
+                <div>
+                  <dt>{t("enrollReg.fieldSundays")}</dt>
+                  <dd>{t("enrollReg.countSelected", { n: (e.dates || []).length })}</dd>
+                </div>
+                <div><dt>{t("enrollReg.fieldSubtotal")}</dt><dd><strong>{money(subtotalOf(e))}</strong></dd></div>
               </dl>
             </section>
           ))}
 
           <section className="household">
-            <div className="household__eyebrow">Household total</div>
+            <div className="household__eyebrow">{t("enrollReg.householdEyebrow")}</div>
             <dl className="household__list">
               {enrollments.map((e, i) => (
                 <div key={i}>
-                  <dt>{e.student?.name || `Child ${i + 1}`}</dt>
+                  <dt>{childLabel(e, i)}</dt>
                   <dd>{money(subtotalOf(e))}</dd>
                 </div>
               ))}
@@ -423,60 +494,67 @@ export default function EnrollRegistration({ onSubmit }) {
               <input
                 type="text"
                 className="coupon__input"
-                placeholder="Coupon code"
+                placeholder={t("enrollReg.couponPlaceholder")}
                 value={couponInput}
-                onChange={(e) => { setCouponInput(e.target.value); setCouponError(""); }}
-                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); applyCoupon(); } }}
+                onChange={(ev) => { setCouponInput(ev.target.value); setCouponError(null); }}
+                onKeyDown={(ev) => { if (ev.key === "Enter") { ev.preventDefault(); applyCoupon(); } }}
               />
-              <button type="button" className="coupon__btn" onClick={applyCoupon}>Apply</button>
+              <button type="button" className="coupon__btn" onClick={applyCoupon}>{t("enrollReg.couponApply")}</button>
             </div>
             {coupon && (
               <p className="coupon__applied">
-                {coupon.code} applied &mdash; {coupon.label}
-                <button type="button" className="coupon__remove" onClick={removeCoupon}>Remove</button>
+                {t("enrollReg.couponAppliedLine", {
+                  code: coupon.code,
+                  label: coupon.labelKey ? t(`enrollReg.${coupon.labelKey}`) : coupon.label,
+                })}
+                <button type="button" className="coupon__remove" onClick={removeCoupon}>
+                  {t("enrollReg.couponRemove")}
+                </button>
               </p>
             )}
-            {couponError && <p className="coupon__error">{couponError}</p>}
+            {couponError && <p className="coupon__error">{msg(couponError)}</p>}
             {(coupon || sibling > 0) && (
               <div className="household__sub">
-                <span>Subtotal</span><span>{money(householdSubtotal)}</span>
+                <span>{t("enrollReg.subtotal")}</span><span>{money(householdSubtotal)}</span>
               </div>
             )}
             {sibling > 0 && (
               <div className="household__sub household__sub--off">
-                <span>Sibling discount ({enrollments.length} children)</span><span>&minus;{money(sibling)}</span>
+                <span>{t("enrollReg.siblingDiscount", { n: enrollments.length })}</span>
+                <span>&minus;{money(sibling)}</span>
               </div>
             )}
             {coupon && (
               <div className="household__sub household__sub--off">
-                <span>Coupon ({coupon.code})</span><span>&minus;{money(discount)}</span>
+                <span>{t("enrollReg.couponRow", { code: coupon.code })}</span>
+                <span>&minus;{money(discount)}</span>
               </div>
             )}
             <div className="household__total">
-              <span>Total due</span>
+              <span>{t("enrollReg.totalDue")}</span>
               <strong>{money(householdTotal)}</strong>
             </div>
             {householdSavings > 0 && (
               <div className="savings">
-                <span className="savings__amount">You save {money(householdSavings)}</span>
+                <span className="savings__amount">{t("enrollReg.youSave", { amount: money(householdSavings) })}</span>
                 <span className="savings__detail">{savingsDetail}</span>
               </div>
             )}
             <p className="household__note">
               {enrollments.length < 2
-                ? `All rates are per student. Enroll a second child and the household saves ${money(SIBLING_DISCOUNT)} more.`
-                : "All rates are per student. Package and sibling savings are applied automatically."}
+                ? t("enrollReg.householdNoteOne", { amount: money(SIBLING_DISCOUNT) })
+                : t("enrollReg.householdNoteMany")}
             </p>
           </section>
 
           <section className="card">
-            <h2 className="card__title">How would you like to pay?</h2>
+            <h2 className="card__title">{t("enrollReg.payTitle")}</h2>
             <div className="pay">
               <label className={`pay__opt${payMethod === "full" ? " pay__opt--on" : ""}`}>
                 <input type="radio" name="payment" checked={payMethod === "full"} onChange={() => setPayment("full")} />
                 <span className="pay__body">
-                  <span className="pay__name">Pay in full</span>
-                  <span className="pay__meta">One payment before the first Sunday</span>
+                  <span className="pay__name">{t("enrollReg.payFull")}</span>
+                  <span className="pay__meta">{t("enrollReg.payFullMeta")}</span>
                 </span>
                 <span className="pay__amount">{money(householdTotal)}</span>
               </label>
@@ -484,14 +562,19 @@ export default function EnrollRegistration({ onSubmit }) {
                 <input type="radio" name="payment" checked={payMethod === "plan"} disabled={planClosed} onChange={() => setPayment("plan")} />
                 <span className="pay__body">
                   <span className="pay__name">
-                    {planClosed ? "Payment plan — unavailable" : `Payment plan — ${schedule.lengthLabel}`}
+                    {planClosed
+                      ? t("enrollReg.payPlanUnavailable")
+                      : t("enrollReg.payPlan", { months: lengthLabel })}
                   </span>
                   <span className="pay__meta">
-                    {planClosed ? "Too few payment dates remain this term" : `${schedule.monthsLabel} · no fees`}
+                    {planClosed
+                      ? t("enrollReg.payPlanClosedMeta")
+                      : t("enrollReg.payPlanMeta", { months: monthsLabel })}
                   </span>
                 </span>
                 <span className="pay__amount">
-                  {money(installments.length ? installments[installments.length - 1].amount : 0)}<em>/mo</em>
+                  {money(installments.length ? installments[installments.length - 1].amount : 0)}
+                  <em>{t("enrollReg.perMonth")}</em>
                 </span>
               </label>
             </div>
@@ -500,43 +583,43 @@ export default function EnrollRegistration({ onSubmit }) {
                 {installments.map((p) => (
                   <li key={p.iso}>
                     <span className="split__month">{p.label}</span>
-                    <span className="split__due">Due {p.due}</span>
+                    <span className="split__due">{t("enrollReg.dueOn", { date: p.due })}</span>
                     <strong>{money(p.amount)}</strong>
                   </li>
                 ))}
               </ul>
             )}
-            <p className="pay__help">{planClosed ? PAYMENT_PLAN_CLOSED_NOTE : PAYMENT_HELP_NOTE}</p>
+            <p className="pay__help">{planClosed ? t("enrollReg.payClosedNote") : t("enrollReg.payHelp")}</p>
           </section>
 
           <section className="card">
-            <h2 className="card__title">Enrollment &amp; refund policy</h2>
-            <p className="card__text">{POLICY_SUMMARY}</p>
+            <h2 className="card__title">{t("enrollReg.policyTitle")}</h2>
+            <p className="card__text">{t("enrollReg.policySummary")}</p>
             <label className="policy">
-              <input type="checkbox" checked={policyAccepted} onChange={() => { setPolicyAccepted((v) => !v); setWarning(""); }} />
-              <span>I have read and accept the enrollment and refund policy. *</span>
+              <input type="checkbox" checked={policyAccepted} onChange={() => { setPolicyAccepted((v) => !v); setWarning(null); }} />
+              <span>{t("enrollReg.policyAccept")}</span>
             </label>
           </section>
 
           <section className="card">
-            <h2 className="card__title">Your child&rsquo;s privacy</h2>
-            <p className="card__text">{PRIVACY_SUMMARY}</p>
+            <h2 className="card__title">{t("enrollReg.privacyTitle")}</h2>
+            <p className="card__text">{t("enrollReg.privacySummary")}</p>
             <label className="policy">
               <input type="checkbox" checked={mediaConsent} onChange={() => setMediaConsent((v) => !v)} />
               <span>
-                {PRIVACY_CONSENT_LABEL}
-                <em className="policy__hint">{PRIVACY_CONSENT_HINT}</em>
+                {t("enrollReg.privacyConsent")}
+                <em className="policy__hint">{t("enrollReg.privacyHint")}</em>
               </span>
             </label>
           </section>
 
-          {warning && <p className="reg__warning">{warning}</p>}
-          <button type="button" className="reg__primary" onClick={submit}>Submit Registration</button>
-          <p className="reg__hint reg__hint--center">
-            No payment is taken now. We confirm placement and send payment instructions by email.
-          </p>
+          {warning && <p className="reg__warning">{msg(warning)}</p>}
+          <button type="button" className="reg__primary" onClick={submit}>{t("enrollReg.submit")}</button>
+          <p className="reg__hint reg__hint--center">{t("enrollReg.submitNote")}</p>
         </>
       )}
-    </main>
+      </main>
+      <Footer />
+    </>
   );
 }

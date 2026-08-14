@@ -50,6 +50,9 @@
 
 .pgrid { margin-bottom: 32px; }
 .pcols { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; }
+/* Same guard as the other forms: let grid items shrink below the intrinsic
+   width of the controls inside them. */
+.pcols > *, .pdays > * { min-width: 0; }
 .pcols:last-of-type { margin-bottom: 8px; }
 .req { color: var(--color-brand); font-weight: 700; }
 .pblocklabel { display: flex; gap: 6px; margin-bottom: 10px; }

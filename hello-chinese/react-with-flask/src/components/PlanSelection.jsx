@@ -1,15 +1,19 @@
 import React from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { LEVELS, PLANS, plansInOrder, planConflict, planTitle, scheduleFor } from "../data/enrollment";
+import { LEVELS, PLANS, plansInOrder, planConflictInfo, scheduleFor } from "../data/enrollment";
 import { money } from "../data/enrollmentDraft";
+import { useLanguage } from "../i18n/LanguageContext";
 import { ChineseIcon } from "./EnrollIcons";
 import "./PlanSelection.css";
 
 // One plan page for every Chinese level. The level's own times drive the
 // schedule strip, and a level/plan time conflict disables the plan.
+// All copy comes from i18n/translations.js — enrollPlans for page chrome,
+// enrollData for level and plan names shared with the data layer.
 export default function PlanSelection({ levelKey: levelKeyProp }) {
   const params = useParams();
   const [search] = useSearchParams();
+  const { t, tList } = useLanguage();
   const levelKey = levelKeyProp || params.levelKey;
   const level = LEVELS[levelKey];
   const childNo = Number(search.get("child")) || 1;
@@ -17,19 +21,28 @@ export default function PlanSelection({ levelKey: levelKeyProp }) {
   if (!level) {
     return (
       <main className="plans plans--empty">
-        <h1>We could not find that level</h1>
-        <Link className="plans__cta" to="/enroll/sunday">Back to Sunday Programs</Link>
+        <h1>{t("enrollPlans.notFoundTitle")}</h1>
+        <Link className="plans__cta" to="/enroll/sunday">{t("enrollPlans.notFoundCta")}</Link>
       </main>
     );
   }
 
-  const mathTime = planConflict(levelKey, 4) ? null : level.math;
+  // Conflict comes back as a code + values so it can render in either language.
+  const conflictText = (info) =>
+    info
+      ? t(`enrollData.${info.code}`, {
+          ...info.vars,
+          level: info.vars.levelKey ? t(`enrollData.levelName.${info.vars.levelKey}`) : "",
+        })
+      : null;
+
+  const mathTime = planConflictInfo(levelKey, 4) ? null : level.math;
   const slots = [
-    { kind: "chinese", time: level.chinese, label: "Chinese Class" },
+    { kind: "chinese", time: level.chinese, labelKey: "chineseClass" },
     ...level.tutoring
-      .filter((t) => t !== mathTime)
-      .map((t) => ({ kind: "tutoring", time: t, label: "Optional Tutoring" })),
-    ...(mathTime ? [{ kind: "math", time: mathTime, label: "Optional Math Enrichment" }] : []),
+      .filter((tm) => tm !== mathTime)
+      .map((tm) => ({ kind: "tutoring", time: tm, labelKey: "optionalTutoring" })),
+    ...(mathTime ? [{ kind: "math", time: mathTime, labelKey: "optionalMath" }] : []),
   ].sort((a, b) => startMinutes(a.time) - startMinutes(b.time));
 
   const childQuery = childNo > 1 ? `&child=${childNo}` : "";
@@ -38,31 +51,34 @@ export default function PlanSelection({ levelKey: levelKeyProp }) {
   return (
     <main className="plans">
       <header className="plans__header">
-        <Link className="plans__back" to={backHref}>← Back to Sunday Programs</Link>
+        <Link className="plans__back" to={backHref}>{t("enrollPlans.backToSunday")}</Link>
         {childNo > 1 && (
           <div className="plans__childbanner">
             <span className="plans__childnum">{childNo}</span>
-            You are enrolling Child {childNo}. This child can choose a different level, plan, and
-            Sundays — parent information is already saved.
+            {t("enrollPlans.childBanner", { n: childNo })}
           </div>
         )}
-        <h1 className="plans__title">{level.name} Chinese</h1>
+        <h1 className="plans__title">
+          {t(`enrollData.levelName.${levelKey}`)}
+          {levelKey !== "math" ? ` ${t("enrollPlans.titleSuffix")}` : ""}
+        </h1>
         <p className="plans__subtitle">
-          <strong>{level.levelLabel}</strong> · Chinese class time: Sunday {level.chinese}
+          <strong>{t(`enrollData.levelLabel.${levelKey}`)}</strong> ·{" "}
+          {t("enrollPlans.classTimeLine", { time: level.chinese })}
         </p>
       </header>
 
-      <section className="plans__strip" aria-label="Sunday morning schedule">
-        <div className="plans__striptitle">Sunday Morning Schedule</div>
+      <section className="plans__strip" aria-label={t("enrollPlans.scheduleAria")}>
+        <div className="plans__striptitle">{t("enrollPlans.scheduleTitle")}</div>
         <div className="plans__slots">
           {slots.map((s, i) => (
-            <React.Fragment key={s.time + s.label}>
+            <React.Fragment key={s.time + s.labelKey}>
               {i > 0 && <span className="plans__slotdiv" aria-hidden="true" />}
               <div className={`plans__slot plans__slot--${s.kind}`}>
                 <span className="plans__sloticon" aria-hidden="true">{ICON[s.kind]}</span>
                 <span>
                   <span className="plans__slottime">{s.time}</span>
-                  <span className="plans__slotlabel">{s.label}</span>
+                  <span className="plans__slotlabel">{t(`enrollData.slot.${s.labelKey}`)}</span>
                 </span>
               </div>
             </React.Fragment>
@@ -72,29 +88,38 @@ export default function PlanSelection({ levelKey: levelKeyProp }) {
 
       <section className="plans__pricing">
         <div>
-          <div className="plans__pricingtitle">How Pricing Works</div>
+          <div className="plans__pricingtitle">{t("enrollPlans.pricingTitle")}</div>
           <ul className="plans__pricinglist">
-            <li><strong>Flexible dates</strong> — choose the Sundays that work for your family.</li>
-            <li><strong>Per student</strong> — standard weekly rates shown below are per student.</li>
-            <li><strong>Automatic savings</strong> — package savings are applied automatically when eligible.</li>
+            <li>
+              <strong>{t("enrollPlans.pricingFlexibleLabel")}</strong> — {t("enrollPlans.pricingFlexible")}
+            </li>
+            <li>
+              <strong>{t("enrollPlans.pricingPerStudentLabel")}</strong> — {t("enrollPlans.pricingPerStudent")}
+            </li>
+            <li>
+              <strong>{t("enrollPlans.pricingSavingsLabel")}</strong> — {t("enrollPlans.pricingSavings")}
+            </li>
           </ul>
         </div>
       </section>
 
       <div className="plans__sectionhead">
-        <h2>Choose Your Plan</h2>
-        <span>Five plan types</span>
+        <h2>{t("enrollPlans.chooseTitle")}</h2>
+        <span>{t("enrollPlans.chooseCount")}</span>
       </div>
 
       <div className="plans__grid">
         {plansInOrder()
           .filter((plan) => (levelKey === "math" ? !plan.chinese : plan.chinese))
-          .map((plan) => ({ plan, conflict: planConflict(levelKey, plan.id) }))
+          .map((plan) => ({ plan, conflict: planConflictInfo(levelKey, plan.id) }))
           .sort((a, b) => Number(!!a.conflict) - Number(!!b.conflict))
           .map(({ plan, conflict }) => {
           const planNo = plan.order;
           const blocks = conflict
-            ? [{ time: level.chinese, label: "Chinese Class" }, { time: level.math, label: "Math Enrichment" }]
+            ? [
+                { time: level.chinese, labelKey: "chineseClass" },
+                { time: level.math, labelKey: "math" },
+              ]
             : scheduleFor(levelKey, plan.id);
           return (
             <article
@@ -106,29 +131,33 @@ export default function PlanSelection({ levelKey: levelKeyProp }) {
                 plan.id === 5 && !conflict ? "plan--popular" : "",
               ].filter(Boolean).join(" ")}
             >
-              {plan.id === 5 && !conflict && <span className="plan__ribbon">★ Most Popular</span>}
-              {conflict && <span className="plan__ribbon plan__ribbon--off">Not available at this level</span>}
+              {plan.id === 5 && !conflict && <span className="plan__ribbon">{t("enrollPlans.mostPopular")}</span>}
+              {conflict && (
+                <span className="plan__ribbon plan__ribbon--off">{t("enrollPlans.unavailableRibbon")}</span>
+              )}
               <div className="plan__body">
                 <div className="plan__main">
                   <span className="plan__num">{planNo}</span>
                   <div>
-                    <h3 className="plan__name">{planNo}. {plan.name}</h3>
+                    <h3 className="plan__name">{planNo}. {t(`enrollData.planName.${plan.id}`)}</h3>
                     <ul className="plan__blocks">
                       {blocks.map((b, i) => (
                         <li key={b.time + i}>
                           <span className="plan__check" aria-hidden="true">✓</span>
                           <span className="plan__time">{b.time}</span>
-                          <span>· {b.label}</span>
+                          <span>· {t(`enrollData.slot.${b.labelKey}`)}</span>
                         </li>
                       ))}
                     </ul>
                     {conflict ? (
-                      <p className="plan__note">{conflict}</p>
+                      <p className="plan__note">{conflictText(conflict)}</p>
                     ) : (
                       <div className="plan__deal">
-                        <span className="plan__dealsave">Save {money(plan.save)}</span>
+                        <span className="plan__dealsave">
+                          {t("enrollPlans.save", { amount: money(plan.save) })}
+                        </span>
                         <span className="plan__dealline">
-                          <s>{money(plan.regular)}</s> {money(plan.total)} &mdash; {packageLine(plan)}
+                          <s>{money(plan.regular)}</s> {money(plan.total)} &mdash; {packageLine(plan, t)}
                         </span>
                       </div>
                     )}
@@ -137,17 +166,17 @@ export default function PlanSelection({ levelKey: levelKeyProp }) {
                 <div className="plan__price">
                   <div className="plan__rate">
                     <span className="plan__rateamount">{money(plan.perSunday)}</span>
-                    <span className="plan__rateunit">/ Sunday</span>
+                    <span className="plan__rateunit">{t("enrollPlans.perSunday")}</span>
                   </div>
-                  <div className="plan__ratelabel">Standard weekly rate</div>
+                  <div className="plan__ratelabel">{t("enrollPlans.rateLabel")}</div>
                   {conflict ? (
-                    <span className="plan__cta plan__cta--off">Unavailable</span>
+                    <span className="plan__cta plan__cta--off">{t("enrollPlans.unavailable")}</span>
                   ) : (
                     <Link
                       className="plan__cta"
                       to={`/enroll/sundays?level=${levelKey}&plan=${plan.id}${childQuery}`}
                     >
-                      Select Plan
+                      {t("enrollPlans.selectPlan")}
                     </Link>
                   )}
                 </div>
@@ -157,17 +186,19 @@ export default function PlanSelection({ levelKey: levelKeyProp }) {
         })}
       </div>
 
-      <p className="plans__foot">No long-term commitment. Join for the Sundays that work for you.</p>
-      <p className="plans__srhint">{planTitle(5)} is the most popular combination.</p>
+      <p className="plans__foot">{t("enrollPlans.foot")}</p>
+      <p className="plans__srhint">
+        {t("enrollPlans.srHint", { plan: t("enrollData.planName.5") })}
+      </p>
     </main>
   );
 }
 
-function packageLine(plan) {
-  const parts = ["10 Chinese classes"];
-  if (plan.tutoringHours > 0) parts.push(`${plan.tutoringHours * 10} tutoring hours`);
-  if (plan.math) parts.push("10 math classes");
-  return `${parts.join(" + ")}`;
+function packageLine(plan, t) {
+  const parts = [`10 ${t("enrollData.unit.chinese")}`];
+  if (plan.tutoringHours > 0) parts.push(`${plan.tutoringHours * 10} ${t("enrollData.unit.tutoring")}`);
+  if (plan.math) parts.push(`10 ${t("enrollData.unit.math")}`);
+  return parts.join(" + ");
 }
 
 function startMinutes(range) {

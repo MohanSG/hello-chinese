@@ -1,11 +1,14 @@
 import { NavLink } from "react-router-dom";
 import logo from "../assets/logo-panda.png";
+import { useLanguage } from "../i18n/LanguageContext";
 import "../styles/variables.css";
 import "./Footer.css";
 
 const YOUTUBE_URL = "https://www.youtube.com/@HelloChinese-ow3dw";
 
 function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className="footer">
       <div className="footer__grid">
@@ -14,10 +17,10 @@ function Footer() {
             <img className="footer__logo" src={logo} alt="Hello Chinese panda logo" />
             <span className="footer__brand-text">
               <span className="footer__brand-name">Hello Chinese</span>
-              <span className="footer__descriptor">Weekend Language Learning &amp; Enrichment Program</span>
+              <span className="footer__descriptor">{t("nav.brandSub")}</span>
             </span>
           </div>
-          <p className="footer__tagline">Meet the World Through Chinese.</p>
+          <p className="footer__tagline">{t("footer.tagline")}</p>
           <a className="footer__youtube" href={YOUTUBE_URL} target="_blank" rel="noreferrer">
             <span className="footer__youtube-icon" aria-hidden="true">
               <svg width="20" height="14" viewBox="0 0 24 17" fill="none">
@@ -25,27 +28,27 @@ function Footer() {
                 <path d="M9.6 12.1 15.9 8.5 9.6 4.9v7.2Z" fill="#fff" />
               </svg>
             </span>
-            Hello Chinese on YouTube
+            {t("footer.youtube")}
             <span className="footer__youtube-caret" aria-hidden="true">›</span>
           </a>
         </div>
 
         <div className="footer__col">
-          <div className="footer__col-head">Explore</div>
-          <NavLink to="/" className="footer__link">Programs</NavLink>
-          <NavLink to="/FreeTrial" className="footer__link">Book a Free Trial</NavLink>
-          <a href="mailto:hello.nihao.chinese@gmail.com" className="footer__link">Contact Us</a>
+          <div className="footer__col-head">{t("footer.exploreHead")}</div>
+          <NavLink to="/" className="footer__link">{t("footer.linkPrograms")}</NavLink>
+          <NavLink to="/FreeTrial" className="footer__link">{t("footer.linkTrial")}</NavLink>
+          <a href="mailto:hello.nihao.chinese@gmail.com" className="footer__link">{t("footer.linkContact")}</a>
         </div>
 
         <div className="footer__col">
-          <div className="footer__col-head">Programs</div>
-          <NavLink to="/Enroll/Sunday" className="footer__link">Sunday Programs</NavLink>
-          <NavLink to="/Enroll/Saturday" className="footer__link">Saturday Programs</NavLink>
-          <NavLink to="/Enroll/Private" className="footer__link">Private Lessons</NavLink>
+          <div className="footer__col-head">{t("footer.programsHead")}</div>
+          <NavLink to="/Enroll/Sunday" className="footer__link">{t("footer.linkSunday")}</NavLink>
+          <NavLink to="/Enroll/Saturday" className="footer__link">{t("footer.linkSaturday")}</NavLink>
+          <NavLink to="/Enroll/Private" className="footer__link">{t("footer.linkPrivate")}</NavLink>
         </div>
 
         <div className="footer__col">
-          <div className="footer__col-head">Contact</div>
+          <div className="footer__col-head">{t("footer.contactHead")}</div>
           <a href="mailto:hello.nihao.chinese@gmail.com" className="footer__contact">
             <span className="footer__contact-icon" aria-hidden="true">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -79,7 +82,7 @@ function Footer() {
 
       <div className="footer__bottom">
         <div className="footer__bottom-inner">
-          <span>© 2026 Hello Chinese. All rights reserved.</span>
+          <span>{t("footer.rights")}</span>
           <span className="footer__bottom-right">
             <span className="footer__zh">从你好开始，与世界相见</span>
             <span className="footer__bottom-divider" aria-hidden="true">|</span>

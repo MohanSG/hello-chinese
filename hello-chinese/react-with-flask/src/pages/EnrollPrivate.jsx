@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+import { useLanguage } from "../i18n/LanguageContext";
 import "../styles/variables.css";
 import "./EnrollOverview.css";
 import "./EnrollSaturday.css";
@@ -24,23 +25,40 @@ const EMPTY_FORM = {
   goals: "",
 };
 
-const DAYS = ["Monday", "Friday", "Tuesday", "Saturday", "Wednesday", "Sunday", "Thursday", "Flexible"];
+// `value` is what gets submitted — English on purpose, so the inquiry your team
+// reads is identical whichever language the parent used. `key` points at the
+// visible label in i18n/translations.js under enrollPrivate.
+// Day order is column-interleaved for the two-column grid.
+const DAYS = [
+  { value: "Monday", key: "dayMonday" },
+  { value: "Friday", key: "dayFriday" },
+  { value: "Tuesday", key: "dayTuesday" },
+  { value: "Saturday", key: "daySaturday" },
+  { value: "Wednesday", key: "dayWednesday" },
+  { value: "Sunday", key: "daySunday" },
+  { value: "Thursday", key: "dayThursday" },
+  { value: "Flexible", key: "dayFlexible" },
+];
 
 const EXPERIENCE = [
-  "No prior Chinese learning experience",
-  "Less than 1 year",
-  "1–2 years",
-  "3+ years",
+  { value: "No prior Chinese learning experience", key: "expNone" },
+  { value: "Less than 1 year", key: "expUnder1" },
+  { value: "1–2 years", key: "exp1to2" },
+  { value: "3+ years", key: "exp3plus" },
 ];
 
 const CURRENT_CLASSES = [
-  ["Step-In Chinese (Ages 3-6+)", "Step-In Chinese (Ages 3–6+)"],
-  ["Step-Up Chinese (Ages 7-10)", "Step-Up Chinese (Ages 7–10)"],
-  ["Step-Beyond Chinese (Ages 10-12+)", "Step-Beyond Chinese (Ages 10–12+)"],
-  ["Other / Not Sure", "Other / Not Sure"],
+  { value: "Step-In Chinese (Ages 3-6+)", key: "classStepIn" },
+  { value: "Step-Up Chinese (Ages 7-10)", key: "classStepUp" },
+  { value: "Step-Beyond Chinese (Ages 10-12+)", key: "classStepBeyond" },
+  { value: "Other / Not Sure", key: "classOther" },
 ];
 
-const LENGTHS = ["30 Minutes", "60 Minutes", "Not Sure - Please Recommend"];
+const LENGTHS = [
+  { value: "30 Minutes", key: "length30" },
+  { value: "60 Minutes", key: "length60" },
+  { value: "Not Sure - Please Recommend", key: "lengthUnsure" },
+];
 
 function ageFrom(dob) {
   if (!dob) return null;
@@ -63,9 +81,11 @@ function Step({ n, children }) {
 }
 
 function EnrollPrivate() {
+  const { t } = useLanguage();
   const [form, setForm] = useState(EMPTY_FORM);
   const [days, setDays] = useState([]);
-  const [error, setError] = useState("");
+  // Held as a key so the message follows a language switch.
+  const [error, setError] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [submittedName, setSubmittedName] = useState("");
 
@@ -79,27 +99,27 @@ function EnrollPrivate() {
       // Leaving the group class clears the class pick that only applies to "Yes".
       ...(name === "enrolled" && value === "no" ? { currentClass: "" } : null),
     }));
-    setError("");
+    setError(null);
   };
 
   const onDayToggle = (e) => {
     const { value, checked } = e.target;
     setDays((d) => (checked ? [...d, value] : d.filter((x) => x !== value)));
-    setError("");
+    setError(null);
   };
 
   const submitInquiry = async (e) => {
     e.preventDefault();
     if (!form.parentName || !form.email || !form.phone || !form.childName || !form.dob) {
-      setError("Please fill in parent name, email, phone, child’s name, and date of birth.");
+      setError("warnRequired");
       return;
     }
     if (!form.lessonType) {
-      setError("Please choose what you are looking for from private lessons (A or B).");
+      setError("warnLessonType");
       return;
     }
     if (!form.lessonLength) {
-      setError("Please choose a preferred lesson length.");
+      setError("warnLessonLength");
       return;
     }
     const payload = {
@@ -139,13 +159,10 @@ function EnrollPrivate() {
                 <path d="M4 12.5L9.5 18L20 6" stroke="#e08a7c" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <div className="enroll-header__eyebrow">Inquiry received</div>
-            <h1 className="enroll-header__title">Thanks, {submittedName}.</h1>
-            <p className="enroll-header__desc enroll-confirm__desc">
-              Our team will review your child's information and follow up by email to recommend the most
-              appropriate lesson structure and schedule.
-            </p>
-            <NavLink to="/" className="btn-primary">Back to programs</NavLink>
+            <div className="enroll-header__eyebrow">{t("enrollPrivate.doneEyebrow")}</div>
+            <h1 className="enroll-header__title">{t("enrollPrivate.doneTitle", { name: submittedName })}</h1>
+            <p className="enroll-header__desc enroll-confirm__desc">{t("enrollPrivate.doneDesc")}</p>
+            <NavLink to="/" className="btn-primary">{t("enrollPrivate.doneCta")}</NavLink>
           </div>
         </section>
         <Footer />
@@ -161,18 +178,15 @@ function EnrollPrivate() {
       <section className="enroll-header">
         <div className="enroll-header__inner">
           <div className="enroll-back">
-            <NavLink to="/" className="enroll-back__link">← Back to Programs</NavLink>
+            <NavLink to="/" className="enroll-back__link">{t("enrollPrivate.back")}</NavLink>
           </div>
-          <span className="enroll-badge enroll-badge--private">Flexible Schedule</span>
-          <h1 className="enroll-header__title">Private Chinese Lessons</h1>
-          <p className="enroll-header__desc private-header__desc">
-            Timing and goals vary by family, so private lessons are arranged individually — not through the Sunday
-            package structure. Tell us what you're looking for and our team will follow up.
-          </p>
+          <span className="enroll-badge enroll-badge--private">{t("enrollPrivate.badge")}</span>
+          <h1 className="enroll-header__title">{t("enrollPrivate.title")}</h1>
+          <p className="enroll-header__desc private-header__desc">{t("enrollPrivate.desc")}</p>
           <div className="private-tags">
-            <span className="private-tag">Available Monday–Sunday</span>
-            <span className="private-tag">Online or in person</span>
-            <span className="private-tag">One-on-one</span>
+            <span className="private-tag">{t("enrollPrivate.tagDays")}</span>
+            <span className="private-tag">{t("enrollPrivate.tagFormat")}</span>
+            <span className="private-tag">{t("enrollPrivate.tagOneOnOne")}</span>
           </div>
         </div>
       </section>
@@ -188,9 +202,9 @@ function EnrollPrivate() {
                 <path d="M16 13.6h1.2A3.8 3.8 0 0 1 21 17.4V19" />
               </svg>
             </span>
-            <h2 className="pform__title">Private Chinese Lesson Inquiry</h2>
+            <h2 className="pform__title">{t("enrollPrivate.formTitle")}</h2>
           </div>
-          <p className="pform__sub">Flexible One-on-One Chinese Instruction</p>
+          <p className="pform__sub">{t("enrollPrivate.formSub")}</p>
 
           <aside className="pintro">
             <span className="pintro__icon" aria-hidden="true">
@@ -199,34 +213,30 @@ function EnrollPrivate() {
                 <path d="M12 6.5v12.7" />
               </svg>
             </span>
-            <p>
-              Our private lessons use Hello Chinese curriculum and materials and can be tailored to each child's
-              learning goals. Current Hello Chinese students may also use private lessons for individualized
-              reinforcement of their group-class learning.
-            </p>
+            <p>{t("enrollPrivate.intro")}</p>
           </aside>
 
           {/* 1 — PARENT & CHILD */}
-          <Step n="1">Parent &amp; Child Information</Step>
+          <Step n="1">{t("enrollPrivate.step1")}</Step>
           <div className="sat-form__grid pgrid">
             <label className="field">
-              <span className="field__label">Parent / Guardian Name <b className="req">*</b></span>
+              <span className="field__label">{t("enrollPrivate.parentName")} <b className="req">*</b></span>
               <input type="text" name="parentName" value={form.parentName} onChange={onField} className="field__input" />
             </label>
             <label className="field">
-              <span className="field__label">Email <b className="req">*</b></span>
-              <input type="email" name="email" placeholder="parent@email.com" value={form.email} onChange={onField} className="field__input" />
+              <span className="field__label">{t("enrollPrivate.email")} <b className="req">*</b></span>
+              <input type="email" name="email" placeholder={t("enrollPrivate.emailPlaceholder")} value={form.email} onChange={onField} className="field__input" />
             </label>
             <label className="field">
-              <span className="field__label">Phone Number <b className="req">*</b></span>
+              <span className="field__label">{t("enrollPrivate.phone")} <b className="req">*</b></span>
               <input type="tel" name="phone" value={form.phone} onChange={onField} className="field__input" />
             </label>
             <label className="field">
-              <span className="field__label">Child's Name <b className="req">*</b></span>
+              <span className="field__label">{t("enrollPrivate.childName")} <b className="req">*</b></span>
               <input type="text" name="childName" value={form.childName} onChange={onField} className="field__input" />
             </label>
             <label className="field">
-              <span className="field__label">Date of Birth <b className="req">*</b></span>
+              <span className="field__label">{t("enrollPrivate.dob")} <b className="req">*</b></span>
               <input type="date" name="dob" value={form.dob} onChange={onField} className="field__input" />
             </label>
             <div className="pdob">
@@ -238,39 +248,39 @@ function EnrollPrivate() {
               </span>
               <span>
                 {age === null
-                  ? "We will use the date of birth to understand your child’s age and recommend the best fit."
-                  : `Your child is ${age} years old — we will use this to recommend the best fit.`}
+                  ? t("enrollPrivate.dobHint")
+                  : t("enrollPrivate.dobAge", { age })}
               </span>
             </div>
           </div>
 
           {/* 2 — CURRENTLY ENROLLED */}
-          <Step n="2">Is your child currently enrolled in a Hello Chinese group class?</Step>
+          <Step n="2">{t("enrollPrivate.step2")}</Step>
           <div className="sat-form__grid pgrid">
             <div className="pradios">
               <label className="pradio">
                 <input type="radio" name="enrolled" value="yes" checked={form.enrolled === "yes"} onChange={onField} />
                 <span>
-                  <span className="pradio__label">Yes</span>
-                  <span className="pradio__desc">My child is currently enrolled in a Hello Chinese group class.</span>
+                  <span className="pradio__label">{t("enrollPrivate.enrolledYes")}</span>
+                  <span className="pradio__desc">{t("enrollPrivate.enrolledYesDesc")}</span>
                 </span>
               </label>
               <label className="pradio">
                 <input type="radio" name="enrolled" value="no" checked={form.enrolled === "no"} onChange={onField} />
                 <span>
-                  <span className="pradio__label">No</span>
-                  <span className="pradio__desc">My child is not enrolled in any Hello Chinese group class.</span>
+                  <span className="pradio__label">{t("enrollPrivate.enrolledNo")}</span>
+                  <span className="pradio__desc">{t("enrollPrivate.enrolledNoDesc")}</span>
                 </span>
               </label>
             </div>
             {form.enrolled === "yes" && (
               <div className="ppanel">
-                <div className="ppanel__title">Which class is your child currently enrolled in?</div>
+                <div className="ppanel__title">{t("enrollPrivate.whichClass")}</div>
                 <div className="ppanel__list">
-                  {CURRENT_CLASSES.map(([value, label]) => (
-                    <label className="prow" key={value}>
-                      <input type="radio" name="currentClass" value={value} checked={form.currentClass === value} onChange={onField} />
-                      {label}
+                  {CURRENT_CLASSES.map((c) => (
+                    <label className="prow" key={c.value}>
+                      <input type="radio" name="currentClass" value={c.value} checked={form.currentClass === c.value} onChange={onField} />
+                      {t(`enrollPrivate.${c.key}`)}
                     </label>
                   ))}
                 </div>
@@ -279,7 +289,7 @@ function EnrollPrivate() {
           </div>
 
           {/* 3 — WHAT ARE YOU LOOKING FOR */}
-          <Step n="3">What are you looking for from private lessons? <b className="req">*</b></Step>
+          <Step n="3">{t("enrollPrivate.step3")} <b className="req">*</b></Step>
           <div className="sat-form__grid pgrid">
             <label className="pcard pcard--a">
               <input type="radio" name="lessonType" value="Group Class Reinforcement" checked={form.lessonType === "Group Class Reinforcement"} onChange={onField} />
@@ -290,12 +300,9 @@ function EnrollPrivate() {
                       <path d="M12 3.5l1.9 3.9 4.3.6-3.1 3 .8 4.3L12 13.3l-3.9 2 .8-4.3-3.1-3 4.3-.6L12 3.5Z" />
                     </svg>
                   </span>
-                  <span className="pcard__title">A. Group Class Reinforcement</span>
+                  <span className="pcard__title">{t("enrollPrivate.optionATitle")}</span>
                 </span>
-                <span className="pcard__desc">
-                  Personalized support based on your child's current Hello Chinese group class, including review,
-                  reading, writing, speaking, homework, and areas that need additional practice.
-                </span>
+                <span className="pcard__desc">{t("enrollPrivate.optionADesc")}</span>
               </span>
             </label>
             <label className="pcard pcard--b">
@@ -307,12 +314,9 @@ function EnrollPrivate() {
                       <path d="M20 14.5a2.5 2.5 0 0 1-2.5 2.5H9l-4 3V6.5A2.5 2.5 0 0 1 7.5 4h10A2.5 2.5 0 0 1 20 6.5v8Z" />
                     </svg>
                   </span>
-                  <span className="pcard__title">B. Standalone One-on-One Chinese</span>
+                  <span className="pcard__title">{t("enrollPrivate.optionBTitle")}</span>
                 </span>
-                <span className="pcard__desc">
-                  A fully personalized one-on-one Chinese learning program using Hello Chinese curriculum and
-                  materials, designed for students who are not currently enrolled in our group classes.
-                </span>
+                <span className="pcard__desc">{t("enrollPrivate.optionBDesc")}</span>
               </span>
             </label>
           </div>
@@ -320,64 +324,67 @@ function EnrollPrivate() {
           {/* 4 + 5 */}
           <div className="pcols">
             <div>
-              <Step n="4">Lesson Preference</Step>
-              <div className="field__label pblocklabel">Preferred Lesson Length <b className="req">*</b></div>
+              <Step n="4">{t("enrollPrivate.step4")}</Step>
+              <div className="field__label pblocklabel">
+                {t("enrollPrivate.lessonLength")} <b className="req">*</b>
+              </div>
               <div className="pchips">
-                {LENGTHS.map((v) => (
-                  <label className="pchip" key={v}>
-                    <input type="radio" name="lessonLength" value={v} checked={form.lessonLength === v} onChange={onField} />
-                    {v === "Not Sure - Please Recommend" ? "Not Sure – Please Recommend" : v}
+                {LENGTHS.map((l) => (
+                  <label className="pchip" key={l.value}>
+                    <input type="radio" name="lessonLength" value={l.value} checked={form.lessonLength === l.value} onChange={onField} />
+                    {t(`enrollPrivate.${l.key}`)}
                   </label>
                 ))}
               </div>
               <label className="field">
                 <span className="field__label field__label--split">
-                  <span>Preferred Format</span>
-                  <span className="field__optional">(optional)</span>
+                  <span>{t("enrollPrivate.format")}</span>
+                  <span className="field__optional">{t("enrollPrivate.optional")}</span>
                 </span>
                 <select name="format" value={form.format} onChange={onField} className="field__input">
-                  <option value="">No Preference</option>
-                  <option value="Online">Online</option>
-                  <option value="In person">In person</option>
+                  <option value="">{t("enrollPrivate.formatNone")}</option>
+                  <option value="Online">{t("enrollPrivate.formatOnline")}</option>
+                  <option value="In person">{t("enrollPrivate.formatInPerson")}</option>
                 </select>
               </label>
             </div>
 
             <div>
-              <Step n="5">Preferred Schedule</Step>
+              <Step n="5">{t("enrollPrivate.step5")}</Step>
               <div className="field__label pblocklabel">
-                Preferred Days <span className="field__optional">(select all that apply)</span>
+                {t("enrollPrivate.preferredDays")}{" "}
+                <span className="field__optional">{t("enrollPrivate.selectAllApply")}</span>
               </div>
               <div className="pdays">
                 {DAYS.map((d) => (
-                  <label className="prow" key={d}>
-                    <input type="checkbox" value={d} checked={days.includes(d)} onChange={onDayToggle} />
-                    {d}
+                  <label className="prow" key={d.value}>
+                    <input type="checkbox" value={d.value} checked={days.includes(d.value)} onChange={onDayToggle} />
+                    {t(`enrollPrivate.${d.key}`)}
                   </label>
                 ))}
               </div>
               <label className="field">
                 <span className="field__label field__label--split">
-                  <span>Preferred Time</span>
-                  <span className="field__optional">(optional)</span>
+                  <span>{t("enrollPrivate.preferredTime")}</span>
+                  <span className="field__optional">{t("enrollPrivate.optional")}</span>
                 </span>
                 <select name="preferredTime" value={form.preferredTime} onChange={onField} className="field__input">
-                  <option value="">No Preference</option>
-                  <option value="Morning (before 12 PM)">Morning (before 12 PM)</option>
-                  <option value="Early afternoon (12-3 PM)">Early afternoon (12–3 PM)</option>
-                  <option value="Late afternoon (3-6 PM)">Late afternoon (3–6 PM)</option>
-                  <option value="Evening (after 6 PM)">Evening (after 6 PM)</option>
+                  <option value="">{t("enrollPrivate.formatNone")}</option>
+                  <option value="Morning (before 12 PM)">{t("enrollPrivate.timeMorning")}</option>
+                  <option value="Early afternoon (12-3 PM)">{t("enrollPrivate.timeEarlyAfternoon")}</option>
+                  <option value="Late afternoon (3-6 PM)">{t("enrollPrivate.timeLateAfternoon")}</option>
+                  <option value="Evening (after 6 PM)">{t("enrollPrivate.timeEvening")}</option>
                 </select>
               </label>
               <label className="field">
                 <span className="field__label field__label--split">
-                  <span>Specific preferred time(s)</span>
-                  <span className="field__optional">(optional)</span>
+                  <span>{t("enrollPrivate.specificTimes")}</span>
+                  <span className="field__optional">{t("enrollPrivate.optional")}</span>
                 </span>
                 <input
                   type="text"
                   name="specificTimes"
-                  placeholder="e.g. Tuesdays after 4:00 PM, Saturday mornings"
+                  placeholder={t("enrollPrivate.specificTimesPlaceholder")}
                   value={form.specificTimes}
                   onChange={onField}
                   className="field__input"
@@ -389,24 +396,24 @@ function EnrollPrivate() {
           {/* 6 + 7 */}
           <div className="pcols">
             <div>
-              <Step n="6">Chinese Learning Experience</Step>
+              <Step n="6">{t("enrollPrivate.step6")}</Step>
               <div className="ppanel__list">
-                {EXPERIENCE.map((v) => (
-                  <label className="prow" key={v}>
-                    <input type="radio" name="experience" value={v} checked={form.experience === v} onChange={onField} />
-                    {v}
+                {EXPERIENCE.map((x) => (
+                  <label className="prow" key={x.value}>
+                    <input type="radio" name="experience" value={x.value} checked={form.experience === x.value} onChange={onField} />
+                    {t(`enrollPrivate.${x.key}`)}
                   </label>
                 ))}
               </div>
             </div>
             <div>
               <Step n="7">
-                Tell Us About Your Child's Learning Goals <span className="field__optional">(optional)</span>
+                {t("enrollPrivate.step7")} <span className="field__optional">{t("enrollPrivate.optional")}</span>
               </Step>
               <textarea
                 name="goals"
                 rows="5"
-                placeholder="Please share any specific goals, areas your child would like to strengthen, school requirements, or anything else that would help us personalize the lesson."
+                placeholder={t("enrollPrivate.goalsPlaceholder")}
                 value={form.goals}
                 onChange={onField}
                 className="field__input field__input--area pgoals"
@@ -414,14 +421,14 @@ function EnrollPrivate() {
             </div>
           </div>
 
-          {error && <p className="sat-form__error">{error}</p>}
+          {error && <p className="sat-form__error">{t(`enrollPrivate.${error}`)}</p>}
 
           <button type="submit" className="psubmit">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M21 3 10.5 13.5" />
               <path d="M21 3l-6.8 18-3.7-7.5L3 9.8 21 3Z" />
             </svg>
-            Submit Private Lesson Inquiry
+            {t("enrollPrivate.submit")}
           </button>
 
           <div className="pfoot">
@@ -430,14 +437,13 @@ function EnrollPrivate() {
                 <rect x="4.5" y="10.5" width="15" height="10" rx="2.2" />
                 <path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" />
               </svg>
-              Once we receive your inquiry, our team will review your child's information and contact you to
-              recommend the most appropriate lesson structure and schedule.
+              {t("enrollPrivate.footNote")}
             </p>
             <div className="pfoot__brand">
               <img src="/assets/logo-panda.png" alt="Hello Chinese" />
               <span>
                 <span className="pfoot__name">Hello Chinese</span>
-                <span className="pfoot__tag">Language Learning &amp; Enrichment</span>
+                <span className="pfoot__tag">{t("enrollPrivate.brandTag")}</span>
               </span>
             </div>
           </div>
