@@ -1,10 +1,14 @@
 from flask import Flask, request, Response, jsonify
 from flask_mail import Mail
 from flask_cors import CORS
-from openai import OpenAI
 from dotenv import load_dotenv
 from extensions import mail
-from services.email_service import send_email, send_contact_email, send_saturday_interest_email
+from services.email_service import (
+    send_saturday_interest_email,
+    send_free_trial_email,
+    send_private_lessons_email,
+    send_sunday_program_email,
+)
 import os
 
 load_dotenv()
@@ -19,12 +23,12 @@ if FRONTEND_URL:
 app = Flask(__name__)
 CORS(app, origins=allowed_origins, supports_credentials=True)
 
-app.config['MAIL_SERVER']= 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USERNAME'] = os.getenv("EMAIL_USER")
-app.config['MAIL_PASSWORD'] = os.getenv("EMAIL_APP_PASSWORD")
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
+app.config["MAIL_SERVER"] = "smtp.gmail.com"
+app.config["MAIL_PORT"] = 587
+app.config["MAIL_USERNAME"] = os.getenv("EMAIL_USER")
+app.config["MAIL_PASSWORD"] = os.getenv("EMAIL_APP_PASSWORD")
+app.config["MAIL_USE_TLS"] = True
+app.config["MAIL_USE_SSL"] = False
 
 mail = Mail(app)
 
@@ -36,36 +40,98 @@ app.logger.info(
     bool(app.config["MAIL_PASSWORD"]),
 )
 
-client = OpenAI(
-    api_key=os.getenv("OPENAI_API")
-)
+# @app.route("/send-test-email", methods=['POST'])
+# def send_test_email():
+#     data = request.get_json();
+#     payload = data.get('msg')
 
-@app.route("/send-test-email", methods=['POST'])
-def send_test_email():
-    data = request.get_json();
-    payload = data.get('msg')
+#     print(payload)
 
-    print(payload)
-    
-    if not payload:
-        return jsonify({'error' : 'payload is requred'}), 400
-    
-    send_email(payload)
+#     if not payload:
+#         return jsonify({'error' : 'payload is requred'}), 400
 
-    return jsonify({'message' : 'Email Sent'}), 200
+#     send_email(payload)
 
-@app.route("/contact", methods=['POST'])
-def contact():
-    data = request.get_json()
-    send_contact_email(data)
-    return jsonify({'message' : 'Email sent'}), 200
+#     return jsonify({'message' : 'Email Sent'}), 200
 
-@app.route("/saturday_interest", methods=['POST'])
+
+@app.route("/trial-email", methods=["POST"])
+def send_trial_email():
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({"error": "Missing or invalid JSON body"}), 400
+
+    parent = data.get("parent") or {}
+    if not parent.get("email") or not parent.get("name"):
+        return jsonify({"error": "Parent name and email are required"}), 400
+
+    try:
+        send_free_trial_email(data)
+    except Exception:
+        app.logger.exception("Free trial email failed")
+        return jsonify({"error": "Could not send confirmation email"}), 500
+
+    return jsonify({"message": "OK"}), 200
+
+
+@app.route("/private-lesson-email", methods=["POST"])
+def send_private_lesson_email():
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({"error" : "Missing or invalid JSON body"}), 400
+
+    parent = data.get("parentName") or {}
+    if not data.get("email") or not parent:
+        return jsonify({"error" : "Parent name and email are required"}), 400
+
+    try:
+        send_private_lessons_email(data)
+    except Exception:
+        app.logger.exception("Private Lessons email failed")
+        return jsonify({"error": "Could not send confirmation email"}), 500
+
+    return jsonify({"message": "OK"}), 200
+
+
+@app.route("/saturday-interest-email", methods=["POST"])
 def saturday_interest_email():
-    data = request.get_json();
-    send_saturday_interest_email(data['payload'])
+    data = request.get_json(silent=True)
+
+    if not data:
+        return jsonify({"error" : "Missing or invalid JSON body"}), 400
+
+    parent = data.get("parentName") or {}
+    if not data.get("email") or not parent:
+            return jsonify({"error" : "Parent name and email are required"}), 400
+
+    try:
+        send_saturday_interest_email(data)
+    except:
+        app.logger.exception("Saturday Interest email failed")
+        return jsonify({"error" : "Could not send confirmation email"})
     
-    return jsonify({'message' : 'OK'}), 200
+    return jsonify({"message": "OK"}), 200
+
+
+@app.route("/sunday-registration-email", methods=["POST"])
+def sunday_registration_email():
+    data = request.get_json()
+    print(data)
+    if not data:
+        return jsonify({"error" : "Missing or invalid JSON body"}), 400
+    
+    parent = data.get("parent") or {}
+    if not parent.get("email") or not parent.get("name"):
+        return jsonify({"error" : "Parent name and email are required"}), 400
+
+    try:
+        send_sunday_program_email(data)
+    except:
+        app.logger.exception("Sunday Registration email failed")
+        return jsonify({"error" : "Could not send confirmation email"}), 500
+
+    return jsonify({"message": "OK"}), 200
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

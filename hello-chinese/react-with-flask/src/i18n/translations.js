@@ -590,14 +590,33 @@ enrollReg: {
       zh: "本学期已无法使用分期付款——剩余付款日期过少。请一次付清以完成报名，或联系我们另行安排。",
     },
 
-    policyTitle: { en: "Enrollment & refund policy", zh: "报名与退费政策" },
+    policyTitle: { en: "Enrollment, Make-Up & Refund Policy", zh: "报名、补课与退费政策" },
     policySummary: {
       en: "You pay only for the Sundays you select, at the standard weekly rate per student. Package savings are applied automatically when a component reaches an eligible quantity — Chinese classes, Math classes, and tutoring hours each qualify independently. There is no long-term commitment. Refunds are calculated from tuition actually paid and itemized in writing.",
       zh: "您只需为所选择的周日付费，按每位学生的标准周单价计算。当某一项课程达到优惠数量时，套餐优惠将自动生效——中文课、数学课与辅导课时各自独立计算。无需长期承诺。退费将按实际已付学费计算，并以书面形式逐项列明。",
     },
+    policyMakeupFirst: {
+      en: "If your child misses a class, we will first offer a make-up class on another available date.",
+      zh: "如果孩子缺课，我们会首先安排在其他可行的日期补课。",
+    },
+    policyMakeupStrong: { en: "make-up class", zh: "补课" },
+    policyMakeupChoose: {
+      en: "If no make-up date works for your family, you may choose:",
+      zh: "如果没有合适的补课日期，您可以选择：",
+    },
+    policyCreditLabel: { en: "Future Credit", zh: "课程余额" },
+    policyCreditDesc: {
+      en: "apply the missed class value toward a future term",
+      zh: "将缺课金额抵扣到之后的学期",
+    },
+    policyRefundLabel: { en: "Refund", zh: "退款" },
+    policyRefundDesc: {
+      en: "receive a refund to the original payment method",
+      zh: "退回至原付款方式",
+    },
     policyAccept: {
-      en: "I have read and accept the enrollment and refund policy. *",
-      zh: "我已阅读并接受报名与退费政策。*",
+      en: "I have read and accept the Enrollment, Make-Up & Refund Policy. *",
+      zh: "我已阅读并接受报名、补课与退费政策。*",
     },
 
     privacyTitle: { en: "Your child's privacy", zh: "关于孩子的隐私" },

@@ -125,13 +125,10 @@ function FreeTrial() {
 
     setSending(true);
     try {
-      await apiRequest("/send-test-email", {
+      await apiRequest("/trial-email", {
         method: "POST",
-        body: JSON.stringify({
-          subject: "Free trial request",
-          recipient: form.parentEmail,
-          msg: payload,
-        }),
+        headers: {"Content-Type" : "application/json"},
+        body: JSON.stringify(payload),
       });
       // Stored as raw values, not finished sentences, so the confirmation screen
       // also follows a language switch.
