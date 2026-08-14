@@ -639,6 +639,10 @@ enrollReg: {
       zh: "现在无需付款。我们会确认班级安排，并通过邮件发送付款说明。",
     },
 
+    warnSend: {
+      en: "We could not submit your registration just now. Please try again, or contact us if it keeps happening — nothing has been lost.",
+      zh: "目前无法提交您的报名信息。请重试，若仍不成功请联系我们——您填写的内容不会丢失。",
+    },
     warnMissingChild: {
       en: "One child is missing required information. Use Edit to complete it.",
       zh: "有一个孩子的必填信息尚未完成，请点击“修改”补充。",
@@ -738,6 +742,10 @@ enrollMath: {
     note: {
       en: "No enrollment or payment yet — this only adds you to the notification list.",
       zh: "这不是报名也无需付款——仅将您加入通知名单。",
+    },
+    warnSend: {
+      en: "We could not submit your request just now. Please try again, or email us directly.",
+      zh: "目前无法提交您的申请。请重试，或直接发邮件联系我们。",
     },
     warnFields: {
       en: "Please fill in parent name, email, and program of interest.",
@@ -870,6 +878,10 @@ enrollPrivate: {
     },
     brandTag: { en: "Language Learning & Enrichment", zh: "语言学习与素养课程" },
 
+    warnSend: {
+      en: "We could not submit your inquiry just now. Please try again, or email us directly.",
+      zh: "目前无法提交您的咨询。请重试，或直接发邮件联系我们。",
+    },
     warnRequired: {
       en: "Please fill in parent name, email, phone, child's name, and date of birth.",
       zh: "请填写家长姓名、电子邮箱、联系电话、孩子姓名和出生日期。",

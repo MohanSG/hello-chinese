@@ -127,7 +127,7 @@ function FreeTrial() {
     try {
       await apiRequest("/trial-email", {
         method: "POST",
-        headers: {"Content-Type" : "application/json"},
+        // Content-Type is set by apiRequest itself.
         body: JSON.stringify(payload),
       });
       // Stored as raw values, not finished sentences, so the confirmation screen

@@ -13,7 +13,7 @@ import os
 
 load_dotenv()
 
-allowed_origins = ["http://localhost:5173"]
+allowed_origins = ["http://localhost:5173"] 
 
 FRONTEND_URL = os.getenv("FRONTEND_URL")
 
@@ -106,17 +106,17 @@ def saturday_interest_email():
 
     try:
         send_saturday_interest_email(data)
-    except:
+    except Exception:
         app.logger.exception("Saturday Interest email failed")
-        return jsonify({"error" : "Could not send confirmation email"})
+        return jsonify({"error" : "Could not send confirmation email"}), 500
     
     return jsonify({"message": "OK"}), 200
 
 
 @app.route("/sunday-registration-email", methods=["POST"])
 def sunday_registration_email():
-    data = request.get_json()
-    print(data)
+    data = request.get_json(silent=True)
+
     if not data:
         return jsonify({"error" : "Missing or invalid JSON body"}), 400
     
@@ -126,7 +126,7 @@ def sunday_registration_email():
 
     try:
         send_sunday_program_email(data)
-    except:
+    except Exception:
         app.logger.exception("Sunday Registration email failed")
         return jsonify({"error" : "Could not send confirmation email"}), 500
 

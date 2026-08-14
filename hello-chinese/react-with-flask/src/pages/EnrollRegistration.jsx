@@ -298,10 +298,17 @@ export default function EnrollRegistration({ onSubmit }) {
       policyAcknowledged: true,
       privacy: { mediaConsent },
     };
-    await apiRequest("/sunday-registration-email", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
+    // The draft is only cleared once the send succeeds, so a failed submit
+    // leaves the family's answers intact and they can retry.
+    try {
+      await apiRequest("/sunday-registration-email", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+    } catch (err) {
+      setWarning({ code: "warnSend", vars: {} });
+      return;
+    }
     if (onSubmit) onSubmit(payload);
     clearDraft();
     setWarning(null);

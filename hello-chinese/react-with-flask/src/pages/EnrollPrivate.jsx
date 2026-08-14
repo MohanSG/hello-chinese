@@ -149,14 +149,18 @@ function EnrollPrivate() {
       goals: form.goals || null,
       submittedAt: new Date().toISOString(),
     };
-    // TODO: POST payload to the existing Hello Chinese enrollment/contact endpoint.
-    await apiRequest("/private-lesson-email", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
+    try {
+      await apiRequest("/private-lesson-email", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+    } catch (err) {
+      setError("warnSend");
+      return;
+    }
 
-    setSubmitted(true)
-    setSubmittedName(form.parentName)
+    setSubmittedName(form.parentName);
+    setSubmitted(true);
   };
 
   if (submitted) {

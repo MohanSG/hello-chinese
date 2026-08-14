@@ -132,11 +132,15 @@ function EnrollSaturday() {
       comments: form.comments || null,
       submittedAt: new Date().toISOString(),
     };
-    // TODO: POST payload to the existing Hello Chinese enrollment/contact endpoint.
-    await apiRequest("/saturday-interest-email", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
+    try {
+      await apiRequest("/saturday-interest-email", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+    } catch (err) {
+      setError("warnSend");
+      return;
+    }
     setSubmittedName(form.parentName);
     setSubmitted(true);
   };
