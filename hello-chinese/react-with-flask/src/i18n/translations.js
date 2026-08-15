@@ -119,8 +119,8 @@ export const translations = {
   enrollSunday: {
     title: { en: "Sunday Programs", zh: "周日课程" },
     desc: {
-      en: "Chinese language classes, learning support, and math enrichment on Sunday mornings.",
-      zh: "周日上午的中文课程、学习辅导与数学思维拓展。",
+      en: "We offer Chinese language learning, personalized learning support before and after our three leveled Chinese classes, as well as math enrichment on Sunday mornings from 9:00 AM to 12:00 PM.",
+      zh: "我们提供中文语言学习，在三个级别的中文课程前后设有个性化学习辅导，并在周日上午 9:00 至 12:00 提供数学思维拓展课程。",
     },
     pathwayEyebrow: { en: "课程", zh: "课程" },
     pathwayTitle: { en: "Chinese Learning Pathway (3 Levels)", zh: "中文学习进阶路径（三个级别）" },

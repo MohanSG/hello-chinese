@@ -400,46 +400,6 @@ export default function EnrollRegistration({ onSubmit }) {
                 />
               </label>
             </section>
-            <section className="card">
-              <h2 className="card__title">{t("enrollReg.termsTitle")}</h2>
-              <p className="card__text">{t("enrollReg.termsLede")}</p>
-              <label className="policy">
-                <input
-                  type="checkbox"
-                  checked={termsAccepted}
-                  onChange={() => {
-                    setTermsAccepted((v) => !v);
-                    setWarning(null);
-                  }}
-                />
-                <span>
-                  {t("enrollReg.termsAgreePre")}{" "}
-                  <button
-                    type="button"
-                    className="policy__link"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setLegalTab("terms");
-                    }}
-                  >
-                    {t("legal.termsTab")}
-                  </button>{" "}
-                  {t("enrollReg.termsAgreeMid")}{" "}
-                  <button
-                    type="button"
-                    className="policy__link"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setLegalTab("privacy");
-                    }}
-                  >
-                    {t("legal.privacyTab")}
-                  </button>
-                  {t("enrollReg.termsAgreePost")}
-                </span>
-              </label>
-            </section>
-
             {warning && <p className="reg__warning">{msg(warning)}</p>}
             <button
               type="button"
@@ -581,46 +541,6 @@ export default function EnrollRegistration({ onSubmit }) {
                     {t("enrollReg.backgroundFluent")}
                   </option>
                 </select>
-              </label>
-            </section>
-
-            <section className="card">
-              <h2 className="card__title">{t("enrollReg.termsTitle")}</h2>
-              <p className="card__text">{t("enrollReg.termsLede")}</p>
-              <label className="policy">
-                <input
-                  type="checkbox"
-                  checked={termsAccepted}
-                  onChange={() => {
-                    setTermsAccepted((v) => !v);
-                    setWarning(null);
-                  }}
-                />
-                <span>
-                  {t("enrollReg.termsAgreePre")}{" "}
-                  <button
-                    type="button"
-                    className="policy__link"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setLegalTab("terms");
-                    }}
-                  >
-                    {t("legal.termsTab")}
-                  </button>{" "}
-                  {t("enrollReg.termsAgreeMid")}{" "}
-                  <button
-                    type="button"
-                    className="policy__link"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setLegalTab("privacy");
-                    }}
-                  >
-                    {t("legal.privacyTab")}
-                  </button>
-                  {t("enrollReg.termsAgreePost")}
-                </span>
               </label>
             </section>
 
