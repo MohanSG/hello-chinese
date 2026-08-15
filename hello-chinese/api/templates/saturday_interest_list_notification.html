@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="color-scheme" content="light dark">
 <meta name="supported-color-schemes" content="light dark">
-<title>Saturday Class Interest List</title>
+<title>Saturday Interest List</title>
 <!--[if mso]>
 <noscript>
 <xml>
@@ -28,10 +28,12 @@ td, th, p, a { font-family: Arial, Helvetica, sans-serif; }
   @media only screen and (max-width: 600px) {
     .email-container { width: 100% !important; }
     .fluid-pad { padding-left: 20px !important; padding-right: 20px !important; }
+    .stack-col { display: block !important; width: 100% !important; padding: 0 0 12px 0 !important; }
   }
   @media (prefers-color-scheme: dark) {
     .bg-body { background-color: #241d16 !important; }
     .bg-card { background-color: #2c241a !important; }
+    .bg-tint { background-color: #33291d !important; }
     .text-main { color: #e9e0d2 !important; }
     .text-soft { color: #c9bfb0 !important; }
     .border-line { border-color: #4a4034 !important; }
@@ -40,7 +42,7 @@ td, th, p, a { font-family: Arial, Helvetica, sans-serif; }
 </head>
 <body class="bg-body" style="margin:0; padding:0; background-color:#f7f1e7;">
 <div style="display:none; max-height:0; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:#f7f1e7;">
-You're on the HelloChinese Saturday interest list — we'll email you when enrollment opens.
+You&rsquo;re on the Hello Chinese Saturday interest list &mdash; we&rsquo;ll email you when the next cohort opens.
 </div>
 <div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">&#8203;&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;</div>
 
@@ -52,17 +54,17 @@ You're on the HelloChinese Saturday interest list — we'll email you when enrol
 
 <!-- Header -->
 <tr>
-<td style="background-color:#a72620; border-radius:14px 14px 0 0; padding: 28px 36px;" class="fluid-pad">
+<td style="background-color:#a72620; border-bottom: 3px solid #d9a441; border-radius:14px 14px 0 0; padding: 22px 30px;" class="fluid-pad">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
 <tr>
-<td width="40" valign="middle" style="padding-right: 12px;">
-<!-- Swap src for your hosted logo URL, e.g. https://hellochinese.com/logo-panda.png -->
-<img src="logo-panda.png" width="40" height="40" alt="HelloChinese logo" style="display:block; border-radius: 8px; border: 0;">
+<td width="44" valign="middle" style="padding-right: 12px;">
+<!-- Logo URL: set HELLO_CHINESE_LOGO_URL env var, or payload["logoUrl"] -->
+<img src="{{logoUrl}}" width="44" height="44" alt="Hello Chinese" style="display:block; border-radius: 8px; border: 0;">
 </td>
-<td valign="middle" style="font-family: Georgia, 'Times New Roman', serif; font-size: 22px; font-weight: 700; color: #f7f1e7; letter-spacing: 0.2px;">
-HelloChinese
+<td valign="middle" style="font-family: Georgia, 'Times New Roman', serif; font-size: 24px; font-weight: 700; color: #fffdf8; letter-spacing: 0.2px;">
+Hello Chinese
 </td>
-<td align="right" valign="middle" style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 600; color: #e08a7c; text-transform: uppercase; letter-spacing: 1px;">
+<td align="right" valign="middle" style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 700; color: #f0d9a8; text-transform: uppercase; letter-spacing: 2px;">
 Interest List
 </td>
 </tr>
@@ -72,81 +74,96 @@ Interest List
 
 <!-- Title band -->
 <tr>
-<td class="bg-card fluid-pad" style="background-color:#fffdf8; padding: 32px 36px 8px 36px;">
-<div style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 700; color: #a72620; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 10px 0;">Saturday Classes</div>
-<h1 class="text-main" style="margin: 0 0 10px 0; font-family: Georgia, 'Times New Roman', serif; font-size: 24px; line-height: 1.3; mso-line-height-rule: exactly; color: #20201f; font-weight: 700;">
-You're on the list, {{parentName}}.
+<td class="bg-card fluid-pad" style="background-color:#fffdf8; padding: 30px 34px 0 34px;">
+<div style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 700; color: #a08a5e; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 10px 0;">Saturday Classes</div>
+<h1 class="text-main" style="margin: 0 0 12px 0; font-family: Georgia, 'Times New Roman', serif; font-size: 30px; line-height: 1.25; mso-line-height-rule: exactly; color: #20201f; font-weight: 700;">
+Thanks for your interest, {{parentName}}.
 </h1>
-<p class="text-soft" style="margin: 0 0 24px 0; font-family: Arial, Helvetica, sans-serif; font-size: 14px; line-height: 1.6; mso-line-height-rule: exactly; color: #5b5348;">
-Thanks for your interest in our Saturday classes. We'll email you as soon as the next cohort opens for enrollment. Here's a copy of what you told us.
+<p class="text-soft" style="margin: 0 0 22px 0; font-family: Arial, Helvetica, sans-serif; font-size: 14px; line-height: 1.65; mso-line-height-rule: exactly; color: #5b5348;">
+We&rsquo;ve received your Saturday interest form. Our team will follow up when the next Saturday cohort opens.
 </p>
 </td>
 </tr>
 
-<!-- Details -->
+<!-- Interest list band -->
 <tr>
-<td class="bg-card fluid-pad" style="background-color:#fffdf8; padding: 0 36px;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="border-line" style="border: 1px solid #e7d9c2; border-radius: 12px;">
-
+<td class="bg-card fluid-pad" style="background-color:#fffdf8; padding: 0 34px 22px 34px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border: 2px solid #a72620; border-radius: 12px;">
 <tr>
-<td style="padding: 18px 22px; border-bottom: 1px solid #e7d9c2;" class="border-line">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-<td width="150" valign="top" style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 700; color: #948977; text-transform: uppercase; letter-spacing: 0.5px;">Your Name</td>
-<td valign="top" class="text-main" style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; font-weight: 600; color: #20201f;">{{parentName}}</td>
-</tr></table>
+<td style="padding: 16px 22px; font-family: Georgia, 'Times New Roman', serif; font-size: 18px; color: #20201f;">
+<span style="font-weight: 700;">Interest List:&nbsp;&nbsp;</span><span style="color:#a72620; font-weight: 700;">{{programInterest}}</span>
 </td>
 </tr>
-
-<tr>
-<td style="padding: 18px 22px; border-bottom: 1px solid #e7d9c2;" class="border-line">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-<td width="150" valign="top" style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 700; color: #948977; text-transform: uppercase; letter-spacing: 0.5px;">Email</td>
-<td valign="top" style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; font-weight: 600;"><a href="mailto:{{email}}" style="color:#a72620; text-decoration: none;">{{email}}</a></td>
-</tr></table>
-</td>
-</tr>
-
-<tr>
-<td style="padding: 18px 22px; border-bottom: 1px solid #e7d9c2;" class="border-line">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-<td width="150" valign="top" style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 700; color: #948977; text-transform: uppercase; letter-spacing: 0.5px;">Child's Age / Grade</td>
-<td valign="top" class="text-main" style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; font-weight: 600; color: #20201f;">{{childAgeGrade}}</td>
-</tr></table>
-</td>
-</tr>
-
-<tr>
-<td style="padding: 18px 22px; border-bottom: 1px solid #e7d9c2;" class="border-line">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-<td width="150" valign="top" style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 700; color: #948977; text-transform: uppercase; letter-spacing: 0.5px;">Program Interest</td>
-<td valign="top" style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; font-weight: 600;">
-<span style="display:inline-block; background-color:#f6e7e1; color:#a72620; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 700;">{{programInterest}}</span>
-</td>
-</tr></table>
-</td>
-</tr>
-
-<tr>
-<td style="padding: 18px 22px;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-<td width="150" valign="top" style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 700; color: #948977; text-transform: uppercase; letter-spacing: 0.5px;">Preferred Time</td>
-<td valign="top" class="text-main" style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; font-weight: 600; color: #20201f;">{{preferredTime}}</td>
-</tr></table>
-</td>
-</tr>
-
 </table>
 </td>
 </tr>
 
-<!-- Comments -->
+<!-- 1 + 2 -->
 <tr>
-<td class="bg-card fluid-pad" style="background-color:#fffdf8; padding: 20px 36px 0 36px;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="border-line" style="border: 1px solid #e7d9c2; border-radius: 12px;">
+<td class="bg-card fluid-pad" style="background-color:#fffdf8; padding: 0 34px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
 <tr>
-<td style="padding: 18px 22px;">
-<div style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 700; color: #948977; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Comments</div>
-<p class="text-soft" style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 1.6; mso-line-height-rule: exactly; color: #5b5348;">{{comments}}</p>
+<td class="stack-col" width="50%" valign="top" style="padding: 0 7px 14px 0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="border-line bg-tint" style="border: 1px solid #efe3cf; border-radius: 12px; background-color:#fdf8ef;">
+<tr><td style="padding: 18px 20px;">
+<div style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px; font-weight: 700; color: #a72620; border-bottom: 1px solid #e7d9c2; padding-bottom: 8px; margin-bottom: 10px;">1. Parent</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td width="70" valign="top" style="padding: 5px 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #948977;">Name</td>
+<td valign="top" class="text-main" style="padding: 5px 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #20201f;">{{parentName}}</td>
+</tr>
+<tr>
+<td width="70" valign="top" style="padding: 5px 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #948977;">Email</td>
+<td valign="top" style="padding: 5px 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; word-break: break-all;"><a href="mailto:{{email}}" style="color:#20201f; text-decoration: none;">{{email}}</a></td>
+</tr>
+</table>
+</td></tr>
+</table>
+</td>
+<td class="stack-col" width="50%" valign="top" style="padding: 0 0 14px 7px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="border-line bg-tint" style="border: 1px solid #efe3cf; border-radius: 12px; background-color:#fdf8ef;">
+<tr><td style="padding: 18px 20px;">
+<div style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px; font-weight: 700; color: #a72620; border-bottom: 1px solid #e7d9c2; padding-bottom: 8px; margin-bottom: 10px;">2. Student</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td valign="top" style="padding: 5px 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #948977;">Child&rsquo;s Age / Grade</td>
+<td align="right" valign="top" class="text-main" style="padding: 5px 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #20201f;">{{childAgeGrade}}</td>
+</tr>
+</table>
+</td></tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- 3 + 4 -->
+<tr>
+<td class="bg-card fluid-pad" style="background-color:#fffdf8; padding: 0 34px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td class="stack-col" width="50%" valign="top" style="padding: 0 7px 14px 0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="border-line bg-tint" style="border: 1px solid #efe3cf; border-radius: 12px; background-color:#fdf8ef;">
+<tr><td style="padding: 18px 20px;">
+<div style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px; font-weight: 700; color: #a72620; border-bottom: 1px solid #e7d9c2; padding-bottom: 8px; margin-bottom: 10px;">3. Program Interest</div>
+<p class="text-main" style="margin: 0 0 8px 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #20201f;">{{programInterest}}</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td valign="top" style="padding: 4px 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #948977;">Preferred Time</td>
+<td align="right" valign="top" class="text-main" style="padding: 4px 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #20201f;">{{preferredTime}}</td>
+</tr>
+</table>
+</td></tr>
+</table>
+</td>
+<td class="stack-col" width="50%" valign="top" style="padding: 0 0 14px 7px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="border-line bg-tint" style="border: 1px solid #efe3cf; border-radius: 12px; background-color:#fdf8ef;">
+<tr><td style="padding: 18px 20px;">
+<div style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px; font-weight: 700; color: #a72620; border-bottom: 1px solid #e7d9c2; padding-bottom: 8px; margin-bottom: 10px;">4. Comments</div>
+<p class="text-main" style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; line-height: 1.6; color: #20201f;">{{comments}}</p>
+</td></tr>
+</table>
 </td>
 </tr>
 </table>
@@ -155,11 +172,28 @@ Thanks for your interest in our Saturday classes. We'll email you as soon as the
 
 <!-- CTA -->
 <tr>
-<td class="bg-card fluid-pad" align="center" style="background-color:#fffdf8; padding: 28px 36px 36px 36px;">
+<td class="bg-card fluid-pad" align="center" style="background-color:#fffdf8; padding: 14px 34px 22px 34px;">
 <table role="presentation" cellpadding="0" cellspacing="0" border="0">
 <tr>
-<td align="center" bgcolor="#a72620" style="border-radius: 10px;">
-<a href="https://hellochinese.com/programs" target="_blank" style="display:block; padding: 14px 32px; font-family: Arial, Helvetica, sans-serif; font-size: 15px; font-weight: 700; color: #f7f1e7; text-decoration: none; border-radius: 10px;">Browse our programs</a>
+<td align="center" bgcolor="#8f1d18" style="background-color:#8f1d18; border-radius: 10px;">
+<a href="{{ctaHref}}" target="_blank" style="display:block; padding: 15px 46px; font-family: Georgia, 'Times New Roman', serif; font-size: 17px; font-weight: 700; color: #fffdf8; text-decoration: none; border-radius: 10px;">{{ctaLabel}}</a>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- Questions -->
+<tr>
+<td class="bg-card fluid-pad" style="background-color:#fffdf8; padding: 0 34px 26px 34px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="border-line bg-tint" style="border: 1px solid #efe3cf; border-radius: 12px; background-color:#fdf6ec;">
+<tr>
+<td style="padding: 18px 22px;">
+<div style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px; font-weight: 700; color: #a72620; margin: 0 0 6px 0;">Questions in the meantime?</div>
+<p class="text-soft" style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 14px; line-height: 1.7; color: #5b5348;">
+Call us at <a href="tel:+13019195863" style="color:#a72620; text-decoration: none;">(301) 919-5863</a><br>
+or email <a href="mailto:hello.nihao.chinese@gmail.com" style="color:#a72620; text-decoration: none;">hello.nihao.chinese@gmail.com</a>.
+</p>
 </td>
 </tr>
 </table>
@@ -168,13 +202,12 @@ Thanks for your interest in our Saturday classes. We'll email you as soon as the
 
 <!-- Footer -->
 <tr>
-<td style="background-color:#241d16; border-radius: 0 0 14px 14px; padding: 22px 36px;" class="fluid-pad">
-<p style="margin: 0 0 6px 0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; line-height: 1.6; color: #b3a893;">
-Questions in the meantime? Call us at <a href="tel:+13019195863" style="color:#e08a7c; text-decoration: none;">(301) 919-5863</a> or email <a href="mailto:hello.nihao.chinese@gmail.com" style="color:#e08a7c; text-decoration: none;">hello.nihao.chinese@gmail.com</a>.
+<td align="center" class="bg-card fluid-pad" style="background-color:#fffdf8; border-radius: 0 0 14px 14px; border-top: 1px solid #e7d9c2; padding: 22px 34px 26px 34px;">
+<p class="text-soft" style="margin: 0 0 14px 0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; line-height: 1.6; color: #5b5348;">
+Submitted from the Saturday interest list page on hellochinese.com &middot; {{submittedAt}}
 </p>
-<p style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; line-height: 1.6; color: #6b6154;">
-HelloChinese &middot; The Yard (Eastern Market), 700 Pennsylvania Ave. SE, Washington, DC 20003 &middot; Submitted {{submittedAt}}
-</p>
+<div style="font-family: Georgia, 'Times New Roman', serif; font-size: 22px; font-weight: 700; color: #a72620; margin-bottom: 6px;">Hello Chinese</div>
+<div style="font-family: Arial, Helvetica, sans-serif; font-size: 10px; font-weight: 700; color: #a08a5e; text-transform: uppercase; letter-spacing: 2px;">Weekend Language Learning &amp; Enrichment Program</div>
 </td>
 </tr>
 

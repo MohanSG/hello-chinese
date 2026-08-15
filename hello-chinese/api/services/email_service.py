@@ -1,12 +1,17 @@
-from flask_mail import Message
-from flask import current_app
-from extensions import mail
 from datetime import datetime
-# import resend
+import logging 
+import resend
 import os
 
-# resend.api_key= os.environ["RESEND_API_KEY"]
+# Public URL of the Hello Chinese header logo (override per-send with payload["logoUrl"])
+LOGO_URL = os.environ.get(
+    "HELLO_CHINESE_LOGO_URL", "https://hellochinese.info/assets/logo-panda.png"
+)
 
+NOTIFY = "hello.nihao.chinese@gmail.com"
+
+resend.api_key= os.environ["RESEND_API_KEY"]
+logger = logging.getLogger(__name__)
 
 def _money(value):
     """Render a numeric or string amount as $1,150."""
@@ -56,6 +61,39 @@ def _format_dates(dates):
     return ", ".join(out) if out else "TBD"
 
 
+def _group_dates_by_month(dates):
+    """['2026-09-06', ...] -> 'September: 6, 13, 20, 27<br>October: 4, 18, 25'"""
+    months = []
+    for d in dates or []:
+        try:
+            dt = datetime.fromisoformat(str(d)[:10])
+            key = dt.strftime("%B")
+            day = str(dt.day)
+        except (ValueError, TypeError):
+            key, day = "", str(d)
+        if months and months[-1][0] == key:
+            months[-1][1].append(day)
+        else:
+            months.append([key, [day]])
+    if not months:
+        return "Dates to be confirmed"
+    return "<br>".join(
+        (f"{m}: {', '.join(days)}" if m else ", ".join(days)) for m, days in months
+    )
+
+
+def _schedule_lines(schedule):
+    """schedule is a list of {time, label} dicts -> one line each."""
+    if not schedule:
+        return "Schedule to be confirmed"
+    if isinstance(schedule, str):
+        return schedule
+    return "<br>".join(
+        f"{s.get('time', '')} &mdash; {s.get('label', '')}".strip(" &mdash;")
+        for s in schedule
+    )
+
+
 def _format_timestamp(value):
     """Turn an ISO timestamp from the frontend into a readable string."""
     try:
@@ -65,94 +103,22 @@ def _format_timestamp(value):
     except (AttributeError, ValueError):
         return value or ""
 
+def send_email(recipients, html_content, subject):    
+    params: resend.Emails.SendParams = {
+    "from": "HelloChinese <hello@hellochinese.info>",
+    "to": recipients,
+    "reply_to": [NOTIFY],
+    "subject": subject,
+    "html": html_content,
+    }
 
-def send_email(payload):
-    with open("templates/booking_confirmation_notification.html", "r", encoding="utf-8") as f:
-        html_content = f.read()
-
-    row_template = """
-                <tr>
-                    <td style="padding: 10px 14px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #20201f; border-bottom: 1px solid #e7d9c2;">{name}</td>
-                    <td style="padding: 10px 14px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #20201f; border-bottom: 1px solid #e7d9c2;">{age}</td>
-                    <td style="padding: 10px 14px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #20201f; border-bottom: 1px solid #e7d9c2;">{type} Class</td>
-                    <td style="padding: 10px 14px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #20201f; border-bottom: 1px solid #e7d9c2;">{sessions} / week</td>
-                    <td style="padding: 10px 14px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #20201f; border-bottom: 1px solid #e7d9c2;">{daysLabel}</td>
-                    <td align="right" style="padding: 10px 14px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 600; color: #20201f; border-bottom: 1px solid #e7d9c2;">{priceLabel}</td>
-                </tr>"""
-
-    students_rows = "".join(
-        row_template.format(
-            name=s.get("name", ""),
-            age=s.get("age", ""),
-            type=s.get("type", ""),
-            sessions=s.get("sessions", ""),
-            daysLabel=s.get("daysLabel", ""),
-            priceLabel=s.get("priceLabel", ""),
-        )
-        for s in payload.get("students", [])
-    )
-
-    html_content = html_content.replace("{{students_rows}}", students_rows)
-    html_content = html_content.replace("{{confirmationNumber}}", str(payload.get("confirmationNumber", "")))
-    html_content = html_content.replace("{{paymentPlan}}", str(payload.get("paymentPlan", "")))
-    html_content = html_content.replace(
-        "{{couponCode}}", "None" if not payload.get("couponCode") else str(payload.get("couponCode"))
-    )
-    html_content = html_content.replace("{{discount}}", str(payload.get("discount", "")))
-    html_content = html_content.replace("{{total}}", str(payload.get("total", "")))
-
-    subject = f"{payload.get('confirmationNumber')} - Hello Chinese Enrollment"
-    recipients = payload.get("recipientEmail")
-    recipients.append("hello.nihao.chinese@gmail.com")
-
-    msg = Message(
-        subject,
-        sender=current_app.config["MAIL_USERNAME"],
-        recipients=recipients,
-        html=html_content,
-    )
-
-    mail.send(msg)
-
-    # params: resend.Emails.SendParams = {
-    # "from": "Acme <onboarding@resend.dev>",
-    # "to": recipients,
-    # "subject": subject,
-    # "html": html_content,
-    # }
-
-    # email = resend.Emails.send(params)
-    # print(email)
-
-
-def send_contact_email(formData):
-    data = formData["formData"]
-
-    with open("templates/contact_form_notification.html", "r", encoding="utf-8") as f:
-        html_content = f.read()
-
-    html_content = html_content.replace("{{name}}", data.get("name", ""))
-    html_content = html_content.replace("{{email}}", data.get("email", ""))
-    html_content = html_content.replace("{{phone}}", data.get("phone", ""))
-    html_content = html_content.replace("{{childAge}}", data.get("childAge", ""))
-    html_content = html_content.replace("{{program}}", data.get("program", ""))
-    html_content = html_content.replace("{{message}}", data.get("message", ""))
-    html_content = html_content.replace(
-        "{{submitted_at}}", datetime.now().strftime("%B %d, %Y at %I:%M %p")
-    )
-
-    subject = "We received your message - Hello Chinese"
-    recipients = [r for r in [data.get("email"), 'mohansg12@gmail.com'] if r]
-
-    msg = Message(
-        subject,
-        sender=current_app.config["MAIL_USERNAME"],
-        recipients=recipients,
-        html=html_content,
-    )
-
-    mail.send(msg)
-
+    try:
+        email = resend.Emails.send(params)
+        logger.info("Resend id=%s to=%s", email.get("id"), recipients)
+        return email
+    except Exception as e:
+        logger.error("Resend failed to=%s: %s", recipients, e)
+        raise
 
 def send_saturday_interest_email(payload):
     with open("templates/saturday_interest_list_notification.html", "r", encoding="utf-8") as f:
@@ -165,22 +131,19 @@ def send_saturday_interest_email(payload):
         "{{programInterest}}": payload.get("programInterest") or "",
         "{{preferredTime}}": payload.get("preferredTime") or "No preference given",
         "{{comments}}": payload.get("comments") or "No comments provided.",
+        "{{ctaHref}}": f"mailto:{payload.get('email')}" if payload.get("email") else "https://hellochinese.info/",
+        "{{ctaLabel}}": f"Reply to {payload.get('parentName')}" if payload.get("parentName") else "Browse our programs",
+        "{{logoUrl}}": payload.get("logoUrl") or LOGO_URL,
         "{{submittedAt}}": _format_timestamp(payload.get("submittedAt")),
     }
     for token, value in fields.items():
         html_content = html_content.replace(token, str(value))
 
     subject = "You're on the Saturday interest list - Hello Chinese"
-    recipients = [r for r in [payload.get("email"), "mohansg12@gmail.com"] if r]
+    recipients = [r for r in [payload.get("email"), NOTIFY] if r]
 
-    msg = Message(
-        subject,
-        sender=current_app.config["MAIL_USERNAME"],
-        recipients=recipients,
-        html=html_content,
-    )
-
-    mail.send(msg)
+    send_email(recipients, html_content, subject)
+        
 
 
 def send_free_trial_email(payload):
@@ -207,16 +170,9 @@ def send_free_trial_email(payload):
         html_content = html_content.replace(token, str(value))
 
     subject = "Your free trial request - Hello Chinese"
-    recipients = [r for r in [parent.get("email"), "mohansg12@gmail.com"] if r]
+    recipients = [r for r in [parent.get("email"), NOTIFY] if r]
 
-    msg = Message(
-        subject,
-        sender=current_app.config["MAIL_USERNAME"],
-        recipients=recipients,
-        html=html_content,
-    )
-
-    mail.send(msg)
+    send_email(recipients, html_content, subject)
 
 
 def send_private_lessons_email(payload):
@@ -243,97 +199,206 @@ def send_private_lessons_email(payload):
         "{{specificTimes}}": payload.get("specificTimes") or "&mdash;",
         "{{experience}}": payload.get("experience") or "Not provided.",
         "{{goals}}": payload.get("goals") or "Not provided.",
+        "{{logoUrl}}": payload.get("logoUrl") or LOGO_URL,
         "{{submittedAt}}": _format_timestamp(payload.get("submittedAt")),
     }
     for token, value in fields.items():
         html_content = html_content.replace(token, str(value))
 
     subject = "Your private lessons inquiry - Hello Chinese"
-    recipients = [r for r in [payload.get("email"), "mohansg12@gmail.com"] if r]
+    recipients = [r for r in [payload.get("email"), NOTIFY] if r]
 
-    msg = Message(
-        subject,
-        sender=current_app.config["MAIL_USERNAME"],
-        recipients=recipients,
-        html=html_content,
-    )
-
-    mail.send(msg)
+    send_email(recipients, html_content, subject)
 
 
 def send_sunday_program_email(payload):
+    """Expected payload:
+    {
+      "term": "Fall 2026",
+      "parent": {"name","email","phone"},
+      "children": [
+        {"student": {"name","age"}, "levelName", "placementStatus",
+         "enrollmentLabel" (or "planName"),
+         "schedule": [{"time","label"}],
+         "sessionDates": ["2026-09-06", ...],
+         "pricing": {"total": 520}}
+      ],
+      "standardTuition" (or "householdSubtotal"),
+      "packageSavings", "siblingDiscount",
+      "coupon": {"code","discount"},
+      "householdTotal", "householdSavings",
+      "payment": {"method": "plan"|"full", "planName",
+                  "installments": [{"due","amount"}], "amount"},
+      "yct": {"title","date","note"},
+      "policyAcknowledged": bool, "privacy": {"mediaConsent": bool},
+      "submittedAt": ISO string
+    }
+    """
     with open("templates/sunday_program_enrollment_confirmation.html", "r", encoding="utf-8") as f:
         html_content = f.read()
 
     child_card = """
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="border-line" style="border: 1px solid #e7d9c2; border-radius: 12px; margin-bottom: 12px;">
-<tr><td style="padding: 16px 20px; background-color:#f6e7e1; border-radius: 11px 11px 0 0;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-<td style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; font-weight: 700; color: #20201f;">{name}</td>
-<td align="right" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 700; color: #a72620;">{price}</td>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="border-line bg-tint" style="border: 1px solid #efe3cf; border-radius: 12px; background-color:#fdf8ef; margin-bottom: 14px;">
+<tr><td style="padding: 16px 20px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td width="30" valign="top" style="padding-right: 10px;">
+<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+<td align="center" width="26" height="26" bgcolor="#a72620" style="background-color:#a72620; border-radius: 13px; font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 700; color: #fffdf8; line-height: 26px;">{index}</td>
 </tr></table>
+</td>
+<td valign="top">
+<div class="text-main" style="font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 700; color: #20201f; margin-bottom: 4px;">{name}</div>
+<div class="text-main" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #20201f;"><strong>Level:</strong> {levelName}</div>
+<div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-style: italic; color: #a72620; margin-top: 2px;">Placement Status: {placementStatus}</div>
+</td>
+<td align="right" valign="top" class="text-soft" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #5b5348;">Age: {age}</td>
+</tr>
+</table>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 12px; border-top: 1px solid #e7d9c2;">
+<tr><td style="padding: 10px 0 0 0;">
+<div class="text-main" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 700; color: #20201f;">Enrollment:</div>
+<div class="text-soft" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; line-height: 1.6; color: #5b5348; margin-bottom: 10px;">{enrollmentLabel}</div>
+<div class="text-main" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 700; color: #20201f;">Sunday Schedule:</div>
+<div class="text-soft" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; line-height: 1.6; color: #5b5348; margin-bottom: 10px;">{schedule}</div>
+<div class="text-main" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 700; color: #20201f;">{sessions} Sundays Selected:</div>
+<div class="text-soft" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; line-height: 1.6; color: #5b5348;">{dates}</div>
 </td></tr>
-<tr><td style="padding: 14px 20px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; line-height: 1.7; color: #5b5348;">
-Age {age} &middot; {levelName}<br>
-{planName}<br>
-{schedule}<br>
-{sessions} session(s): {dates}
+</table>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 12px; border-top: 1px solid #e7d9c2;">
+<tr>
+<td class="text-main" style="padding: 10px 0 0 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 700; color: #20201f;">Student Tuition:</td>
+<td align="right" style="padding: 10px 0 0 0; font-family: Arial, Helvetica, sans-serif; font-size: 18px; font-weight: 700; color: #a72620;">{price}</td>
+</tr>
+</table>
 </td></tr>
 </table>"""
 
+    summary_row = """
+<tr>
+<td class="border-line" style="padding: 12px 18px; border-bottom: 1px solid #efe3cf;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+<td class="text-soft" style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #5b5348;">{label}</td>
+<td align="right" style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: {color};">{value}</td>
+</tr></table>
+</td>
+</tr>"""
+
+    installment_row = """
+<tr>
+<td class="border-line" style="padding: 11px 18px; border-bottom: 1px solid #efe3cf;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+<td class="text-soft" style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #5b5348;">{due}</td>
+<td align="right" class="text-main" style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #20201f;">{amount}</td>
+</tr></table>
+</td>
+</tr>"""
+
+    yct_block = """
+<tr>
+<td class="bg-card fluid-pad" style="background-color:#fffdf8; padding: 8px 34px 0 34px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="border-line bg-tint" style="border: 1px solid #efe3cf; border-radius: 12px; background-color:#fdf6ec;">
+<tr><td style="padding: 18px 22px;">
+<div style="font-family: Georgia, 'Times New Roman', serif; font-size: 17px; font-weight: 700; color: #a72620; margin: 0 0 6px 0;">{title}</div>
+<p class="text-soft" style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; line-height: 1.65; color: #5b5348;">{note}</p>
+</td></tr>
+</table>
+</td>
+</tr>"""
+
     cards = ""
-    for c in payload.get("children", []):
+    for i, c in enumerate(payload.get("children", []), start=1):
         student = c.get("student") or {}
         dates = c.get("sessionDates") or []
         pricing = c.get("pricing") or {}
         cards += child_card.format(
+            index=i,
             name=student.get("name", ""),
             age=student.get("age", ""),
             levelName=c.get("levelName", ""),
-            planName=c.get("planName", ""),
-            schedule=_format_schedule(c.get("schedule")),
+            placementStatus=c.get("placementStatus") or "Pending Review",
+            enrollmentLabel=c.get("enrollmentLabel") or c.get("planName") or "",
+            schedule=_schedule_lines(c.get("schedule")),
             sessions=len(dates),
-            dates=_format_dates(dates),
+            dates=_group_dates_by_month(dates),
             price=_money(pricing.get("total")),
         )
 
     parent = payload.get("parent") or {}
     coupon = payload.get("coupon")
     payment = payload.get("payment") or {}
+    package_savings = payload.get("packageSavings")
+    sibling_discount = payload.get("siblingDiscount")
 
-    if payment.get("method") == "plan":
-        payment_line = _format_installments(payment.get("installments"))
+    def _savings_row(label, amount):
+        if not amount:
+            return ""
+        return summary_row.format(
+            label=label, value=f"&minus;{_money(amount)}", color="#a72620"
+        )
+
+    coupon_row = ""
+    if coupon:
+        coupon_row = summary_row.format(
+            label=f"Coupon ({coupon.get('code', '')})",
+            value=f"&minus;{_money(coupon.get('discount'))}",
+            color="#a72620",
+        )
+
+    installments = payment.get("installments") or []
+    if payment.get("method") == "plan" and installments:
+        plan_line = payment.get("planName") or f"You selected the {len(installments)}-Payment Installment Plan."
+        installment_rows = "".join(
+            installment_row.format(
+                due=i.get("due", i.get("label", "")), amount=_money(i.get("amount"))
+            )
+            for i in installments
+        )
     else:
-        payment_line = f"Paid in full &middot; {_money(payment.get('amount'))}"
+        plan_line = payment.get("planName") or "You selected to pay in full."
+        installment_rows = installment_row.format(
+            due="Paid in full", amount=_money(payment.get("amount") or payload.get("householdTotal"))
+        )
+
+    yct = payload.get("yct")
+    yct_html = ""
+    if yct:
+        yct_html = yct_block.format(
+            title=yct.get("title") or "YCT Exam Day",
+            note=yct.get("note") or "",
+        )
+
+    savings_total = payload.get("householdSavings")
+    if savings_total in (None, ""):
+        savings_total = sum(
+            float(v or 0)
+            for v in [package_savings, sibling_discount, (coupon or {}).get("discount")]
+        )
 
     fields = {
         "{{children_cards}}": cards,
-        "{{householdSubtotal}}": _money(payload.get("householdSubtotal")),
-        "{{couponLine}}": f"{coupon['code']} (&minus;{_money(coupon['discount'])})" if coupon else "None",
-        "{{siblingDiscount}}": f"&minus;{_money(payload.get('siblingDiscount'))}" if payload.get("siblingDiscount") else "None",
-        "{{packageSavings}}": f"&minus;{_money(payload.get('packageSavings'))}" if payload.get("packageSavings") else "None",
-        "{{paymentLine}}": payment_line,
+        "{{term}}": payload.get("term") or "Fall 2026",
+        "{{standardTuition}}": _money(payload.get("standardTuition") or payload.get("householdSubtotal")),
+        "{{packageSavingsRow}}": _savings_row("Package Savings", package_savings),
+        "{{siblingDiscountRow}}": _savings_row("Sibling Discount", sibling_discount),
+        "{{couponRow}}": coupon_row,
+        "{{paymentPlanLine}}": plan_line,
+        "{{installment_rows}}": installment_rows,
+        "{{yctBlock}}": yct_html,
         "{{householdTotal}}": _money(payload.get("householdTotal")),
-        "{{householdSavings}}": _money(payload.get("householdSavings")) or "$0",
+        "{{householdSavings}}": _money(savings_total) or "$0",
         "{{parentName}}": parent.get("name") or "",
         "{{parentEmail}}": parent.get("email") or "",
         "{{parentPhone}}": parent.get("phone") or "",
-        "{{language}}": "English" if payload.get("language") == "en" else "\u4e2d\u6587",
-        "{{policyAcknowledged}}": "Yes" if payload.get("policyAcknowledged") else "No",
+        "{{policyAcknowledged}}": "Accepted" if payload.get("policyAcknowledged") else "Not accepted",
         "{{mediaConsent}}": "Granted" if (payload.get("privacy") or {}).get("mediaConsent") else "Declined",
+        "{{logoUrl}}": payload.get("logoUrl") or LOGO_URL,
         "{{submittedAt}}": _format_timestamp(payload.get("submittedAt")),
     }
     for token, value in fields.items():
         html_content = html_content.replace(token, str(value))
 
-    subject = "Your HelloChinese Sunday Program Enrollment"
-    recipients = [parent.get("email"), "hello.nihao.chinese@gmail.com"]
+    subject = "Your Hello Chinese Sunday Program Enrollment"
+    recipients = [r for r in [parent.get("email"), NOTIFY] if r]
 
-    msg = Message(
-        subject,
-        sender=current_app.config["MAIL_USERNAME"],
-        recipients=[r for r in recipients if r],
-        html=html_content,
-    )
-
-    mail.send(msg)
+    send_email(recipients, html_content, subject)
