@@ -38,6 +38,7 @@ function Footer() {
           <NavLink to="/" className="footer__link">{t("footer.linkPrograms")}</NavLink>
           <NavLink to="/FreeTrial" className="footer__link">{t("footer.linkTrial")}</NavLink>
           <a href="mailto:hello.nihao.chinese@gmail.com" className="footer__link">{t("footer.linkContact")}</a>
+          <NavLink to="/Terms" className="footer__link">{t("footer.linkTerms")}</NavLink>
         </div>
 
         <div className="footer__col">

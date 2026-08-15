@@ -119,8 +119,8 @@ export const translations = {
   enrollSunday: {
     title: { en: "Sunday Programs", zh: "周日课程" },
     desc: {
-      en: "Chinese language classes, learning support, and math enrichment on Sunday mornings.",
-      zh: "周日上午的中文课程、学习辅导与数学思维拓展。",
+      en: "We offer Chinese language learning, personalized learning support before and after our three leveled Chinese classes, as well as math enrichment on Sunday mornings from 9:00 AM to 12:00 PM.",
+      zh: "我们提供中文语言学习，在三个级别的中文课程前后设有个性化学习辅导，并在周日上午 9:00 至 12:00 提供数学思维拓展课程。",
     },
     pathwayEyebrow: { en: "课程", zh: "课程" },
     pathwayTitle: { en: "Chinese Learning Pathway (3 Levels)", zh: "中文学习进阶路径（三个级别）" },
@@ -648,6 +648,20 @@ enrollReg: {
       zh: "有一个孩子的必填信息尚未完成，请点击“修改”补充。",
     },
     warnPolicy: { en: "Please accept the enrollment and refund policy.", zh: "请先接受报名与退费政策。" },
+    warnTerms: {
+      en: "Please agree to the Terms of Service and Privacy Policy.",
+      zh: "请先同意《服务条款》与《隐私政策》。",
+    },
+    termsTitle: { en: "Terms & Privacy", zh: "条款与隐私" },
+    termsLede: {
+      en: "Registration is completed by a parent or legal guardian. Please review both documents before submitting.",
+      zh: "报名须由家长或法定监护人完成。提交前请阅读以下两份文件。",
+    },
+    // Three fragments because the two links sit inside the sentence; Chinese
+    // word order differs, so these are the keys to check with a reviewer.
+    termsAgreePre: { en: "I have read and agree to the", zh: "我已阅读并同意" },
+    termsAgreeMid: { en: "and acknowledge the", zh: "，并已知悉" },
+    termsAgreePost: { en: ". *", zh: "。*" },
     warnParentFields: {
       en: "Please add your name, email, and phone number.",
       zh: "请填写您的姓名、电子邮箱和联系电话。",
@@ -992,6 +1006,33 @@ freeTrial: {
     submitAnother: { en: "Submit another request", zh: "再提交一份申请" },
     returnHome: { en: "Return home", zh: "返回首页" },
   },
+  legal: {
+    eyebrow: { en: "Legal", zh: "法律条款" },
+    title: {
+      en: "Terms of Service & Privacy Policy",
+      zh: "服务条款与隐私政策",
+    },
+    effective: { en: "Effective Date: {date}", zh: "生效日期：{date}" },
+    tocHead: { en: "On this page", zh: "本页内容" },
+    partOne: { en: "Part I — Terms of Service", zh: "第一部分 — 服务条款" },
+    partTwo: { en: "Part II — Privacy Policy", zh: "第二部分 — 隐私政策" },
+    termsTab: { en: "Terms of Service", zh: "服务条款" },
+    privacyTab: { en: "Privacy Policy", zh: "隐私政策" },
+    agreement: {
+      en: "By registering for a Hello Chinese weekend language learning program, the parent or legal guardian confirms that they have reviewed and agree to the Terms of Service and acknowledge the Privacy Policy.",
+      zh: "为孩子报名 Hello Chinese 周末中文课程时，家长或法定监护人确认已阅读并同意《服务条款》，并已知悉《隐私政策》。",
+    },
+    contactHead: { en: "Contact", zh: "联系我们" },
+    contactLead: { en: "Questions may be directed to:", zh: "如有疑问，请联系：" },
+    contactLine: {
+      en: "Questions may be directed to Hello Chinese, Washington, DC, United States —",
+      zh: "如有疑问，请联系 Hello Chinese（美国华盛顿特区）——",
+    },
+    openFull: { en: "Open the full page", zh: "查看完整页面" },
+    close: { en: "Close", zh: "关闭" },
+    agree: { en: "I agree", zh: "我同意" },
+  },
+
 footer: {
     tagline: { en: "Meet the World Through Chinese.", zh: "从你好开始，与世界相见" },
     youtube: { en: "Hello Chinese on YouTube", zh: "Hello Chinese 的 YouTube 频道" },
@@ -1000,6 +1041,7 @@ footer: {
     linkPrograms: { en: "Programs", zh: "课程总览" },
     linkTrial: { en: "Book a Free Trial", zh: "预约免费试听" },
     linkContact: { en: "Contact Us", zh: "联系我们" },
+    linkTerms: { en: "Terms & Privacy", zh: "条款与隐私" },
 
     programsHead: { en: "Programs", zh: "课程" },
     linkSunday: { en: "Sunday Programs", zh: "周日课程" },

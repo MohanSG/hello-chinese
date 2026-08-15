@@ -115,3 +115,21 @@
 }
 
 .reg__back:hover{background:#a72620;color:#fff}
+
+/* Terms & Privacy links inside the agree checkbox. Buttons, not anchors: they
+   open the modal instead of navigating, and clicking one must not toggle the
+   checkbox its label wraps. */
+.policy__link {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-brand);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.policy__link:hover {
+  color: var(--color-brand-dark);
+}

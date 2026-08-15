@@ -218,7 +218,7 @@ export function planTitleParts(planId) {
 // ---------------------------------------------------------------------------
 
 export const MIN_SESSION_DATES = 6;
-export const MAX_SESSION_DATES = 11;
+export const MAX_SESSION_DATES = 12;
 
 // The Fall 2026 term runs on these Sundays only (published calendar). Sep 6 is
 // the first class date. Families may select any combination of the open dates.

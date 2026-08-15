@@ -24,8 +24,9 @@ import EnrollMath from "./pages/EnrollMath";
 import EnrollSelectDates from "./pages/EnrollSelectDates";
 import EnrollRegistration from "./pages/EnrollRegistration";
 import FreeTrial from "./pages/FreeTrial";
-import ScrollToTop from "./components/ScrollToTop";
+import Terms from "./pages/Terms";
 
+import ScrollToTop from "./components/ScrollToTop";
 function App() {
   return (
     <LanguageProvider>
@@ -52,7 +53,8 @@ function App() {
           <Route path="/Enroll/Sundays" element={<EnrollSelectDates />} />
           <Route path="/Enroll/Registration" element={<EnrollRegistration />} />
           <Route path="/FreeTrial" element={<FreeTrial />} />
-
+          <Route path="/Terms" element= {<Terms />} />
+          
         </Routes>
       </BrowserRouter>
     </LanguageProvider>

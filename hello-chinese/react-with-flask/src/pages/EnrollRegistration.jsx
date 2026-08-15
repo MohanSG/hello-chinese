@@ -19,6 +19,8 @@ import {
 } from "../data/enrollmentDraft";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+import LegalModal from "../components/LegalModal";
+import { LEGAL_VERSION } from "../data/legal";
 import { apiRequest } from "../api/client";
 import { useLanguage } from "../i18n/LanguageContext";
 import "./EnrollRegistration.css";
@@ -57,6 +59,9 @@ export default function EnrollRegistration({ onSubmit }) {
   const [policyAccepted, setPolicyAccepted] = useState(false);
   const [payment, setPayment] = useState("full");
   const [mediaConsent, setMediaConsent] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  // null when closed, otherwise the tab the parent asked for.
+  const [legalTab, setLegalTab] = useState(null);
   const [couponInput, setCouponInput] = useState("");
   const [coupon, setCoupon] = useState(null);
   // Warnings and the coupon error are held as { code, vars } so they re-render
@@ -266,6 +271,10 @@ export default function EnrollRegistration({ onSubmit }) {
       setWarning({ code: "warnPolicy", vars: {} });
       return;
     }
+    if (!termsAccepted) {
+      setWarning({ code: "warnTerms", vars: {} });
+      return;
+    }
     const payload = {
       type: "enrollment",
       submittedAt: new Date().toISOString(),
@@ -296,6 +305,9 @@ export default function EnrollRegistration({ onSubmit }) {
           ? { method: "plan", installments }
           : { method: "full", amount: householdTotal },
       policyAcknowledged: true,
+      // Which version of the published document the family agreed to.
+      termsAccepted: true,
+      termsVersion: LEGAL_VERSION,
       privacy: { mediaConsent },
     };
     // The draft is only cleared once the send succeeds, so a failed submit
@@ -383,6 +395,46 @@ export default function EnrollRegistration({ onSubmit }) {
                 />
               </label>
             </section>
+            <section className="card">
+              <h2 className="card__title">{t("enrollReg.termsTitle")}</h2>
+              <p className="card__text">{t("enrollReg.termsLede")}</p>
+              <label className="policy">
+                <input
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={() => {
+                    setTermsAccepted((v) => !v);
+                    setWarning(null);
+                  }}
+                />
+                <span>
+                  {t("enrollReg.termsAgreePre")}{" "}
+                  <button
+                    type="button"
+                    className="policy__link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setLegalTab("terms");
+                    }}
+                  >
+                    {t("legal.termsTab")}
+                  </button>{" "}
+                  {t("enrollReg.termsAgreeMid")}{" "}
+                  <button
+                    type="button"
+                    className="policy__link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setLegalTab("privacy");
+                    }}
+                  >
+                    {t("legal.privacyTab")}
+                  </button>
+                  {t("enrollReg.termsAgreePost")}
+                </span>
+              </label>
+            </section>
+
             {warning && <p className="reg__warning">{msg(warning)}</p>}
             <button
               type="button"
@@ -524,6 +576,46 @@ export default function EnrollRegistration({ onSubmit }) {
                     {t("enrollReg.backgroundFluent")}
                   </option>
                 </select>
+              </label>
+            </section>
+
+            <section className="card">
+              <h2 className="card__title">{t("enrollReg.termsTitle")}</h2>
+              <p className="card__text">{t("enrollReg.termsLede")}</p>
+              <label className="policy">
+                <input
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={() => {
+                    setTermsAccepted((v) => !v);
+                    setWarning(null);
+                  }}
+                />
+                <span>
+                  {t("enrollReg.termsAgreePre")}{" "}
+                  <button
+                    type="button"
+                    className="policy__link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setLegalTab("terms");
+                    }}
+                  >
+                    {t("legal.termsTab")}
+                  </button>{" "}
+                  {t("enrollReg.termsAgreeMid")}{" "}
+                  <button
+                    type="button"
+                    className="policy__link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setLegalTab("privacy");
+                    }}
+                  >
+                    {t("legal.privacyTab")}
+                  </button>
+                  {t("enrollReg.termsAgreePost")}
+                </span>
               </label>
             </section>
 
@@ -917,6 +1009,46 @@ export default function EnrollRegistration({ onSubmit }) {
               </label>
             </section>
 
+            <section className="card">
+              <h2 className="card__title">{t("enrollReg.termsTitle")}</h2>
+              <p className="card__text">{t("enrollReg.termsLede")}</p>
+              <label className="policy">
+                <input
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={() => {
+                    setTermsAccepted((v) => !v);
+                    setWarning(null);
+                  }}
+                />
+                <span>
+                  {t("enrollReg.termsAgreePre")}{" "}
+                  <button
+                    type="button"
+                    className="policy__link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setLegalTab("terms");
+                    }}
+                  >
+                    {t("legal.termsTab")}
+                  </button>{" "}
+                  {t("enrollReg.termsAgreeMid")}{" "}
+                  <button
+                    type="button"
+                    className="policy__link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setLegalTab("privacy");
+                    }}
+                  >
+                    {t("legal.privacyTab")}
+                  </button>
+                  {t("enrollReg.termsAgreePost")}
+                </span>
+              </label>
+            </section>
+
             {warning && <p className="reg__warning">{msg(warning)}</p>}
             <button type="button" className="reg__primary" onClick={submit}>
               {t("enrollReg.submit")}
@@ -927,6 +1059,17 @@ export default function EnrollRegistration({ onSubmit }) {
           </>
         )}
       </main>
+      {legalTab && (
+        <LegalModal
+          initialTab={legalTab}
+          onClose={() => setLegalTab(null)}
+          onAgree={() => {
+            setTermsAccepted(true);
+            setWarning(null);
+            setLegalTab(null);
+          }}
+        />
+      )}
       <Footer />
     </>
   );
