@@ -70,6 +70,8 @@ export default function EnrollRegistration({ onSubmit }) {
   const todayISO = new Date().toISOString().slice(0, 10);
   const [warning, setWarning] = useState(null);
   const [submitted, setSubmitted] = useState(false);
+  // True while the send is in flight, so the button can lock itself.
+  const [sending, setSending] = useState(false);
 
   const msg = (info) => (info ? t(`enrollReg.${info.code}`, info.vars) : "");
   const childLabel = (e, i) =>
@@ -312,6 +314,7 @@ export default function EnrollRegistration({ onSubmit }) {
     };
     // The draft is only cleared once the send succeeds, so a failed submit
     // leaves the family's answers intact and they can retry.
+    setSending(true);
     try {
       await apiRequest("/sunday-registration-email", {
         method: "POST",
@@ -319,8 +322,10 @@ export default function EnrollRegistration({ onSubmit }) {
       });
     } catch (err) {
       setWarning({ code: "warnSend", vars: {} });
+      setSending(false);
       return;
     }
+    setSending(false);
     if (onSubmit) onSubmit(payload);
     clearDraft();
     setWarning(null);
@@ -1050,8 +1055,14 @@ export default function EnrollRegistration({ onSubmit }) {
             </section>
 
             {warning && <p className="reg__warning">{msg(warning)}</p>}
-            <button type="button" className="reg__primary" onClick={submit}>
-              {t("enrollReg.submit")}
+            <button
+              type="button"
+              className="reg__primary"
+              onClick={submit}
+              disabled={sending}
+            >
+              {sending && <span className="btn-spinner" aria-hidden="true" />}
+              {sending ? t("enrollReg.sending") : t("enrollReg.submit")}
             </button>
             <p className="reg__hint reg__hint--center">
               {t("enrollReg.submitNote")}

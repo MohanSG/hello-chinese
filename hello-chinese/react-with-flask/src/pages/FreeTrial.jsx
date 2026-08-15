@@ -390,6 +390,7 @@ function FreeTrial() {
               {error && <div className="trial-error">{t(`freeTrial.${error}`)}</div>}
 
               <button type="submit" className="trial-submit" disabled={sending}>
+                {sending && <span className="btn-spinner" aria-hidden="true" />}
                 {sending ? t("freeTrial.sending") : t("freeTrial.submit")}
               </button>
             </form>

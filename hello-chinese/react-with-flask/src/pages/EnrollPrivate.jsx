@@ -89,6 +89,8 @@ function EnrollPrivate() {
   const [error, setError] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [submittedName, setSubmittedName] = useState("");
+  // True while the send is in flight, so the button can lock itself.
+  const [sending, setSending] = useState(false);
 
   const age = useMemo(() => ageFrom(form.dob), [form.dob]);
 
@@ -149,6 +151,7 @@ function EnrollPrivate() {
       goals: form.goals || null,
       submittedAt: new Date().toISOString(),
     };
+    setSending(true);
     try {
       await apiRequest("/private-lesson-email", {
         method: "POST",
@@ -156,8 +159,10 @@ function EnrollPrivate() {
       });
     } catch (err) {
       setError("warnSend");
+      setSending(false);
       return;
     }
+    setSending(false);
 
     setSubmittedName(form.parentName);
     setSubmitted(true);
@@ -653,7 +658,8 @@ function EnrollPrivate() {
             <p className="sat-form__error">{t(`enrollPrivate.${error}`)}</p>
           )}
 
-          <button type="submit" className="psubmit">
+          <button type="submit" className="psubmit" disabled={sending}>
+            {sending && <span className="btn-spinner" aria-hidden="true" />}
             <svg
               width="20"
               height="20"
@@ -668,7 +674,7 @@ function EnrollPrivate() {
               <path d="M21 3 10.5 13.5" />
               <path d="M21 3l-6.8 18-3.7-7.5L3 9.8 21 3Z" />
             </svg>
-            {t("enrollPrivate.submit")}
+            {sending ? t("enrollPrivate.sending") : t("enrollPrivate.submit")}
           </button>
 
           <div className="pfoot">

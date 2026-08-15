@@ -104,6 +104,8 @@ function EnrollSaturday() {
   const [error, setError] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [submittedName, setSubmittedName] = useState("");
+  // True while the send is in flight, so the button can lock itself.
+  const [sending, setSending] = useState(false);
 
   const onField = (e) => {
     const { name, value } = e.target;
@@ -132,6 +134,7 @@ function EnrollSaturday() {
       comments: form.comments || null,
       submittedAt: new Date().toISOString(),
     };
+    setSending(true);
     try {
       await apiRequest("/saturday-interest-email", {
         method: "POST",
@@ -139,8 +142,10 @@ function EnrollSaturday() {
       });
     } catch (err) {
       setError("warnSend");
+      setSending(false);
       return;
     }
+    setSending(false);
     setSubmittedName(form.parentName);
     setSubmitted(true);
   };
@@ -338,8 +343,13 @@ function EnrollSaturday() {
             <p className="sat-form__error">{t(`enrollSat.${error}`)}</p>
           )}
 
-          <button type="submit" className="btn-primary btn-primary--block">
-            {t("enrollSat.submit")}
+          <button
+            type="submit"
+            className="btn-primary btn-primary--block"
+            disabled={sending}
+          >
+            {sending && <span className="btn-spinner" aria-hidden="true" />}
+            {sending ? t("enrollSat.sending") : t("enrollSat.submit")}
           </button>
           <p className="sat-form__note">{t("enrollSat.note")}</p>
         </form>

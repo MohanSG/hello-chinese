@@ -169,3 +169,8 @@
   .pcols { grid-template-columns: 1fr; gap: 28px; }
   .pform__sub { padding-left: 0; }
 }
+
+/* While sending, the spinner replaces the paper-plane icon. */
+.psubmit:disabled svg {
+  display: none;
+}

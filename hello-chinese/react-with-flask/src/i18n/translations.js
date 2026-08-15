@@ -119,8 +119,8 @@ export const translations = {
   enrollSunday: {
     title: { en: "Sunday Programs", zh: "周日课程" },
     desc: {
-      en: "We offer Chinese language learning, personalized learning support before and after our three leveled Chinese classes, as well as math enrichment on Sunday mornings from 9:00 AM to 12:00 PM.",
-      zh: "我们提供中文语言学习，在三个级别的中文课程前后设有个性化学习辅导，并在周日上午 9:00 至 12:00 提供数学思维拓展课程。",
+      en: "Chinese language classes, learning support, and math enrichment on Sunday mornings.",
+      zh: "周日上午的中文课程、学习辅导与数学思维拓展。",
     },
     pathwayEyebrow: { en: "课程", zh: "课程" },
     pathwayTitle: { en: "Chinese Learning Pathway (3 Levels)", zh: "中文学习进阶路径（三个级别）" },
@@ -652,6 +652,7 @@ enrollReg: {
       en: "Please agree to the Terms of Service and Privacy Policy.",
       zh: "请先同意《服务条款》与《隐私政策》。",
     },
+    sending: { en: "Sending…", zh: "提交中…" },
     termsTitle: { en: "Terms & Privacy", zh: "条款与隐私" },
     termsLede: {
       en: "Registration is completed by a parent or legal guardian. Please review both documents before submitting.",
@@ -716,6 +717,7 @@ enrollMath: {
   },
 
   enrollSat: {
+    sending: { en: "Sending…", zh: "提交中…" },
     back: { en: "← Back to Programs", zh: "← 返回课程总览" },
     title: { en: "Saturday Programs Interest List", zh: "周六课程意向名单" },
     desc: {
@@ -774,6 +776,7 @@ enrollMath: {
     doneCta: { en: "Back to programs", zh: "返回课程总览" },
   },
 enrollPrivate: {
+    sending: { en: "Sending…", zh: "提交中…" },
     back: { en: "← Back to Programs", zh: "← 返回课程总览" },
     badge: { en: "Flexible Schedule", zh: "时间灵活" },
     title: { en: "Private Chinese Lessons", zh: "中文一对一私教课" },

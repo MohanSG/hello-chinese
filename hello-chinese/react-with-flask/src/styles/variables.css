@@ -167,3 +167,33 @@ a:hover {
     transform: translateY(-9px);
   }
 }
+
+/* Submit-button spinner. Used by every form button while a send is in flight:
+   <button disabled={sending}>{sending && <span className="btn-spinner" />} … */
+@keyframes hcSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.btn-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  flex: none;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 999px;
+  animation: hcSpin 0.7s linear infinite;
+  vertical-align: -3px;
+  margin-right: 9px;
+}
+/* Disabled submits: dimmed, not-allowed, and no hover lift. */
+button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-spinner {
+    animation-duration: 2s;
+  }
+}
