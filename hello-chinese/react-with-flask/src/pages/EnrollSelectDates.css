@@ -92,3 +92,48 @@
 .yct p:last-child{margin-bottom:0}
 .day__reason{flex:0 1 auto;min-width:0;color:#a0937c;font-size:10.5px;font-weight:700;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .day__label{white-space:nowrap}
+
+/* Consistency bonus note — 12 Sundays */
+.bonus {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin: 18px 0 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--line, #e4ded3);
+  border-left: 3px solid var(--gold, #c8a24a);
+  border-radius: 10px;
+  background: rgba(200, 162, 74, 0.06);
+}
+
+.bonus--on {
+  background: rgba(200, 162, 74, 0.14);
+  border-left-color: #a8801f;
+}
+
+.bonus__icon {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--gold, #c8a24a);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.bonus__title {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink, #2b2620);
+}
+
+.bonus__body {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-soft, #5c534a);
+}

@@ -177,6 +177,16 @@ export default function EnrollSelectDates() {
               </button>
             </div>
 
+            <aside className={`bonus${selected.length >= 12 ? " bonus--on" : ""}`}>
+              <span className="bonus__icon" aria-hidden="true">★</span>
+              <div>
+                <h3 className="bonus__title">{t("enrollDates.bonusTitle")}</h3>
+                <p className="bonus__body">
+                  {selected.length >= 12 ? t("enrollDates.bonusEarned") : t("enrollDates.bonusBody")}
+                </p>
+              </div>
+            </aside>
+
             {months.map((group) => (
               <div className="picker__month" key={group.month}>
                 <div className="picker__monthname">{group.month}</div>

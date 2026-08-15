@@ -10,6 +10,10 @@ import {
   paymentSchedule,
   priceQuote,
 } from "../data/enrollment";
+
+// All Sundays in the term earns an extra credit at payment time.
+const CONSISTENCY_SESSIONS = 12;
+const CONSISTENCY_BONUS = 30;
 import {
   readDraft,
   writeDraft,
@@ -131,10 +135,19 @@ export default function EnrollRegistration({ onSubmit }) {
     0,
   );
   const sibling = siblingDiscountFor(enrollments.length);
-  const discount = couponDiscount(coupon, householdSubtotal - sibling);
-  const householdTotal = householdSubtotal - sibling - discount;
+  // Extra credit for families who commit to every Sunday in the term.
+  const consistencyOf = (e) =>
+    (e.dates || []).length >= CONSISTENCY_SESSIONS ? CONSISTENCY_BONUS : 0;
+  const consistencyCount = enrollments.filter((e) => consistencyOf(e) > 0).length;
+  // Flat credit per household, however many children pick every Sunday.
+  const consistency = consistencyCount > 0 ? CONSISTENCY_BONUS : 0;
+  const discount = couponDiscount(
+    coupon,
+    householdSubtotal - sibling - consistency,
+  );
+  const householdTotal = householdSubtotal - sibling - consistency - discount;
   const packageSavings = enrollments.reduce((sum, e) => sum + savingsOf(e), 0);
-  const householdSavings = packageSavings + sibling + discount;
+  const householdSavings = packageSavings + sibling + consistency + discount;
   const schedule = paymentSchedule(
     householdTotal,
     new Date(),
@@ -175,6 +188,9 @@ export default function EnrollRegistration({ onSubmit }) {
       ? t("enrollReg.savePackage", { amount: money(packageSavings) })
       : null,
     sibling > 0 ? t("enrollReg.saveSibling", { amount: money(sibling) }) : null,
+    consistency > 0
+      ? t("enrollReg.saveConsistency", { amount: money(consistency) })
+      : null,
     discount > 0 && coupon
       ? t("enrollReg.saveCoupon", {
           amount: money(discount),
@@ -299,6 +315,8 @@ export default function EnrollRegistration({ onSubmit }) {
         ? { code: coupon.code, label: coupon.label, discount }
         : null,
       siblingDiscount: sibling,
+      consistencyBonus: consistency,
+      consistencyChildren: consistencyCount,
       packageSavings,
       householdTotal,
       householdSavings,
@@ -773,7 +791,7 @@ export default function EnrollRegistration({ onSubmit }) {
               {couponError && (
                 <p className="coupon__error">{msg(couponError)}</p>
               )}
-              {(coupon || sibling > 0) && (
+              {(coupon || sibling > 0 || consistency > 0) && (
                 <div className="household__sub">
                   <span>{t("enrollReg.subtotal")}</span>
                   <span>{money(householdSubtotal)}</span>
@@ -785,6 +803,14 @@ export default function EnrollRegistration({ onSubmit }) {
                     {t("enrollReg.siblingDiscount", { n: enrollments.length })}
                   </span>
                   <span>&minus;{money(sibling)}</span>
+                </div>
+              )}
+              {consistency > 0 && (
+                <div className="household__sub household__sub--off">
+                  <span>
+                    {t("enrollReg.consistencyRow", { n: consistencyCount })}
+                  </span>
+                  <span>&minus;{money(consistency)}</span>
                 </div>
               )}
               {coupon && (

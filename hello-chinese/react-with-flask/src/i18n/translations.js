@@ -377,6 +377,15 @@ export const translations = {
     },
     perStudentNote: { en: "Standard weekly rates shown are per student.", zh: "所示标准周单价为每位学生的价格。" },
     pickerTitle: { en: "Select Your Sundays", zh: "选择上课的周日" },
+    bonusTitle: { en: "Consistency Bonus — all 12 Sundays", zh: "全勤优惠——12个周日" },
+    bonusBody: {
+      en: "Select all 12 Sundays and we will take an extra $30 off when we collect payment.",
+      zh: "选择全部12个周日，收取费用时我们将额外减免 $30。",
+    },
+    bonusEarned: {
+      en: "All 12 Sundays selected — your extra $30 consistency discount will be applied when we collect payment.",
+      zh: "已选择全部12个周日——收取费用时将为您额外减免 $30 全勤优惠。",
+    },
     counter: { en: "{selected} of {total} Sundays selected", zh: "已选择 {selected} / {total} 个周日" },
     hintReduced: {
       en: "Some Sundays in {term} have already passed. Choose at least {minimum} of the remaining Sundays to enroll.",
@@ -552,11 +561,13 @@ enrollReg: {
     },
     subtotal: { en: "Subtotal", zh: "小计" },
     siblingDiscount: { en: "Sibling discount ({n} children)", zh: "多孩优惠（{n}个孩子）" },
+    consistencyRow: { en: "Consistency bonus ({n} child)", zh: "全勤优惠（{n} 名学生）" },
     couponRow: { en: "Coupon ({code})", zh: "优惠码（{code}）" },
     totalDue: { en: "Total due", zh: "应付总额" },
     youSave: { en: "You save {amount}", zh: "共省 {amount}" },
     savePackage: { en: "{amount} package savings", zh: "套餐优惠 {amount}" },
     saveSibling: { en: "{amount} sibling discount", zh: "多孩优惠 {amount}" },
+    saveConsistency: { en: "{amount} consistency bonus", zh: "全勤优惠 {amount}" },
     saveCoupon: { en: "{amount} coupon {code}", zh: "优惠码{code} {amount}" },
     householdNoteOne: {
       en: "All rates are per student. Enroll a second child and the household saves {amount} more.",

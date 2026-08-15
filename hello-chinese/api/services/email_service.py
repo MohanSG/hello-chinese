@@ -224,7 +224,7 @@ def send_sunday_program_email(payload):
          "pricing": {"total": 520}}
       ],
       "standardTuition" (or "householdSubtotal"),
-      "packageSavings", "siblingDiscount",
+      "packageSavings", "siblingDiscount", "consistencyBonus",
       "coupon": {"code","discount"},
       "householdTotal", "householdSavings",
       "payment": {"method": "plan"|"full", "planName",
@@ -329,6 +329,7 @@ def send_sunday_program_email(payload):
     payment = payload.get("payment") or {}
     package_savings = payload.get("packageSavings")
     sibling_discount = payload.get("siblingDiscount")
+    consistency_bonus = payload.get("consistencyBonus")
 
     def _savings_row(label, amount):
         if not amount:
@@ -372,7 +373,7 @@ def send_sunday_program_email(payload):
     if savings_total in (None, ""):
         savings_total = sum(
             float(v or 0)
-            for v in [package_savings, sibling_discount, (coupon or {}).get("discount")]
+            for v in [package_savings, sibling_discount, consistency_bonus, (coupon or {}).get("discount")]
         )
 
     fields = {
@@ -381,6 +382,7 @@ def send_sunday_program_email(payload):
         "{{standardTuition}}": _money(payload.get("standardTuition") or payload.get("householdSubtotal")),
         "{{packageSavingsRow}}": _savings_row("Package Savings", package_savings),
         "{{siblingDiscountRow}}": _savings_row("Sibling Discount", sibling_discount),
+        "{{consistencyBonusRow}}": _savings_row("Consistency Bonus (all 12 Sundays)", consistency_bonus),
         "{{couponRow}}": coupon_row,
         "{{paymentPlanLine}}": plan_line,
         "{{installment_rows}}": installment_rows,
