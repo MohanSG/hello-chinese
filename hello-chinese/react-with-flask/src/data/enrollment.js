@@ -476,6 +476,13 @@ export const PRIVACY_CONSENT_HINT =
 export const COUPONS = {
   WELCOME10: { type: "percent", value: 10, label: "10% off", labelKey: "couponPercent10" },
   FAMILY20: { type: "flat", value: 20, label: "$20 off", labelKey: "couponFlat20" },
+  // Case-by-case family assistance codes. Suffixes are random so a family
+  // given the $30 code cannot guess the $200 one. Rotate each term.
+  HC30TQ: { type: "flat", value: 30, label: "$30 off", labelKey: "couponFlat30" },
+  HC60MV: { type: "flat", value: 60, label: "$60 off", labelKey: "couponFlat60" },
+  HC90RB: { type: "flat", value: 90, label: "$90 off", labelKey: "couponFlat90" },
+  HC100JD: { type: "flat", value: 100, label: "$100 off", labelKey: "couponFlat100" },
+  HC200WS: { type: "flat", value: 200, label: "$200 off", labelKey: "couponFlat200" },
 };
 
 // Returns { code, type, value, label } for a valid code, or null.

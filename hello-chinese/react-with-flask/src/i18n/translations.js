@@ -555,6 +555,11 @@ enrollReg: {
     couponRemove: { en: "Remove", zh: "取消" },
     couponPercent10: { en: "10% off", zh: "9折优惠" },
     couponFlat20: { en: "$20 off", zh: "减20美元" },
+    couponFlat30: { en: "$30 off", zh: "减30美元" },
+    couponFlat60: { en: "$60 off", zh: "减60美元" },
+    couponFlat90: { en: "$90 off", zh: "减90美元" },
+    couponFlat100: { en: "$100 off", zh: "减100美元" },
+    couponFlat200: { en: "$200 off", zh: "减200美元" },
     couponInvalid: {
       en: "That code isn't valid. Check the spelling and try again.",
       zh: "该优惠码无效，请检查后重新输入。",
