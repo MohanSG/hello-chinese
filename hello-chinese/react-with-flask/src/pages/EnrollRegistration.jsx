@@ -9,11 +9,9 @@ import {
   couponDiscount,
   paymentSchedule,
   priceQuote,
+  extraBonusFor,
 } from "../data/enrollment";
 
-// All Sundays in the term earns an extra credit at payment time.
-const CONSISTENCY_SESSIONS = 12;
-const CONSISTENCY_BONUS = 30;
 import {
   readDraft,
   writeDraft,
@@ -135,12 +133,10 @@ export default function EnrollRegistration({ onSubmit }) {
     0,
   );
   const sibling = siblingDiscountFor(enrollments.length);
-  // Extra credit for families who commit to every Sunday in the term.
-  const consistencyOf = (e) =>
-    (e.dates || []).length >= CONSISTENCY_SESSIONS ? CONSISTENCY_BONUS : 0;
-  const consistencyCount = enrollments.filter((e) => consistencyOf(e) > 0).length;
-  // Flat credit per household, however many children pick every Sunday.
-  const consistency = consistencyCount > 0 ? CONSISTENCY_BONUS : 0;
+  // Extra Bonus: $30 per child on the Most Popular package with all 12 sessions.
+  const bonusOf = (e) => extraBonusFor(e.levelKey, e.planId, (e.dates || []).length);
+  const consistencyCount = enrollments.filter((e) => bonusOf(e) > 0).length;
+  const consistency = enrollments.reduce((sum, e) => sum + bonusOf(e), 0);
   const discount = couponDiscount(
     coupon,
     householdSubtotal - sibling - consistency,

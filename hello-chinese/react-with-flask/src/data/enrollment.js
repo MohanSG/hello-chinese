@@ -89,6 +89,23 @@ export function plansInOrder() {
   return Object.values(PLANS).sort((a, b) => a.order - b.order);
 }
 
+// Extra Bonus: only the Most Popular package (display Plan 1 = internal id 5)
+// under Step-In and Step-Up, and only when all 12 sessions are selected.
+// $30 per qualifying child, so two siblings on that package earn $60.
+export const BONUS_PLAN_ID = 5;
+export const BONUS_LEVELS = ["step-in", "step-up"];
+export const BONUS_SESSIONS = 12;
+export const BONUS_AMOUNT = 30;
+
+export function isBonusPlan(levelKey, planId) {
+  return Number(planId) === BONUS_PLAN_ID && BONUS_LEVELS.includes(levelKey);
+}
+
+export function extraBonusFor(levelKey, planId, sessionCount) {
+  if (!isBonusPlan(levelKey, planId)) return 0;
+  return (Number(sessionCount) || 0) >= BONUS_SESSIONS ? BONUS_AMOUNT : 0;
+}
+
 // The number shown next to a plan's name.
 export function planNumber(planId) {
   const plan = PLANS[planId];

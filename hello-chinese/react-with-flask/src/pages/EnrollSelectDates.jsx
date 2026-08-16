@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
-  LEVELS, PLANS, TERMS, MIN_SESSION_DATES, minimumDatesFor, planConflictInfo, planTitle, priceQuote, scheduleFor,
+  LEVELS, PLANS, TERMS, MIN_SESSION_DATES, BONUS_SESSIONS, isBonusPlan, minimumDatesFor, planConflictInfo, planTitle, priceQuote, scheduleFor,
   sundaysByMonth, eligibleSundays, validateDateSelectionInfo, formatDateShort,
 } from "../data/enrollment";
 import { readDraft, saveEnrollment, nextOpenIndex, money } from "../data/enrollmentDraft";
@@ -177,15 +177,19 @@ export default function EnrollSelectDates() {
               </button>
             </div>
 
-            <aside className={`bonus${selected.length >= 12 ? " bonus--on" : ""}`}>
+            {isBonusPlan(levelKey, planId) && (
+            <aside className={`bonus${selected.length >= BONUS_SESSIONS ? " bonus--on" : ""}`}>
               <span className="bonus__icon" aria-hidden="true">★</span>
               <div>
                 <h3 className="bonus__title">{t("enrollDates.bonusTitle")}</h3>
                 <p className="bonus__body">
-                  {selected.length >= 12 ? t("enrollDates.bonusEarned") : t("enrollDates.bonusBody")}
+                  {selected.length >= BONUS_SESSIONS
+                    ? t("enrollDates.bonusEarned")
+                    : t("enrollDates.bonusBody")}
                 </p>
               </div>
             </aside>
+            )}
 
             {months.map((group) => (
               <div className="picker__month" key={group.month}>
