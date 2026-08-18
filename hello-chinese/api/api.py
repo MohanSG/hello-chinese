@@ -1,8 +1,6 @@
 from flask import Flask, request, Response, jsonify
-from flask_mail import Mail
 from flask_cors import CORS
 from dotenv import load_dotenv
-from extensions import mail
 from services.email_service import (
     send_saturday_interest_email,
     send_free_trial_email,
@@ -22,13 +20,6 @@ if FRONTEND_URL:
 
 app = Flask(__name__)
 CORS(app, origins=allowed_origins, supports_credentials=True)
-
-app.config["MAIL_SERVER"] = "smtp.gmail.com"
-app.config["MAIL_PORT"] = 587
-app.config["MAIL_USERNAME"] = os.getenv("EMAIL_USER")
-app.config["MAIL_PASSWORD"] = os.getenv("EMAIL_APP_PASSWORD")
-app.config["MAIL_USE_TLS"] = True
-app.config["MAIL_USE_SSL"] = False
 
 mail = Mail(app)
 
