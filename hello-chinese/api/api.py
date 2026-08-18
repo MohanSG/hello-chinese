@@ -7,6 +7,12 @@ from services.email_service import (
     send_private_lessons_email,
     send_sunday_program_email,
 )
+from services.sheets_service import (
+    append_sunday_registration,
+    append_saturday_interest,
+    append_private_lessons,
+    append_free_trial,
+)
 import os
 
 load_dotenv()
@@ -37,6 +43,11 @@ def send_trial_email():
         app.logger.exception("Free trial email failed")
         return jsonify({"error": "Could not send confirmation email"}), 500
 
+    try:
+        append_free_trial(data)
+    except Exception:
+        app.logger.exception("Free trial sheet append failed")
+
     return jsonify({"message": "OK"}), 200
 
 
@@ -55,6 +66,11 @@ def send_private_lesson_email():
     except Exception:
         app.logger.exception("Private Lessons email failed")
         return jsonify({"error": "Could not send confirmation email"}), 500
+
+    try:
+        append_private_lessons(data)
+    except Exception:
+        app.logger.exception("Private Lessons sheets append failed")
 
     return jsonify({"message": "OK"}), 200
 
@@ -75,6 +91,11 @@ def saturday_interest_email():
     except Exception:
         app.logger.exception("Saturday Interest email failed")
         return jsonify({"error" : "Could not send confirmation email"}), 500
+
+    try:
+        append_saturday_interest(data)
+    except Exception:
+        app.logger.exception("Saturday Interest List sheet append failed")
     
     return jsonify({"message": "OK"}), 200
 
@@ -95,6 +116,11 @@ def sunday_registration_email():
     except Exception:
         app.logger.exception("Sunday Registration email failed")
         return jsonify({"error" : "Could not send confirmation email"}), 500
+
+    try:
+        append_sunday_registration(data)
+    except Exception:
+        app.logger.exception("Sunday Registration sheet append failed")
 
     return jsonify({"message": "OK"}), 200
 
