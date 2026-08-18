@@ -21,31 +21,6 @@ if FRONTEND_URL:
 app = Flask(__name__)
 CORS(app, origins=allowed_origins, supports_credentials=True)
 
-mail = Mail(app)
-
-app.logger.info(
-    "Mail config: server=%s port=%s username_set=%s password_set=%s",
-    app.config["MAIL_SERVER"],
-    app.config["MAIL_PORT"],
-    bool(app.config["MAIL_USERNAME"]),
-    bool(app.config["MAIL_PASSWORD"]),
-)
-
-# @app.route("/send-test-email", methods=['POST'])
-# def send_test_email():
-#     data = request.get_json();
-#     payload = data.get('msg')
-
-#     print(payload)
-
-#     if not payload:
-#         return jsonify({'error' : 'payload is requred'}), 400
-
-#     send_email(payload)
-
-#     return jsonify({'message' : 'Email Sent'}), 200
-
-
 @app.route("/trial-email", methods=["POST"])
 def send_trial_email():
     data = request.get_json(silent=True)
